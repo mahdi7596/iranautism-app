@@ -6,8 +6,8 @@ Status: Documented for upcoming scope; planned after Pump unless priority change
 
 Source files:
 
-- `debit-peyman/Payman-Services-V1.6.2-1404_10_10.pdf`
-- `debit-peyman/سقف تراکنش های بانک ها تعدادی و مبلغی _موسسه اتیسم ایران.xlsx`
+- `docs/source/client/debit-peyman/Payman-Services-V1.6.2-1404_10_10.pdf`
+- `docs/source/client/debit-peyman/سقف تراکنش های بانک ها تعدادی و مبلغی _موسسه اتیسم ایران.xlsx`
 
 ## Purpose
 

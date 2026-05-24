@@ -6,9 +6,9 @@ Status: In progress for documentation; planned as the first feature to implement
 
 Source files:
 
-- `pump/API Documentation V2.pdf`
-- `pump/V1.xlsx`
-- `pump/pumpLink`
+- `docs/source/client/pump/API Documentation V2.pdf`
+- `docs/source/client/pump/V1.xlsx`
+- `docs/source/client/pump/pumpLink`
 
 ## Purpose
 
@@ -85,7 +85,7 @@ The Iran Autism mission landing page should require or strongly guide mobile OTP
 
 ## Missions From Client Spreadsheet
 
-The client-provided `pump/V1.xlsx` currently lists these mission candidates:
+The client-provided `docs/source/client/pump/V1.xlsx` currently lists these mission candidates:
 
 | Mission title | Medal title | Medal text | Known reward/limit details |
 |---|---|---|---|
@@ -224,4 +224,3 @@ Exact route names should be finalized during implementation planning.
 - What are Pump's production and staging server IPs?
 - What is the campaign start date for each mission?
 - Should the 200,000 toman threshold be stored as 2,000,000 IRR, and is that threshold only for the general donation mission?
-

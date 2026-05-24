@@ -9,8 +9,8 @@ meta:
   owners: ["Design", "Engineering"]
   lastReviewed: "2026-05-24"
   sources:
-    brandAssets: "design/logos, design/banners, design/fonts"
-    brandbook: "design/041203 Brandbook Hoviat basari H.Hobbi.pdf"
+    brandAssets: "docs/source/client/design/logos, docs/source/client/design/banners, docs/source/client/design/fonts"
+    brandbook: "docs/source/client/design/041203 Brandbook Hoviat basari H.Hobbi.pdf"
     brandbookExtraction: "pending visual/text verification"
     accessibilityTarget: "WCAG 2.2 AA"
   implementation:
@@ -261,7 +261,7 @@ This file is the source of truth for future UI work. Future CSS, React component
 
 ## Colors
 
-Use semantic roles instead of one-off colors. The provisional brand palette is derived from the supplied logo and campaign assets; exact brandbook values still need verification from `/design/041203 Brandbook Hoviat basari H.Hobbi.pdf`.
+Use semantic roles instead of one-off colors. The provisional brand palette is derived from the supplied logo and campaign assets; exact brandbook values still need verification from `/docs/source/client/design/041203 Brandbook Hoviat basari H.Hobbi.pdf`.
 
 Purple is the brand identity color. Use it for headers, navigation current states, progress identity, section anchors, trusted badges, and selected states.
 

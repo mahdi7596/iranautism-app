@@ -16,6 +16,9 @@ This file is the root coordination document for the Iran Autism platform workspa
 
 - `docs/source/client/given-powerpoint-by-client.pptx`
 - `docs/source/client/iran-autism-developer-proposal-fa.pdf`
+- `docs/source/client/design/`
+- `docs/source/client/pump/`
+- `docs/source/client/debit-peyman/`
 
 ## Current Understanding Artifacts
 
