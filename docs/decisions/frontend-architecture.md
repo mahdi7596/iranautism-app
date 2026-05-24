@@ -118,6 +118,20 @@ The accepted v1 decision is to keep admin inside `apps/web` as a separate route 
 
 The admin route group is only a UI boundary. Backend security must still be enforced by the NestJS API through admin authentication, RBAC, permission checks, and audit logs.
 
+## Message Language Rule
+
+All user-facing frontend messages must be Persian by default.
+
+This includes:
+
+- form labels, helper text, validation errors, and success messages;
+- toast/snackbar messages;
+- loading, empty, error, and confirmation states;
+- payment, donation, authentication, and Pump mission flow copy;
+- admin-facing interface messages unless a future multilingual admin requirement is explicitly confirmed.
+
+English is allowed only for internal code identifiers, route names, API field names, developer-only diagnostics, or external provider constants that must remain unchanged.
+
 ## Component-Driven Architecture
 
 Use layered component ownership:

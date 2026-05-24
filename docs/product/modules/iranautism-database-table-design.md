@@ -26,7 +26,8 @@ Rules:
 
 - Mobile is the identity anchor.
 - Normalize before storing.
-- The first Pump donation flow may create or log in a user with OTP before payment.
+- The first Pump donation flow may create or log in a user with OTP before payment, but this is not mandatory for every Pump user.
+- A Pump mission can also be completed through a mobile-only path when a normalized mobile number is captured and stored on the donation.
 - The table must not be treated as required for every donation, because guest donation remains supported at the schema level.
 
 Enum candidates:
@@ -61,6 +62,8 @@ Rules:
 - `user_id` is nullable.
 - Registered donation: `user_id` is set and `donor_kind` is registered.
 - Guest donation: `user_id` is null and `donor_kind` is guest.
+- Pump mobile-only donation: `user_id` is null, `donor_kind` is guest, and `mobile_snapshot` stores the normalized mobile used for Pump verification.
+- Pump registered donation: `user_id` is set, `donor_kind` is registered, and `mobile_snapshot` still stores the normalized mobile used for Pump verification.
 - A logged-in donor can still choose public anonymity through `public_visibility`.
 - Donation status changes to confirmed only after verified payment success.
 - `public_visibility` controls public display only. It does not remove internal donation, payment, support, legal/financial, fraud-prevention, or account-matching records.
@@ -85,6 +88,7 @@ Example rows:
 | Logged-in donor appears anonymous | `user_123` | registered | anonymous | general |
 | Guest donor pays without account | null | guest | anonymous | campaign |
 | Pump donation after OTP-created account | `user_456` | registered | anonymous | campaign |
+| Pump mobile-only donation with captured mobile | null | guest | anonymous | campaign |
 
 ## PAYMENT_TRANSACTIONS
 
@@ -116,6 +120,7 @@ Rules:
 - A donation can have multiple transactions because payment may fail, be retried, or require later verification.
 - Each payment transaction represents one gateway payment attempt.
 - Donation status changes to confirmed only after server-side payment verification succeeds.
+- Current payment provider focus is Sadad Bank gateway. Sadad merchant, terminal, username, and terminal key values must be configured through environment variables and must not be stored in repository docs or source files.
 - Gateway callbacks and verification calls must be idempotent.
 - Repeated callbacks for the same provider reference must not confirm the donation twice.
 - Repeated callbacks must not create duplicate Pump completions, duplicate receipts, or duplicate financial records.
@@ -189,9 +194,9 @@ Rules:
 Example Pump flow:
 
 1. User enters mobile on Iran Autism after coming from Pump.
-2. Frontend may OTP-register/login the user.
+2. Frontend may OTP-register/login the user, or the user may continue through a mobile-only path if the product flow allows it.
 3. User donates to the Pump campaign target.
-4. Payment transaction succeeds and is verified.
+4. Sadad payment transaction succeeds and is verified server-to-server.
 5. Donation becomes confirmed.
 6. Partner mission completion is created or updated using mission and mobile.
 7. Pump verification API returns the required count or status for that mobile.

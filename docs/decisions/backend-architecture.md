@@ -129,6 +129,21 @@ Do not build recurring payments or international donations in MVP unless explici
 
 ## Authentication and Authorization Strategy
 
+## Message Language Rule
+
+All user-facing backend messages must be Persian by default.
+
+This includes:
+
+- API error messages returned to clients.
+- API success messages intended for display.
+- validation messages exposed to frontend users.
+- authentication, OTP, payment, donation, and Pump mission flow messages.
+
+English is allowed only for internal code identifiers, protocol fields, third-party provider constants, developer/operator logs, and values that must match external API contracts.
+
+Backend responses should keep machine-readable fields stable while returning Persian human-readable messages where a human message is needed.
+
 Public users:
 
 - Mobile OTP login/register.

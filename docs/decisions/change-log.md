@@ -4,6 +4,20 @@ Use this file to record confirmed decisions, scope changes, module status change
 
 ## 2026-05-24
 
+### Backend Scope Narrowed To Auth, Pump, And Sadad
+
+- Current active backend implementation focus is narrowed to mobile auth/register/login, Pump mission donations, and Sadad payment verification.
+- Pump mission donations must support both registered OTP users and mobile-only users where `DONATIONS.user_id` remains null but `mobile_snapshot` is captured for Pump verification.
+- Decision: Pump mission completion for donation missions must come from verified Sadad payment success, not from a partner-driven confirmation request.
+- Decision: Sadad merchant, terminal, username, and key values must be configured through environment variables only and must not be committed or copied into durable docs.
+- Added OpenSpec change `implement-auth-pump-sadad-backend` to capture proposal, design, specs, and implementation tasks for the narrowed backend path.
+
+### Persian User-Facing Message Rule Accepted
+
+- Decision: all user-facing backend and frontend messages must be Persian by default.
+- Applies to API error/success messages, validation text, auth/OTP/payment/donation/Pump messages, frontend forms, toasts, loading states, empty states, and confirmation states.
+- English remains acceptable only for internal code identifiers, protocol fields, third-party provider constants, developer/operator logs, and values that must match external API contracts.
+
 ### User Table Decision Simplified Before First Prisma Slice Commit
 
 - Removed the earlier broad user/admin/auth/log decision draft because it was broader than the currently agreed database implementation slice.

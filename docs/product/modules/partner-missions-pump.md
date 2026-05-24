@@ -71,6 +71,22 @@ If not completed:
 
 Exact field names should be confirmed with Pump before implementation. Internally, Iran Autism should model the result as either `count-based` or `status-based` so the API adapter can adjust field names without changing domain logic.
 
+## Current Implementation Focus
+
+The current active implementation focus is Pump mission donations plus mobile auth plus Sadad payments.
+
+Out of scope for the current backend focus:
+
+- CMS
+- admin panel
+- broad reporting
+- media/storage
+- project and phase management
+- Peyman recurring donations
+- frontend implementation
+
+Sadad payment credentials must be configured through environment variables only. Real merchant, terminal, username, or key values must not be committed to the repository or copied into durable documentation.
+
 ## User Identification
 
 Use mobile-based identification as the preferred method.
@@ -81,7 +97,21 @@ Reason:
 - It works even if a user performs the action through their normal Iran Autism account path instead of only through the Pump landing link.
 - It reduces support tickets caused by users completing the mission outside the original tracked URL.
 
-The Iran Autism mission landing page should require or strongly guide mobile OTP login before mission completion, so mission verification can be tied to a normalized mobile number.
+The backend must support two mission-completion identity paths:
+
+1. Registered/authenticated path:
+   - user completes mobile OTP login/register;
+   - donation stores `user_id`;
+   - donation also stores `mobile_snapshot`;
+   - Pump verification still uses normalized mobile.
+
+2. Mobile-only path:
+   - user provides a normalized mobile number without creating/logging into an account;
+   - donation keeps `user_id` null;
+   - donation stores `mobile_snapshot`;
+   - Pump verification uses normalized mobile and can still return count/status.
+
+The Iran Autism mission landing page may encourage OTP login because it improves donation history and future user dashboard support, but OTP registration must not be treated as the only valid Pump mission path unless the product owner later confirms that stricter rule.
 
 ## Missions From Client Spreadsheet
 
@@ -140,6 +170,7 @@ For repeatable missions:
 - The count should not be reset.
 - If a repeat cap exists, it should be enforced by mission configuration.
 - The API should return the current qualifying count.
+- Count increases only after the related mission action is verified. For donation missions, this means verified payment success, not merely starting checkout.
 
 ## One-Time Mission Flagging
 
@@ -187,6 +218,8 @@ This feature depends on:
 - Audit Log: manual support/admin actions.
 - Settings: Pump API key, IP allowlist, campaign configuration.
 
+For the current narrowed backend focus, Auth, Users, Donations, Payments/Transactions, and Partner Missions are active. Admin, reports, audit UI, CMS, media, and settings UI remain later backend/frontend work unless separately confirmed.
+
 ## Initial Backend Shape
 
 Recommended module name: `PartnerMissionsModule`.
@@ -211,6 +244,12 @@ Initial endpoint family:
 - `/api/admin/partner-missions/*` for mission configuration and support views.
 
 Exact route names should be finalized during implementation planning.
+
+Payment-confirmation rule:
+
+- Pump verification endpoints may read and return mission completion state.
+- Pump partner endpoints must not be the source of truth for donation/payment completion.
+- For Sadad-backed donation missions, Sadad server-side verification confirms the payment, then the backend confirms the donation and records the Pump mission completion.
 
 ## Open Questions
 

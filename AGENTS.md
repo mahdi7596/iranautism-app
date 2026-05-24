@@ -62,6 +62,13 @@ The product is a custom Iran Autism platform combining:
 
 The platform should be treated as a serious custom system, not a template website.
 
+Current active implementation focus:
+
+- Finish backend first for mobile auth/register/login, Pump mission donations, and Sadad payment verification.
+- Pump mission donations must support both OTP-registered users and mobile-only users identified by normalized mobile.
+- Broader CMS, admin, media, reports, project/phase, Peyman, and frontend work remains outside the immediate backend focus unless separately confirmed.
+- All user-facing messages must be Persian by default across backend and frontend, including API error/success messages, validation text, form messages, toasts, empty states, and loading states.
+
 ## Current Backend Direction
 
 The accepted backend baseline is documented in `docs/decisions/backend-architecture.md`.
@@ -155,6 +162,8 @@ The authoritative module list is maintained in `docs/product/module-registry.md`
 | 2026-05-24 | Payment transaction design tightened to the minimum secure v1 shape: idempotent gateway attempts with amount/currency snapshots, gateway references, correlation IDs, lifecycle timestamps, and safe provider summaries. |
 | 2026-05-24 | Donation identity wording clarified: registered donation, guest donation, and public anonymity are separate concepts; all database-level monetary amounts should be stored as integer IRR and displayed as toman in UI where appropriate. |
 | 2026-05-24 | User table decision simplified before the first Prisma slice commit: `USERS.mobile` replaces `USERS.normalized_mobile`, and the first Prisma schema now starts only with the agreed `USERS` table. |
+| 2026-05-24 | Backend implementation focus narrowed to mobile auth/register/login, Pump mission donations, and Sadad payment verification; Pump must support both registered and mobile-only mission completion paths. |
+| 2026-05-24 | Project message-language rule accepted: all user-facing backend and frontend messages must be Persian by default. |
 
 ## Working Rules Going Forward
 
@@ -165,6 +174,7 @@ The authoritative module list is maintained in `docs/product/module-registry.md`
 - Before implementing a backend module, check `docs/decisions/backend-architecture.md` and create/update a dedicated module note under `docs/product/modules/` when work begins.
 - Before implementing users beyond the agreed `USERS` table, admins, authentication, authorization, sessions, OTP, audit logs, activity logs, or auth security events, create or update a focused decision document first.
 - Before implementing frontend UI, check `docs/decisions/frontend-architecture.md`; create or update project-root `DESIGN.md` before serious UI implementation begins.
+- All user-facing backend/frontend messages must be Persian by default. Use English only for internal code identifiers, logs intended only for developers/operators, protocol field names, or third-party provider constants.
 - Before changing repo structure, workspace tooling, or admin app placement, check `docs/decisions/repository-architecture.md`.
 - Before deciding durable module, data ownership, API, state, CMS, security, operations, or testing rules, check `docs/architecture-rules/deep-dive-agenda.md` and convert the relevant topic into a focused decision document.
 - Mark unclear items as `Needs confirmation` until the client or project owner confirms them.
