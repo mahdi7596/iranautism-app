@@ -102,7 +102,7 @@ chore(web): scaffold Next.js app router shell
 
 ### Step 4: Add local database and service foundation
 
-Status: In progress
+Status: Completed on 2026-05-24
 
 Goal:
 
@@ -129,7 +129,7 @@ chore(db): add local database and prisma foundation
 
 ### Step 5: Add first user database slice
 
-Status: In progress
+Status: Completed on 2026-05-24
 
 Goal:
 
@@ -143,11 +143,39 @@ Expected result:
 Progress:
 
 - 2026-05-24: Removed the broader identity/security schema draft from the current implementation slice. Step 5 now contains only the agreed `USERS` table shape: `id`, `mobile`, `first_name`, `last_name`, `status`, `last_login_at`, `last_login_ip_address`, `created_at`, and `updated_at`.
+- 2026-05-24: Committed the simplified users-only Prisma schema in `feat(db): add initial users prisma schema`.
 
 Suggested commit message:
 
 ```txt
 feat(db): add initial users schema
+```
+
+### Step 6: Add remaining first database slice tables
+
+Status: Completed on 2026-05-24
+
+Goal:
+
+Add the rest of the already documented first database slice to Prisma without expanding into auth, admin, OTP, Peyman, CMS, media, or project tables.
+
+Expected result:
+
+- Prisma includes `Donation`, `PaymentTransaction`, `PartnerMission`, and `PartnerMissionCompletion`.
+- The schema preserves nullable user ownership for guest donations.
+- Payment transaction fields support idempotent gateway attempts and reconciliation.
+- Partner mission completions can be counted by `mission_id + mobile_snapshot`.
+- No API routes, frontend flows, auth logic, seed data, or provider integrations are implemented in this step.
+
+Progress:
+
+- 2026-05-24: Started Step 6 by adding Prisma models, enums, relations, indexes, and a SQL migration for donations, payment transactions, partner missions, and partner mission completions.
+- 2026-05-24: Verified Step 6 with Prisma format, schema validation, client generation, API tests, API typecheck, and full workspace build.
+
+Suggested commit message:
+
+```txt
+feat(db): add donation payment and partner mission schema
 ```
 
 ## Completed Work
@@ -159,4 +187,4 @@ feat(db): add initial users schema
 
 ## Current Next Action
 
-Review the simplified Step 5 user schema and resolve the Prisma `migrate dev` schema-engine issue before committing or moving to auth/API implementation.
+Decide whether the next focused step should be Prisma migration workflow stabilization or the first NestJS database integration layer.

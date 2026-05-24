@@ -17,13 +17,159 @@ model User {
   createdAt          DateTime   @default(now()) @map("created_at")
   updatedAt          DateTime   @updatedAt @map("updated_at")
 
+  donations                 Donation[]
+  partnerMissionCompletions PartnerMissionCompletion[]
+
   @@index([status])
   @@index([createdAt])
   @@map("users")
+}
+
+model Donation {
+  id                  String                   @id @default(uuid()) @db.Uuid
+  userId              String?                  @map("user_id") @db.Uuid
+  donorKind           DonationDonorKind        @map("donor_kind")
+  donorDisplayName    String?                  @map("donor_display_name") @db.VarChar(160)
+  mobileSnapshot      String?                  @map("mobile_snapshot") @db.VarChar(20)
+  publicVisibility    DonationPublicVisibility @default(ANONYMOUS) @map("public_visibility")
+  targetType          DonationTargetType       @default(GENERAL) @map("target_type")
+  targetId            String?                  @map("target_id") @db.Uuid
+  targetLabelSnapshot String?                  @map("target_label_snapshot") @db.VarChar(200)
+  status              DonationStatus           @default(PENDING)
+  amount              BigInt                   @db.BigInt
+  currency            String                   @default("IRR") @db.VarChar(3)
+  confirmedAt         DateTime?                @map("confirmed_at")
+  createdAt           DateTime                 @default(now()) @map("created_at")
+
+  user                      User?                      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  paymentTransactions       PaymentTransaction[]
+  partnerMissionCompletions PartnerMissionCompletion[]
+
+  @@index([userId])
+  @@index([donorKind])
+  @@index([status])
+  @@index([targetType, targetId])
+  @@index([createdAt])
+  @@map("donations")
+}
+
+model PaymentTransaction {
+  id                      String                   @id @default(uuid()) @db.Uuid
+  donationId              String                   @map("donation_id") @db.Uuid
+  gateway                 String                   @db.VarChar(80)
+  status                  PaymentTransactionStatus @default(PENDING)
+  amount                  BigInt                   @db.BigInt
+  currency                String                   @default("IRR") @db.VarChar(3)
+  providerAuthority       String?                  @map("provider_authority") @db.VarChar(160)
+  providerReference       String?                  @map("provider_reference") @db.VarChar(160)
+  idempotencyKey          String?                  @unique @map("idempotency_key") @db.VarChar(160)
+  correlationId           String?                  @map("correlation_id") @db.VarChar(160)
+  callbackReceivedAt      DateTime?                @map("callback_received_at")
+  verifiedAt              DateTime?                @map("verified_at")
+  failedAt                DateTime?                @map("failed_at")
+  failureCode             String?                  @map("failure_code") @db.VarChar(120)
+  providerResponseSummary Json?                    @map("provider_response_summary")
+  createdAt               DateTime                 @default(now()) @map("created_at")
+  updatedAt               DateTime                 @updatedAt @map("updated_at")
+
+  donation Donation @relation(fields: [donationId], references: [id], onDelete: Restrict)
+
+  @@unique([gateway, providerAuthority])
+  @@unique([gateway, providerReference])
+  @@index([donationId])
+  @@index([status])
+  @@index([gateway])
+  @@index([correlationId])
+  @@index([createdAt])
+  @@map("payment_transactions")
+}
+
+model PartnerMission {
+  id               String                   @id @default(uuid()) @db.Uuid
+  partner          String                   @db.VarChar(80)
+  missionKey       String                   @map("mission_key") @db.VarChar(120)
+  resultType       PartnerMissionResultType @map("result_type")
+  campaignStartsAt DateTime                 @map("campaign_starts_at")
+
+  completions PartnerMissionCompletion[]
+
+  @@unique([partner, missionKey])
+  @@index([partner])
+  @@index([resultType])
+  @@map("partner_missions")
+}
+
+model PartnerMissionCompletion {
+  id                   String    @id @default(uuid()) @db.Uuid
+  missionId            String    @map("mission_id") @db.Uuid
+  userId               String?   @map("user_id") @db.Uuid
+  qualifyingDonationId String?   @map("qualifying_donation_id") @db.Uuid
+  mobileSnapshot       String    @map("mobile_snapshot") @db.VarChar(20)
+  completionCount      Int       @default(0) @map("completion_count")
+  completed            Boolean   @default(false)
+  lastQualifiedAt      DateTime? @map("last_qualified_at")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+
+  mission            PartnerMission @relation(fields: [missionId], references: [id], onDelete: Restrict)
+  user               User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+  qualifyingDonation Donation?      @relation(fields: [qualifyingDonationId], references: [id], onDelete: SetNull)
+
+  @@unique([missionId, mobileSnapshot])
+  @@index([userId])
+  @@index([qualifyingDonationId])
+  @@index([lastQualifiedAt])
+  @@map("partner_mission_completions")
 }
 
 enum UserStatus {
   ACTIVE
   BLOCKED
   DISABLED
+}
+
+enum DonationDonorKind {
+  REGISTERED
+  GUEST
+}
+
+enum DonationPublicVisibility {
+  ANONYMOUS
+  DISPLAY_NAME
+  INITIALS
+  HIDDEN
+}
+
+enum DonationTargetType {
+  GENERAL
+  PROJECT
+  PHASE
+  ITEM
+  CAMPAIGN
+}
+
+enum DonationStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+  CANCELLED
+  EXPIRED
+  REFUNDED
+}
+
+enum PaymentTransactionStatus {
+  PENDING
+  REDIRECTED
+  VERIFICATION_PENDING
+  SUCCESSFUL
+  FAILED
+  CANCELLED
+  MISMATCH
+  EXPIRED
+  REFUNDED
+}
+
+enum PartnerMissionResultType {
+  COUNT_BASED
+  STATUS_BASED
 }
