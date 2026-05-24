@@ -2,6 +2,10 @@
 design/
 debit-peyman/
 pump/
+.env
+.env.*
+!.env.example
+!apps/*/.env.example
 node_modules/
 dist/
 .next/

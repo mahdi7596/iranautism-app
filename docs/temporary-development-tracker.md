@@ -102,7 +102,7 @@ chore(web): scaffold Next.js app router shell
 
 ### Step 4: Add local database and service foundation
 
-Status: Not started
+Status: In progress
 
 Goal:
 
@@ -113,6 +113,10 @@ Expected result:
 - Local database and Redis service can run.
 - Prisma is configured for the API app.
 - No full domain schema is implemented unless separately confirmed.
+
+Progress:
+
+- 2026-05-24: Started Step 4 by adding local PostgreSQL/Redis Compose service definitions and environment examples. Prisma setup and service smoke checks remain pending.
 
 Suggested commit message:
 
@@ -148,4 +152,4 @@ feat(auth): add initial identity and admin security schema
 
 ## Current Next Action
 
-Review Step 3 changes. If accepted, the next confirmed implementation step is Step 4: add the local database and service foundation.
+Continue Step 4 with the next small substep: add Prisma foundation without implementing business domain schema.
