@@ -62,7 +62,7 @@ chore(repo): bootstrap pnpm monorepo skeleton
 
 ### Step 2: Scaffold API application shell
 
-Status: Not started
+Status: Completed on 2026-05-24
 
 Goal:
 
@@ -143,7 +143,8 @@ feat(auth): add initial identity and admin security schema
 
 - 2026-05-24: Completed Step 1 by adding the pnpm workspace skeleton, root package manifest, app package manifests, and shared package manifests. No framework, database, UI, or feature implementation was added.
 - 2026-05-24: Cleaned root-level source assets by moving `pump/`, `debit-peyman/`, and `design/` into `docs/source/client/`, then updated references. Kept `docs/`, `openspec/`, and `.codex/` at the root because they are active project memory/tooling paths.
+- 2026-05-24: Completed Step 2 by adding a minimal NestJS API application shell, TypeScript config, a `/health` endpoint, an e2e smoke test, and the planned modular monolith source folders. No business domain implementation was added.
 
 ## Current Next Action
 
-Review Step 1 changes. If accepted, the next confirmed implementation step is Step 2: scaffold the NestJS API application shell.
+Review Step 2 changes. If accepted, the next confirmed implementation step is Step 3: scaffold the Next.js App Router web application shell.
