@@ -8,7 +8,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-iranautism}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me-local-only}
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "${POSTGRES_PORT:-55434}:5432"
     volumes:
       - iranautism-postgres-data:/var/lib/postgresql/data
     healthcheck:
@@ -23,7 +23,7 @@ services:
     restart: unless-stopped
     command: ["redis-server", "--appendonly", "yes"]
     ports:
-      - "${REDIS_PORT:-6379}:6379"
+      - "${REDIS_PORT:-6384}:6379"
     volumes:
       - iranautism-redis-data:/data
     healthcheck:
