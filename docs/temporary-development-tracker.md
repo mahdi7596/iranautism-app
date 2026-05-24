@@ -210,7 +210,7 @@ chore(db): stabilize prisma migration workflow
 
 ### Step 8: Add NestJS Prisma integration layer
 
-Status: Not started
+Status: Completed on 2026-05-24
 
 Goal:
 
@@ -222,6 +222,14 @@ Expected result:
 - App startup and shutdown handle Prisma connection lifecycle cleanly.
 - Tests can import the database module safely.
 - No user, donation, payment, Pump, auth, admin, or frontend business flows are implemented in this step.
+
+Progress:
+
+- 2026-05-24: Added a global `PrismaModule` and shared `PrismaService` under `apps/api/src/infrastructure/prisma`.
+- 2026-05-24: Configured `PrismaService` for Prisma 7 using the official PostgreSQL driver adapter.
+- 2026-05-24: Wired `PrismaModule` into `AppModule` so future API modules have one shared database access path.
+- 2026-05-24: Added a focused test proving `AppModule` provides the shared Prisma service, while keeping the health smoke test independent from a live database connection.
+- 2026-05-24: Verified Step 8 with API tests, API typecheck, Prisma validation/client generation, and full workspace build.
 
 Suggested commit message:
 
@@ -278,4 +286,4 @@ feat(pump): add initial donation mission backend flow
 
 ## Current Next Action
 
-Review and confirm Step 8 before implementation.
+Review and confirm Step 9 before implementation.

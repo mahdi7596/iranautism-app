@@ -3,11 +3,15 @@ import { test } from "node:test";
 import request from "supertest";
 
 import { AppModule } from "../src/app.module";
+import { PrismaService } from "../src/infrastructure/prisma/prisma.service";
 
 test("GET /health returns API health status", async () => {
   const testingModule = await Test.createTestingModule({
     imports: [AppModule],
-  }).compile();
+  })
+    .overrideProvider(PrismaService)
+    .useValue({})
+    .compile();
 
   const app = testingModule.createNestApplication();
   await app.init();
