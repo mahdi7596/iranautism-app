@@ -239,7 +239,7 @@ chore(api): add prisma integration layer
 
 ### Step 9: Add backend domain module boundaries
 
-Status: Not started
+Status: Completed on 2026-05-24
 
 Goal:
 
@@ -250,6 +250,13 @@ Expected result:
 - Minimal module folders/classes exist for users, donations, payments, and partner missions.
 - Modules are wired enough to compile, but contain no public product endpoints unless separately confirmed.
 - The API source tree starts matching the documented modular monolith direction.
+
+Progress:
+
+- 2026-05-24: Added minimal NestJS module classes for users, donations, payments, and partner missions.
+- 2026-05-24: Wired the initial domain modules into `AppModule` without adding controllers, providers, routes, or business logic.
+- 2026-05-24: Added a focused test proving `AppModule` includes the initial domain module boundaries.
+- 2026-05-24: Verified Step 9 with API tests, API typecheck, Prisma validation, and full workspace build.
 
 Suggested commit message:
 
@@ -286,4 +293,4 @@ feat(pump): add initial donation mission backend flow
 
 ## Current Next Action
 
-Review and confirm Step 9 before implementation.
+Review and confirm Step 10 before implementation.
