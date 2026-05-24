@@ -469,7 +469,7 @@ feat(users): add mobile identity service
 
 ### Step 12: Add validation and DTO layer for public backend inputs
 
-Status: Not started
+Status: Completed on 2026-05-24
 
 Goal:
 
@@ -481,10 +481,37 @@ Expected result:
 - Invalid public input returns predictable API errors.
 - Keep OTP, payment gateway integration, Pump API-key security, and frontend work outside this step unless separately confirmed.
 
+Progress:
+
+- 2026-05-24: Added DTO validation dependencies and a small explicit DTO validation pipe for Nest endpoints.
+- 2026-05-24: Added Pump endpoint DTOs for donation intent, mission confirmation, and mission verification query input.
+- 2026-05-24: Updated Pump controller methods to reject invalid mobile, missing required IDs, and invalid amount input before calling services.
+- 2026-05-24: Extended endpoint tests to verify invalid Pump requests return `400` and do not call the flow service.
+
 Suggested commit message:
 
 ```txt
 feat(api): add validation for pump donation inputs
+```
+
+### Step 13: Add database-backed Pump flow integration tests
+
+Status: Not started
+
+Goal:
+
+Verify the current Pump service flow against a real test database instead of only mocked Prisma services.
+
+Expected result:
+
+- Test database setup can apply existing migrations.
+- Tests cover actual `donations`, `payment_transactions`, and `partner_mission_completions` writes.
+- No production gateway integration, Pump API security, OTP, frontend, or admin UI is added.
+
+Suggested commit message:
+
+```txt
+test(pump): add database-backed mission flow coverage
 ```
 
 ## Completed Work
@@ -496,4 +523,4 @@ feat(api): add validation for pump donation inputs
 
 ## Current Next Action
 
-Review Step 11 output and confirm whether to commit it or start Step 12.
+Review Step 12 output and confirm whether to commit it or start Step 13.

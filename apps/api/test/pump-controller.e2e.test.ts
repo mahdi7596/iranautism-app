@@ -7,6 +7,7 @@ import { PrismaService } from "../src/infrastructure/prisma/prisma.service";
 import { PumpMissionFlowService } from "../src/modules/partner-missions/pump/pump-mission-flow.service";
 
 test("Pump endpoints expose the initial donation mission backend flow", async () => {
+  const calls: string[] = [];
   const testingModule = await Test.createTestingModule({
     imports: [AppModule],
   })
@@ -14,21 +15,30 @@ test("Pump endpoints expose the initial donation mission backend flow", async ()
     .useValue({})
     .overrideProvider(PumpMissionFlowService)
     .useValue({
-      startDonationIntent: async () => ({
-        donationId: "donation_1",
-        paymentTransactionId: "payment_1",
-        status: "PENDING",
-      }),
-      confirmDonationMission: async () => ({
-        mobile: "09123456789",
-        missionId: "iran-autism-general-donation",
-        count: 1,
-      }),
-      getVerificationResult: async () => ({
-        mobile: "09123456789",
-        missionId: "iran-autism-general-donation",
-        count: 1,
-      }),
+      startDonationIntent: async () => {
+        calls.push("start");
+        return {
+          donationId: "donation_1",
+          paymentTransactionId: "payment_1",
+          status: "PENDING",
+        };
+      },
+      confirmDonationMission: async () => {
+        calls.push("confirm");
+        return {
+          mobile: "09123456789",
+          missionId: "iran-autism-general-donation",
+          count: 1,
+        };
+      },
+      getVerificationResult: async () => {
+        calls.push("verify");
+        return {
+          mobile: "09123456789",
+          missionId: "iran-autism-general-donation",
+          count: 1,
+        };
+      },
     })
     .compile();
 
@@ -73,6 +83,31 @@ test("Pump endpoints expose the initial donation mission backend flow", async ()
       missionId: "iran-autism-general-donation",
       count: 1,
     });
+
+  await request(app.getHttpServer())
+    .post("/api/public/missions/pump/donation-intents")
+    .send({
+      mobile: "not-a-mobile",
+      missionId: "iran-autism-general-donation",
+      amountIrr: "not-a-number",
+      gateway: "stub",
+    })
+    .expect(400);
+
+  await request(app.getHttpServer())
+    .post("/api/partners/pump/missions/iran-autism-general-donation/confirm")
+    .send({
+      mobile: "09123456789",
+    })
+    .expect(400);
+
+  await request(app.getHttpServer())
+    .get("/api/partners/pump/missions/iran-autism-general-donation/verify")
+    .expect(400);
+
+  if (calls.join(",") !== "start,confirm,verify") {
+    throw new Error("Invalid Pump requests should not call the flow service");
+  }
 
   await app.close();
 });

@@ -1,23 +1,20 @@
-import { Body, Controller, Get, Inject, Param, Post, Query } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Param,
+  Post,
+  Query,
+} from "@nestjs/common";
 
+import { DtoValidationPipe } from "../../../common/pipes/dto-validation.pipe";
+import {
+  ConfirmPumpDonationMissionDto,
+  StartPumpDonationIntentDto,
+  VerifyPumpMissionQueryDto,
+} from "./pump.dto";
 import { PumpMissionFlowService } from "./pump-mission-flow.service";
-
-type StartPumpDonationIntentBody = {
-  mobile: string;
-  missionId: string;
-  amountIrr: string;
-  gateway: string;
-  donorDisplayName?: string;
-  idempotencyKey?: string;
-  correlationId?: string;
-};
-
-type ConfirmPumpDonationMissionBody = {
-  mobile: string;
-  donationId: string;
-  paymentTransactionId?: string;
-  providerReference?: string;
-};
 
 @Controller()
 export class PumpController {
@@ -27,7 +24,10 @@ export class PumpController {
   ) {}
 
   @Post("/api/public/missions/pump/donation-intents")
-  startDonationIntent(@Body() body: StartPumpDonationIntentBody) {
+  startDonationIntent(
+    @Body(new DtoValidationPipe(StartPumpDonationIntentDto))
+    body: StartPumpDonationIntentDto,
+  ) {
     return this.pumpMissionFlow.startDonationIntent({
       mobile: body.mobile,
       missionId: body.missionId,
@@ -42,7 +42,8 @@ export class PumpController {
   @Post("/api/partners/pump/missions/:missionId/confirm")
   confirmDonationMission(
     @Param("missionId") missionId: string,
-    @Body() body: ConfirmPumpDonationMissionBody,
+    @Body(new DtoValidationPipe(ConfirmPumpDonationMissionDto))
+    body: ConfirmPumpDonationMissionDto,
   ) {
     return this.pumpMissionFlow.confirmDonationMission({
       missionId,
@@ -56,11 +57,12 @@ export class PumpController {
   @Get("/api/partners/pump/missions/:missionId/verify")
   verifyMission(
     @Param("missionId") missionId: string,
-    @Query("mobile") mobile: string,
+    @Query(new DtoValidationPipe(VerifyPumpMissionQueryDto))
+    query: VerifyPumpMissionQueryDto,
   ) {
     return this.pumpMissionFlow.getVerificationResult({
       missionId,
-      mobile,
+      mobile: query.mobile,
     });
   }
 }
