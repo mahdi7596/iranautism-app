@@ -266,11 +266,11 @@ chore(api): add initial domain module boundaries
 
 ### Step 10: Start first Pump donation backend flow
 
-Status: Not started
+Status: Completed on 2026-05-24
 
 Goal:
 
-Begin the first real business flow after database and module foundations are stable.
+Begin the first real business flow after database and module foundations are stable, but keep it split into small reviewable backend slices.
 
 Expected result:
 
@@ -278,10 +278,186 @@ Expected result:
 - Keep provider-specific payment and Pump integration details behind interfaces/stubs until real credentials and final provider contracts are confirmed.
 - Do not build frontend screens or admin UI in this step unless separately confirmed.
 
+Progress:
+
+- 2026-05-24: Implemented the first backend Pump flow skeleton through contracts, services, minimal endpoints, and tests.
+- 2026-05-24: Kept real gateway calls, Pump API security, auth/OTP, admin UI, and frontend screens outside this step because credentials and final contracts are not confirmed.
+- 2026-05-24: Tightened `.gitignore` so preserved client source folders remain ignored while real API code under `partner-missions/pump/` can be tracked.
+- 2026-05-24: Verified Step 10 with API tests, API typecheck, Prisma validation, and full workspace build.
+
 Suggested commit message:
 
 ```txt
 feat(pump): add initial donation mission backend flow
+```
+
+#### Step 10A: Define Pump backend contracts
+
+Status: Completed on 2026-05-24
+
+Goal:
+
+Create the first code-level contract boundary for Pump request/response shapes without adding routes or database writes.
+
+Expected result:
+
+- Code has a stable `pump` partner key.
+- Code has response types/builders for documented Pump count-based and status-based verification responses.
+- Code has a first command type for the future Pump donation intent flow.
+- No controllers, database writes, payment integration, mission completion mutation, auth, or frontend work is added.
+
+Progress:
+
+- 2026-05-24: Added `pump.contracts.ts` under `PartnerMissionsModule`.
+- 2026-05-24: Added tests for the documented count and status verification response shapes.
+- 2026-05-24: Verified Step 10A with API tests, API typecheck, Prisma validation, and full workspace build.
+
+Suggested commit message:
+
+```txt
+feat(pump): add backend contract shapes
+```
+
+#### Step 10B: Add donation intent service
+
+Status: Completed on 2026-05-24
+
+Goal:
+
+Create a service method that can prepare a pending donation intent for a Pump mission, using the existing Prisma models.
+
+Expected result:
+
+- Donation creation rules are tested at service level.
+- User ownership remains nullable where the documented guest donation design allows it.
+- No payment provider call or public endpoint is added yet.
+
+Progress:
+
+- 2026-05-24: Added `DonationsService.createPumpDonationIntent` for pending Pump donation records.
+- 2026-05-24: Added service-level coverage for donation intent data shape.
+
+Suggested commit message:
+
+```txt
+feat(donations): add pump donation intent service
+```
+
+#### Step 10C: Add payment transaction attempt service
+
+Status: Completed on 2026-05-24
+
+Goal:
+
+Create the backend service slice that records a payment attempt for a donation with amount, gateway, idempotency, and correlation fields.
+
+Expected result:
+
+- Payment transaction creation is tested at service level.
+- No real gateway integration is added yet.
+
+Progress:
+
+- 2026-05-24: Added `PaymentsService.createDonationPaymentAttempt` for pending payment transaction records.
+- 2026-05-24: Added `PaymentsService.markPaymentSuccessful` as the minimal confirmed-payment placeholder for the first Pump flow.
+- 2026-05-24: Added service-level coverage for payment attempt creation.
+
+Suggested commit message:
+
+```txt
+feat(payments): add payment transaction attempt service
+```
+
+#### Step 10D: Add partner mission completion service
+
+Status: Completed on 2026-05-24
+
+Goal:
+
+Create/update partner mission completion records after a qualifying donation is confirmed.
+
+Expected result:
+
+- Count-based and status-based completion updates are tested at service level.
+- Lookup remains based on `mission_id + mobile_snapshot`.
+
+Progress:
+
+- 2026-05-24: Added `PartnerMissionsService` for Pump mission lookup, completion update, and verification response generation.
+- 2026-05-24: Added `PumpMissionFlowService` to orchestrate donation intent creation, payment attempt creation, confirmation, and verification response lookup.
+- 2026-05-24: The confirmation flow now marks the donation confirmed before updating mission completion.
+- 2026-05-24: Added service-level coverage for count-based verification and flow orchestration.
+
+Suggested commit message:
+
+```txt
+feat(partner-missions): add completion update service
+```
+
+#### Step 10E: Add minimal API endpoints
+
+Status: Completed on 2026-05-24
+
+Goal:
+
+Expose the smallest backend endpoints only after the service boundaries are working.
+
+Expected result:
+
+- Public/Pump endpoints are minimal and tested.
+- Provider-specific payment and Pump security details remain behind interfaces until final credentials/contracts are confirmed.
+
+Progress:
+
+- 2026-05-24: Added minimal Pump endpoints for donation intent start, mission confirmation placeholder, and verification lookup.
+- 2026-05-24: Added endpoint-level coverage with mocked services.
+
+Suggested commit message:
+
+```txt
+feat(pump): add initial mission endpoints
+```
+
+#### Step 10F: Add flow-level tests
+
+Status: Completed on 2026-05-24
+
+Goal:
+
+Add end-to-end backend tests for the smallest Pump donation mission path.
+
+Expected result:
+
+- Tests cover donation intent creation, payment transaction recording, confirmed donation handling, and mission completion response shape.
+
+Progress:
+
+- 2026-05-24: Added contract, service, orchestration, and endpoint tests for the initial Pump donation mission backend flow.
+
+Suggested commit message:
+
+```txt
+test(pump): cover initial donation mission flow
+```
+
+### Step 11: Add user mobile identity service
+
+Status: Not started
+
+Goal:
+
+Start the real Users module with the smallest service needed by future donation, Pump, and auth work.
+
+Expected result:
+
+- Add a service for finding a user by mobile and creating or linking a mobile identity when the flow requires a registered user.
+- Keep OTP, sessions, admin users, RBAC, and profile editing outside this step unless separately confirmed.
+- Clarify how guest/mobile-snapshot donation flow upgrades to a registered user later.
+
+Suggested commit message:
+
+```txt
+feat(users): add mobile identity service
 ```
 
 ## Completed Work
@@ -293,4 +469,4 @@ feat(pump): add initial donation mission backend flow
 
 ## Current Next Action
 
-Review and confirm Step 10 before implementation.
+Review Step 10 output and confirm whether to commit it or start Step 11.

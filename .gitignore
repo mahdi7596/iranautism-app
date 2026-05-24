@@ -1,7 +1,10 @@
 .DS_Store
-design/
-debit-peyman/
-pump/
+/design/
+/debit-peyman/
+/pump/
+docs/source/client/design/
+docs/source/client/debit-peyman/
+docs/source/client/pump/
 .env
 .env.*
 !.env.example
