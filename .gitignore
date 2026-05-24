@@ -2,3 +2,6 @@
 design/
 debit-peyman/
 pump/
+node_modules/
+dist/
+*.tsbuildinfo
