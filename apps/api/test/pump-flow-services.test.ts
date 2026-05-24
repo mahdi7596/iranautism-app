@@ -29,8 +29,86 @@ test("DonationsService creates a pending Pump donation intent", async () => {
   assert.deepEqual(calls, [
     {
       data: {
+        userId: null,
         donorKind: "GUEST",
         donorDisplayName: "Test Donor",
+        mobileSnapshot: "09123456789",
+        publicVisibility: "ANONYMOUS",
+        targetType: "CAMPAIGN",
+        targetLabelSnapshot: "iran-autism-general-donation",
+        status: "PENDING",
+        amount: 2_000_000n,
+        currency: "IRR",
+      },
+    },
+  ]);
+});
+
+test("DonationsService creates registered Pump donation intents with user ownership", async () => {
+  const calls: unknown[] = [];
+  const service = new DonationsService({
+    donation: {
+      create: async (input: unknown) => {
+        calls.push(input);
+        return { id: "donation_1" };
+      },
+    },
+  } as never);
+
+  await service.createPumpDonationIntent({
+    identity: {
+      kind: "REGISTERED",
+      userId: "user_1",
+      mobile: "09123456789",
+    },
+    missionId: "iran-autism-general-donation",
+    amountIrr: 2_000_000n,
+  });
+
+  assert.deepEqual(calls, [
+    {
+      data: {
+        userId: "user_1",
+        donorKind: "REGISTERED",
+        donorDisplayName: undefined,
+        mobileSnapshot: "09123456789",
+        publicVisibility: "ANONYMOUS",
+        targetType: "CAMPAIGN",
+        targetLabelSnapshot: "iran-autism-general-donation",
+        status: "PENDING",
+        amount: 2_000_000n,
+        currency: "IRR",
+      },
+    },
+  ]);
+});
+
+test("DonationsService creates mobile-only Pump donation intents without user ownership", async () => {
+  const calls: unknown[] = [];
+  const service = new DonationsService({
+    donation: {
+      create: async (input: unknown) => {
+        calls.push(input);
+        return { id: "donation_1" };
+      },
+    },
+  } as never);
+
+  await service.createPumpDonationIntent({
+    identity: {
+      kind: "MOBILE_ONLY",
+      mobile: "09123456789",
+    },
+    missionId: "iran-autism-general-donation",
+    amountIrr: 2_000_000n,
+  });
+
+  assert.deepEqual(calls, [
+    {
+      data: {
+        userId: null,
+        donorKind: "GUEST",
+        donorDisplayName: undefined,
         mobileSnapshot: "09123456789",
         publicVisibility: "ANONYMOUS",
         targetType: "CAMPAIGN",

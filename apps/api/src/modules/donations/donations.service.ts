@@ -1,7 +1,10 @@
 import { Inject, Injectable } from "@nestjs/common";
 
 import { PrismaService } from "../../infrastructure/prisma/prisma.service";
-import { PumpDonationIntentCommand } from "../partner-missions/pump/pump.contracts";
+import {
+  PumpDonationIntentCommand,
+  PumpDonationIntentV2Command,
+} from "../partner-missions/pump/pump.contracts";
 
 @Injectable()
 export class DonationsService {
@@ -10,12 +13,23 @@ export class DonationsService {
     private readonly prisma: PrismaService,
   ) {}
 
-  createPumpDonationIntent(command: PumpDonationIntentCommand) {
+  createPumpDonationIntent(
+    command: PumpDonationIntentCommand | PumpDonationIntentV2Command,
+  ) {
+    const identity =
+      "identity" in command
+        ? command.identity
+        : {
+            kind: "MOBILE_ONLY" as const,
+            mobile: command.mobile,
+          };
+
     return this.prisma.donation.create({
       data: {
-        donorKind: "GUEST",
+        userId: identity.kind === "REGISTERED" ? identity.userId : null,
+        donorKind: identity.kind === "REGISTERED" ? "REGISTERED" : "GUEST",
         donorDisplayName: command.donorDisplayName,
-        mobileSnapshot: command.mobile,
+        mobileSnapshot: identity.mobile,
         publicVisibility: "ANONYMOUS",
         targetType: "CAMPAIGN",
         targetLabelSnapshot: command.missionId,

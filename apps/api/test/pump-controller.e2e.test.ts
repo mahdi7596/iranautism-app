@@ -7,6 +7,8 @@ import { PrismaService } from "../src/infrastructure/prisma/prisma.service";
 import { PumpMissionFlowService } from "../src/modules/partner-missions/pump/pump-mission-flow.service";
 
 test("Pump endpoints expose the initial donation mission backend flow", async () => {
+  const originalPumpApiKey = process.env.PUMP_PARTNER_API_KEY;
+  process.env.PUMP_PARTNER_API_KEY = "test-pump-secret";
   const calls: string[] = [];
   const testingModule = await Test.createTestingModule({
     imports: [AppModule],
@@ -21,14 +23,6 @@ test("Pump endpoints expose the initial donation mission backend flow", async ()
           donationId: "donation_1",
           paymentTransactionId: "payment_1",
           status: "PENDING",
-        };
-      },
-      confirmDonationMission: async () => {
-        calls.push("confirm");
-        return {
-          mobile: "09123456789",
-          missionId: "iran-autism-general-donation",
-          count: 1,
         };
       },
       getVerificationResult: async () => {
@@ -61,21 +55,8 @@ test("Pump endpoints expose the initial donation mission backend flow", async ()
     });
 
   await request(app.getHttpServer())
-    .post("/api/partners/pump/missions/iran-autism-general-donation/confirm")
-    .send({
-      mobile: "09123456789",
-      donationId: "donation_1",
-      paymentTransactionId: "payment_1",
-    })
-    .expect(201)
-    .expect({
-      mobile: "09123456789",
-      missionId: "iran-autism-general-donation",
-      count: 1,
-    });
-
-  await request(app.getHttpServer())
     .get("/api/partners/pump/missions/iran-autism-general-donation/verify")
+    .set("x-pump-api-key", "test-pump-secret")
     .query({ mobile: "09123456789" })
     .expect(200)
     .expect({
@@ -98,16 +79,23 @@ test("Pump endpoints expose the initial donation mission backend flow", async ()
     .post("/api/partners/pump/missions/iran-autism-general-donation/confirm")
     .send({
       mobile: "09123456789",
+      donationId: "donation_1",
     })
-    .expect(400);
+    .expect(404);
 
   await request(app.getHttpServer())
     .get("/api/partners/pump/missions/iran-autism-general-donation/verify")
+    .set("x-pump-api-key", "test-pump-secret")
     .expect(400);
 
-  if (calls.join(",") !== "start,confirm,verify") {
+  if (calls.join(",") !== "start,verify") {
     throw new Error("Invalid Pump requests should not call the flow service");
   }
 
   await app.close();
+  if (originalPumpApiKey === undefined) {
+    delete process.env.PUMP_PARTNER_API_KEY;
+  } else {
+    process.env.PUMP_PARTNER_API_KEY = originalPumpApiKey;
+  }
 });

@@ -6,11 +6,12 @@ import {
   Param,
   Post,
   Query,
+  UseGuards,
 } from "@nestjs/common";
 
 import { DtoValidationPipe } from "../../../common/pipes/dto-validation.pipe";
+import { PumpApiKeyGuard } from "./pump-api-key.guard";
 import {
-  ConfirmPumpDonationMissionDto,
   StartPumpDonationIntentDto,
   VerifyPumpMissionQueryDto,
 } from "./pump.dto";
@@ -39,22 +40,8 @@ export class PumpController {
     });
   }
 
-  @Post("/api/partners/pump/missions/:missionId/confirm")
-  confirmDonationMission(
-    @Param("missionId") missionId: string,
-    @Body(new DtoValidationPipe(ConfirmPumpDonationMissionDto))
-    body: ConfirmPumpDonationMissionDto,
-  ) {
-    return this.pumpMissionFlow.confirmDonationMission({
-      missionId,
-      mobile: body.mobile,
-      donationId: body.donationId,
-      paymentTransactionId: body.paymentTransactionId,
-      providerReference: body.providerReference,
-    });
-  }
-
   @Get("/api/partners/pump/missions/:missionId/verify")
+  @UseGuards(PumpApiKeyGuard)
   verifyMission(
     @Param("missionId") missionId: string,
     @Query(new DtoValidationPipe(VerifyPumpMissionQueryDto))

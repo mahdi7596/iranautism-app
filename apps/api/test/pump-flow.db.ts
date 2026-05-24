@@ -13,6 +13,8 @@ import { PaymentsService } from "../src/modules/payments/payments.service";
 
 const missionId = `pump-db-${Date.now()}`;
 const mobile = "09123456789";
+const registeredMobile = "09123456780";
+const mobileOnlyMobile = "09123456781";
 
 const prisma = new PrismaService();
 const flow = new PumpMissionFlowService(
@@ -36,7 +38,6 @@ before(async () => {
 after(async () => {
   await prisma.partnerMissionCompletion.deleteMany({
     where: {
-      mobileSnapshot: mobile,
       mission: {
         missionKey: missionId,
       },
@@ -54,6 +55,13 @@ after(async () => {
       targetLabelSnapshot: missionId,
     },
   });
+  await prisma.user.deleteMany({
+    where: {
+      mobile: {
+        in: [registeredMobile],
+      },
+    },
+  });
   await prisma.partnerMission.deleteMany({
     where: {
       partner: PUMP_PARTNER_KEY,
@@ -61,6 +69,59 @@ after(async () => {
     },
   });
   await prisma.$disconnect();
+});
+
+test("Registered Pump donation intent persists user ownership", async () => {
+  const donations = new DonationsService(prisma);
+  const user = await prisma.user.create({
+    data: {
+      mobile: registeredMobile,
+      status: "ACTIVE",
+    },
+  });
+
+  const donation = await donations.createPumpDonationIntent({
+    identity: {
+      kind: "REGISTERED",
+      userId: user.id,
+      mobile: registeredMobile,
+    },
+    missionId,
+    amountIrr: 3_000_000n,
+  });
+  const persisted = await prisma.donation.findUniqueOrThrow({
+    where: {
+      id: donation.id,
+    },
+  });
+
+  assert.equal(persisted.userId, user.id);
+  assert.equal(persisted.donorKind, "REGISTERED");
+  assert.equal(persisted.mobileSnapshot, registeredMobile);
+  assert.equal(persisted.targetLabelSnapshot, missionId);
+});
+
+test("Mobile-only Pump donation intent persists without user ownership", async () => {
+  const donations = new DonationsService(prisma);
+
+  const donation = await donations.createPumpDonationIntent({
+    identity: {
+      kind: "MOBILE_ONLY",
+      mobile: mobileOnlyMobile,
+    },
+    missionId,
+    amountIrr: 3_000_000n,
+  });
+  const persisted = await prisma.donation.findUniqueOrThrow({
+    where: {
+      id: donation.id,
+    },
+  });
+
+  assert.equal(persisted.userId, null);
+  assert.equal(persisted.donorKind, "GUEST");
+  assert.equal(persisted.mobileSnapshot, mobileOnlyMobile);
+  assert.equal(persisted.targetLabelSnapshot, missionId);
 });
 
 test("Pump donation mission flow persists donation, payment, and completion rows", async () => {

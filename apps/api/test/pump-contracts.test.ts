@@ -4,6 +4,8 @@ import { test } from "node:test";
 import {
   PUMP_PARTNER_KEY,
   createPumpCountVerificationResponse,
+  createPumpMobileOnlyDonationIdentity,
+  createPumpRegisteredDonationIdentity,
   createPumpStatusVerificationResponse,
 } from "../src/modules/partner-missions/pump/pump.contracts";
 
@@ -34,6 +36,29 @@ test("Pump status verification response uses the documented response shape", () 
       mobile: "09123456789",
       missionId: "iran-autism-general-donation",
       completed: false,
+    },
+  );
+});
+
+test("Pump donation identity supports registered and mobile-only starts", () => {
+  assert.deepEqual(
+    createPumpRegisteredDonationIdentity({
+      userId: "user_1",
+      mobile: "09123456789",
+    }),
+    {
+      kind: "REGISTERED",
+      userId: "user_1",
+      mobile: "09123456789",
+    },
+  );
+  assert.deepEqual(
+    createPumpMobileOnlyDonationIdentity({
+      mobile: "09123456789",
+    }),
+    {
+      kind: "MOBILE_ONLY",
+      mobile: "09123456789",
     },
   );
 });
