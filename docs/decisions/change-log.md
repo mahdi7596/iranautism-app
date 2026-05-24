@@ -2,7 +2,38 @@
 
 Use this file to record confirmed decisions, scope changes, module status changes, and important project conclusions. Keep entries short, dated, and linked to the relevant detailed document when possible.
 
+## 2026-05-24
+
+### Donation Privacy And Currency Storage Rules Accepted
+
+- Updated `docs/decisions/iranautism-database-design-decisions.md` to distinguish registered donations, guest donations, and public anonymity.
+- Decision: public anonymity controls public display only; guest donations may still retain internal checkout/payment snapshots for receipt, support, reconciliation, fraud prevention, legal/financial records, and future account matching.
+- Decision: store all monetary amounts as integer IRR at the database level and display toman only at the view/UI level when appropriate.
+- Updated `docs/product/modules/iranautism-database-table-design.md` so donation and payment transaction amount fields use integer IRR with `IRR` as the v1 canonical currency.
+
+### Minimum Secure Payment Transaction Design Accepted
+
+- Updated `docs/decisions/iranautism-database-design-decisions.md` and `docs/product/modules/iranautism-database-table-design.md` to define the v1 `PAYMENT_TRANSACTIONS` model as an idempotent, reconcilable payment-attempt table rather than a minimal gateway reference table.
+- Decision: keep payment transactions related to donations for v1, but include amount/currency snapshots, gateway authority/reference fields, idempotency key, correlation ID, lifecycle timestamps, failure code, and safe provider response summaries.
+- Rule: payment success must come from server-side gateway verification, and repeated callbacks must not double-confirm donations, duplicate Pump completions, duplicate receipts, or duplicate financial records.
+- Updated `docs/analysis/iranautism-database-design-playground.mmd` to reflect the minimum secure payment transaction fields.
+
+### Iran Autism Database Design Slice Captured
+
+- Added `docs/decisions/iranautism-database-design-decisions.md` to capture the current working decisions for the first Iran Autism database design slice: users, guest/registered donations, payment transactions, and partner mission completion.
+- Added `docs/product/modules/iranautism-database-table-design.md` as the table-level memory for the first registration, donation, payment, and partner mission implementation slice.
+- Updated `docs/analysis/iranautism-database-design-playground.mmd` as the visual playground for the overall Iran Autism database design; the current slice supports nullable `user_id`, donor snapshots, public visibility, donation targets, and partner mission qualification by normalized mobile.
+- Current opinion: prefer OTP register/login before the first Pump donation, but keep `DONATIONS.user_id` nullable so product-supported guest/anonymous donation remains possible.
+
 ## 2026-05-23
+
+### User, Admin, Auth, And Log Database Slice Drafted
+
+- Added `docs/decisions/user-admin-auth-log-database-design.md` as the first database-slice decision for users, profiles, mobile OTP auth, sessions/devices, admin membership, RBAC, permissions, audit logs, user activity logs, and auth security events.
+- Recommended a shared `users` identity table with a separate `admin_accounts` membership model instead of fully separate admin identities.
+- Established that permissions, not role names, should be the enforcement primitive for admin APIs; roles group permissions for manageability.
+- Kept future donation, Pump, Peyman, CMS, media, reports, and project references compatible through stable user IDs plus generic audit targets without designing those full schemas yet.
+- Marked AR-05 as in discussion and pointed it to this focused database-design decision.
 
 ### Pump and Peyman Feature Understanding Documented
 

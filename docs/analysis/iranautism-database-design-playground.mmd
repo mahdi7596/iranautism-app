@@ -1,0 +1,150 @@
+erDiagram
+  %% Playground notes:
+  %% DONATIONS.user_id is nullable so guest donations are possible.
+  %% PARTNER_MISSION_COMPLETIONS.user_id is nullable so Pump can count by normalized mobile.
+  %% For the first Pump flow, frontend may still OTP-register/login the user before payment.
+
+  USERS {
+    string id PK
+    string normalized_mobile UK
+    string first_name
+    string last_name
+    string status
+    datetime last_login_at
+    string last_login_ip_address
+    datetime created_at
+    datetime updated_at
+  }
+
+  DONATIONS {
+    string id PK
+    string user_id FK
+    string donor_kind
+    string donor_display_name
+    string normalized_mobile_snapshot
+    string public_visibility
+    string target_type
+    string target_id
+    string target_label_snapshot
+    string status
+    int amount
+    string currency
+    datetime confirmed_at
+    datetime created_at
+  }
+
+  PAYMENT_TRANSACTIONS {
+    string id PK
+    string donation_id FK
+    string gateway
+    string status
+    int amount
+    string currency
+    string provider_authority
+    string provider_reference
+    string idempotency_key UK
+    string correlation_id
+    datetime callback_received_at
+    datetime verified_at
+    datetime failed_at
+    string failure_code
+    string provider_response_summary
+    datetime created_at
+    datetime updated_at
+  }
+
+  PARTNER_MISSIONS {
+    string id PK
+    string partner
+    string mission_key UK
+    string result_type
+    datetime campaign_starts_at
+  }
+
+  PARTNER_MISSION_COMPLETIONS {
+    string id PK
+    string mission_id FK
+    string user_id FK
+    string qualifying_donation_id FK
+    string normalized_mobile_snapshot
+    int completion_count
+    boolean completed
+    datetime last_qualified_at
+    datetime created_at
+    datetime updated_at
+  }
+
+  RECURRING_DONATION_MANDATES {
+    string id PK
+    string user_id FK
+    string mobile_snapshot
+    string national_code_encrypted
+    string bank_code
+    int monthly_amount
+    string status
+    string peyman_trace_id
+    string peyman_id
+    datetime starts_at
+    datetime expires_at
+    datetime created_at
+    datetime updated_at
+  }
+
+  ADMIN_USERS {
+    string id PK
+    string normalized_mobile UK
+    string display_name
+    string status
+    datetime last_login_at
+    string last_login_ip_address
+    datetime created_at
+    datetime updated_at
+  }
+
+  ROLES {
+    string id PK
+    string role_key UK
+    string name
+  }
+
+  PERMISSIONS {
+    string id PK
+    string permission_key UK
+    string description
+  }
+
+  ADMIN_USER_ROLES {
+    string admin_user_id FK
+    string role_id FK
+  }
+
+  ROLE_PERMISSIONS {
+    string role_id FK
+    string permission_id FK
+  }
+
+  AUDIT_LOGS {
+    string id PK
+    string actor_user_id FK
+    string actor_admin_user_id FK
+    string actor_type
+    string action
+    string target_type
+    string target_id
+    string metadata
+    string ip_address
+    datetime created_at
+  }
+
+  USERS |o--o{ DONATIONS : may_make
+  DONATIONS ||--o{ PAYMENT_TRANSACTIONS : has
+  DONATIONS |o--o{ PARTNER_MISSION_COMPLETIONS : may_qualify
+  USERS |o--o{ PARTNER_MISSION_COMPLETIONS : may_complete
+  PARTNER_MISSIONS ||--o{ PARTNER_MISSION_COMPLETIONS : defines
+  USERS ||--o{ RECURRING_DONATION_MANDATES : authorizes
+  USERS ||--o{ AUDIT_LOGS : acts
+  ADMIN_USERS ||--o{ AUDIT_LOGS : acts
+  ADMIN_USERS ||--o{ ADMIN_USER_ROLES : has
+  ROLES ||--o{ ADMIN_USER_ROLES : assigned
+  ROLES ||--o{ ROLE_PERMISSIONS : grants
+  PERMISSIONS ||--o{ ROLE_PERMISSIONS : included

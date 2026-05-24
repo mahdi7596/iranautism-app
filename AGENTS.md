@@ -30,6 +30,10 @@ This file is the root coordination document for the Iran Autism platform workspa
 - `docs/decisions/backend-module-boundaries.md`
 - `docs/product/modules/partner-missions-pump.md`
 - `docs/product/modules/recurring-donations-peyman.md`
+- `docs/analysis/iranautism-database-design-playground.mmd`
+- `docs/decisions/iranautism-database-design-decisions.md`
+- `docs/product/modules/iranautism-database-table-design.md`
+- `docs/decisions/user-admin-auth-log-database-design.md`
 
 ## Project Memory Protocol
 
@@ -118,7 +122,7 @@ The authoritative module list is maintained in `docs/product/module-registry.md`
 | Module | Current status | Notes |
 |---|---|---|
 | Public Website Experience | Core candidate | Homepage, pages, navigation, service narrative, client PowerPoint content. |
-| Crowdfunding and Donation System | Core candidate | Multi-project donations, donation targets, anonymous/registered donation needs confirmation. |
+| Crowdfunding and Donation System | In progress | First donation slice supports registered donations and schema-level guest donations through nullable user ownership plus donor snapshots. |
 | Project and Construction Phase System | Core candidate | Includes the client-provided nine construction phases. |
 | Transparency, Timeline, and Progress Reporting | Core candidate | Dated progress updates with media evidence and admin visibility control. |
 | Media, Gallery, Video, and Storytelling | Core candidate | Gallery, short video page, timelapse, people/efforts stories. |
@@ -129,8 +133,9 @@ The authoritative module list is maintained in `docs/product/module-registry.md`
 | UI/UX and Design | Core candidate | UX flows, wireframes, UI, responsive design system. |
 | Technical Architecture and Deployment | Core candidate | Suggested Next.js/NestJS/PostgreSQL/Prisma/Redis/Docker stack. |
 | Future/Phase-Two Services | Future scope | Appointment booking, doctor profiles, Q&A, play center reservations. |
-| Partner Missions and Reward Integrations | In progress | Pump mission landing pages and verification API; repeatable missions return mobile plus count, non-repeatable missions return mobile plus flag/status. |
+| Partner Missions and Reward Integrations | In progress | Pump mission landing pages and verification API; first design links donation-based mission completions to qualifying donations and counts by normalized mobile. |
 | Recurring Donations | Needs confirmation | Peyman direct debit documented as the likely recurring donation implementation. |
+| User/Admin/Auth/Logs Database Slice | In progress | First database design drafted for users, profiles, OTP, sessions, admin membership, RBAC, permissions, audit logs, activity logs, and auth security events. |
 
 ## Status Log
 
@@ -144,6 +149,10 @@ The authoritative module list is maintained in `docs/product/module-registry.md`
 | 2026-05-21 | Architecture-rule deep-dive agenda added at `docs/architecture-rules/deep-dive-agenda.md`. |
 | 2026-05-21 | Architecture-rule progress tracking started at `docs/architecture-rules/progress.md`; AR-01 backend module boundaries started at `docs/decisions/backend-module-boundaries.md`. |
 | 2026-05-23 | Pump partner missions and Peyman direct debit feature understanding documented in `docs/product/modules/partner-missions-pump.md` and `docs/product/modules/recurring-donations-peyman.md`; Pump is the first planned feature to develop. |
+| 2026-05-24 | First Iran Autism database-design slice documented in `docs/decisions/iranautism-database-design-decisions.md` and `docs/product/modules/iranautism-database-table-design.md`; visual playground updated at `docs/analysis/iranautism-database-design-playground.mmd`. |
+| 2026-05-24 | Payment transaction design tightened to the minimum secure v1 shape: idempotent gateway attempts with amount/currency snapshots, gateway references, correlation IDs, lifecycle timestamps, and safe provider summaries. |
+| 2026-05-24 | Donation identity wording clarified: registered donation, guest donation, and public anonymity are separate concepts; all database-level monetary amounts should be stored as integer IRR and displayed as toman in UI where appropriate. |
+| 2026-05-23 | User/admin/auth/log database slice drafted in `docs/decisions/user-admin-auth-log-database-design.md`; recommends shared user identity with separate admin membership and permission-based admin enforcement. |
 
 ## Working Rules Going Forward
 
@@ -152,6 +161,7 @@ The authoritative module list is maintained in `docs/product/module-registry.md`
 - Record confirmed decisions and scope changes in `docs/decisions/change-log.md`.
 - When a module is actively designed or implemented, update its status in `docs/product/module-registry.md`.
 - Before implementing a backend module, check `docs/decisions/backend-architecture.md` and create/update a dedicated module note under `docs/product/modules/` when work begins.
+- Before implementing users, admins, authentication, authorization, sessions, OTP, audit logs, activity logs, or auth security events, check `docs/decisions/user-admin-auth-log-database-design.md`.
 - Before implementing frontend UI, check `docs/decisions/frontend-architecture.md`; create or update project-root `DESIGN.md` before serious UI implementation begins.
 - Before changing repo structure, workspace tooling, or admin app placement, check `docs/decisions/repository-architecture.md`.
 - Before deciding durable module, data ownership, API, state, CMS, security, operations, or testing rules, check `docs/architecture-rules/deep-dive-agenda.md` and convert the relevant topic into a focused decision document.
