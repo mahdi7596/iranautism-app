@@ -178,6 +178,97 @@ Suggested commit message:
 feat(db): add donation payment and partner mission schema
 ```
 
+### Step 7: Stabilize Prisma migration workflow
+
+Status: Completed on 2026-05-24
+
+Goal:
+
+Make the normal Prisma migration workflow reliable for local development before adding application database code.
+
+Expected result:
+
+- Local PostgreSQL can be started cleanly for migration testing.
+- `pnpm --filter @iranautism/api db:migrate` works against the local database, or the exact blocker is documented with a safe agreed workaround.
+- Existing migrations apply in order from an empty database.
+- Prisma validation and client generation still pass.
+- No schema expansion, API routes, business logic, seed data, frontend work, or provider integration is added in this step.
+
+Progress:
+
+- 2026-05-24: Reproduced the migration failure against a fresh local database. The project-side blocker was a stale empty migration directory left after removing the broad identity/security migration; Prisma failed with `P3015` because that directory had no `migration.sql`.
+- 2026-05-24: Removed the stale empty migration directory. The remaining migration folder list is now only `20260524150000_init_users` and `20260524170000_add_donation_payment_partner_mission_tables`.
+- 2026-05-24: Verified that `prisma migrate deploy` applies both migrations in order from an empty local database.
+- 2026-05-24: Verified that `pnpm --filter @iranautism/api db:migrate` reports the database is already in sync after the migrations are applied.
+- 2026-05-24: Re-ran Prisma validation, Prisma client generation, API tests, API typecheck, and full workspace build successfully.
+
+Suggested commit message:
+
+```txt
+chore(db): stabilize prisma migration workflow
+```
+
+### Step 8: Add NestJS Prisma integration layer
+
+Status: Not started
+
+Goal:
+
+Connect the NestJS API app to Prisma through a small infrastructure module without implementing product features.
+
+Expected result:
+
+- API has a reusable Prisma service/module.
+- App startup and shutdown handle Prisma connection lifecycle cleanly.
+- Tests can import the database module safely.
+- No user, donation, payment, Pump, auth, admin, or frontend business flows are implemented in this step.
+
+Suggested commit message:
+
+```txt
+chore(api): add prisma integration layer
+```
+
+### Step 9: Add backend domain module boundaries
+
+Status: Not started
+
+Goal:
+
+Create the first NestJS module boundaries that match the current Prisma/database slice.
+
+Expected result:
+
+- Minimal module folders/classes exist for users, donations, payments, and partner missions.
+- Modules are wired enough to compile, but contain no public product endpoints unless separately confirmed.
+- The API source tree starts matching the documented modular monolith direction.
+
+Suggested commit message:
+
+```txt
+chore(api): add initial domain module boundaries
+```
+
+### Step 10: Start first Pump donation backend flow
+
+Status: Not started
+
+Goal:
+
+Begin the first real business flow after database and module foundations are stable.
+
+Expected result:
+
+- Define the smallest backend slice for Pump donation intent, payment transaction creation, payment confirmation, and partner mission completion update.
+- Keep provider-specific payment and Pump integration details behind interfaces/stubs until real credentials and final provider contracts are confirmed.
+- Do not build frontend screens or admin UI in this step unless separately confirmed.
+
+Suggested commit message:
+
+```txt
+feat(pump): add initial donation mission backend flow
+```
+
 ## Completed Work
 
 - 2026-05-24: Completed Step 1 by adding the pnpm workspace skeleton, root package manifest, app package manifests, and shared package manifests. No framework, database, UI, or feature implementation was added.
@@ -187,4 +278,4 @@ feat(db): add donation payment and partner mission schema
 
 ## Current Next Action
 
-Decide whether the next focused step should be Prisma migration workflow stabilization or the first NestJS database integration layer.
+Review and confirm Step 8 before implementation.
