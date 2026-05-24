@@ -496,7 +496,7 @@ feat(api): add validation for pump donation inputs
 
 ### Step 13: Add database-backed Pump flow integration tests
 
-Status: Not started
+Status: Completed on 2026-05-24
 
 Goal:
 
@@ -507,6 +507,12 @@ Expected result:
 - Test database setup can apply existing migrations.
 - Tests cover actual `donations`, `payment_transactions`, and `partner_mission_completions` writes.
 - No production gateway integration, Pump API security, OTP, frontend, or admin UI is added.
+
+Progress:
+
+- 2026-05-24: Added a dedicated API `test:db` script that applies Prisma migrations before running database-backed tests.
+- 2026-05-24: Added a Pump flow database test covering actual `donations`, `payment_transactions`, and `partner_mission_completions` persistence.
+- 2026-05-24: Kept the DB integration test isolated in an `iranautism_test` database so it does not depend on or mutate the local development database schema.
 
 Suggested commit message:
 
@@ -523,4 +529,4 @@ test(pump): add database-backed mission flow coverage
 
 ## Current Next Action
 
-Review Step 12 output and confirm whether to commit it or start Step 13.
+Review Step 13 output and confirm whether to commit it or define Step 14.

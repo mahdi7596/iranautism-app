@@ -12,6 +12,7 @@
     "lint": "node -e \"console.log('API lint is not configured yet.')\"",
     "start": "node dist/main.js",
     "test": "node --import tsx --test \"test/**/*.test.ts\"",
+    "test:db": "export DATABASE_URL=${DATABASE_URL:-postgresql://iranautism:change-me-local-only@127.0.0.1:55434/iranautism_test?schema=public} && tsx test/support/prepare-test-db.ts && prisma migrate deploy && node --import tsx --test \"test/**/*.db.ts\"",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
@@ -29,6 +30,7 @@
   "devDependencies": {
     "@nestjs/testing": "^11.1.23",
     "@types/node": "^24.12.4",
+    "@types/pg": "^8.20.0",
     "@types/supertest": "^6.0.3",
     "dotenv": "^17.4.2",
     "prisma": "^7.8.0",
