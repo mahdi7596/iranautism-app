@@ -15,6 +15,12 @@ export class UsersService {
     });
   }
 
+  findById(id: string) {
+    return this.prisma.user.findUnique({
+      where: { id },
+    });
+  }
+
   async findOrCreateByMobile(mobile: string) {
     const existingUser = await this.findByMobile(mobile);
 
