@@ -3,9 +3,21 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "node -e \"console.log('Web app scaffold has not been created yet.')\"",
-    "build": "node -e \"console.log('Web build is not configured yet.')\"",
+    "dev": "next dev --port 3000",
+    "build": "next build",
     "lint": "node -e \"console.log('Web lint is not configured yet.')\"",
-    "typecheck": "node -e \"console.log('Web typecheck is not configured yet.')\""
+    "start": "next start --port 3000",
+    "typecheck": "next typegen && tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "^16.2.6",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6"
+  },
+  "devDependencies": {
+    "@types/node": "^24.12.4",
+    "@types/react": "^19.2.15",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^5.9.3"
   }
 }
