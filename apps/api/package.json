@@ -5,6 +5,10 @@
   "scripts": {
     "dev": "tsx watch src/main.ts",
     "build": "tsc -p tsconfig.build.json",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio",
+    "db:validate": "prisma validate",
     "lint": "node -e \"console.log('API lint is not configured yet.')\"",
     "start": "node dist/main.js",
     "test": "node --import tsx --test \"test/**/*.test.ts\"",
@@ -14,6 +18,7 @@
     "@nestjs/common": "^11.1.23",
     "@nestjs/core": "^11.1.23",
     "@nestjs/platform-express": "^11.1.23",
+    "@prisma/client": "^7.8.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2"
   },
@@ -21,6 +26,8 @@
     "@nestjs/testing": "^11.1.23",
     "@types/node": "^24.12.4",
     "@types/supertest": "^6.0.3",
+    "dotenv": "^17.4.2",
+    "prisma": "^7.8.0",
     "supertest": "^7.1.4",
     "tsx": "^4.22.3",
     "typescript": "^5.9.3"
