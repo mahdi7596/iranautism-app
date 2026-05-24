@@ -1,0 +1,11 @@
+{
+  "name": "@iranautism/web",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node -e \"console.log('Web app scaffold has not been created yet.')\"",
+    "build": "node -e \"console.log('Web build is not configured yet.')\"",
+    "lint": "node -e \"console.log('Web lint is not configured yet.')\"",
+    "typecheck": "node -e \"console.log('Web typecheck is not configured yet.')\""
+  }
+}

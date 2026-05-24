@@ -1,0 +1,11 @@
+{
+  "name": "@iranautism/api",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node -e \"console.log('API app scaffold has not been created yet.')\"",
+    "build": "node -e \"console.log('API build is not configured yet.')\"",
+    "lint": "node -e \"console.log('API lint is not configured yet.')\"",
+    "typecheck": "node -e \"console.log('API typecheck is not configured yet.')\""
+  }
+}
