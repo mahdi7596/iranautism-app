@@ -117,6 +117,9 @@ Expected result:
 Progress:
 
 - 2026-05-24: Started Step 4 by adding local PostgreSQL/Redis Compose service definitions and environment examples. Prisma setup and service smoke checks remain pending.
+- 2026-05-24: Adjusted local service host ports to avoid existing development-service conflicts: PostgreSQL defaults to `55434`, Redis defaults to `6384`.
+- 2026-05-24: Added Prisma 7 foundation in `apps/api`, including Prisma config, schema location, and API database scripts. PostgreSQL and Redis local service checks passed. PostgreSQL migration SQL was generated and verified directly against local Postgres. Normal `prisma migrate dev` currently fails with an unhelpful Prisma schema-engine error and needs follow-up before treating Prisma workflow as fully settled.
+- 2026-05-24: Corrected the first Prisma schema scope before commit: the schema now starts only with the agreed `USERS` table, using `mobile` as the canonical unique mobile column.
 
 Suggested commit message:
 
@@ -124,23 +127,27 @@ Suggested commit message:
 chore(db): add local database and prisma foundation
 ```
 
-### Step 5: Add first identity/security database slice
+### Step 5: Add first user database slice
 
-Status: Not started
+Status: In progress
 
 Goal:
 
-Implement the first users, auth, admin membership, RBAC, audit log, and activity log schema slice based on the documented database decision.
+Implement the first users table based on the simplified documented database decision.
 
 Expected result:
 
-- The schema foundation supports later donation, payment, Pump, Peyman, CMS, and admin workflows.
-- No frontend auth flow is implemented unless separately confirmed.
+- The Prisma schema contains only the agreed `User` model and `UserStatus` enum.
+- No auth, admin, OTP, session, RBAC, audit log, donation, payment, Pump, Peyman, CMS, or frontend flow is implemented unless separately confirmed.
+
+Progress:
+
+- 2026-05-24: Removed the broader identity/security schema draft from the current implementation slice. Step 5 now contains only the agreed `USERS` table shape: `id`, `mobile`, `first_name`, `last_name`, `status`, `last_login_at`, `last_login_ip_address`, `created_at`, and `updated_at`.
 
 Suggested commit message:
 
 ```txt
-feat(auth): add initial identity and admin security schema
+feat(db): add initial users schema
 ```
 
 ## Completed Work
@@ -152,4 +159,4 @@ feat(auth): add initial identity and admin security schema
 
 ## Current Next Action
 
-Continue Step 4 with the next small substep: add Prisma foundation without implementing business domain schema.
+Review the simplified Step 5 user schema and resolve the Prisma `migrate dev` schema-engine issue before committing or moving to auth/API implementation.

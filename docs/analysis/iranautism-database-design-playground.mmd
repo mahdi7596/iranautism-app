@@ -1,12 +1,12 @@
 erDiagram
   %% Playground notes:
   %% DONATIONS.user_id is nullable so guest donations are possible.
-  %% PARTNER_MISSION_COMPLETIONS.user_id is nullable so Pump can count by normalized mobile.
+  %% PARTNER_MISSION_COMPLETIONS.user_id is nullable so Pump can count by mobile.
   %% For the first Pump flow, frontend may still OTP-register/login the user before payment.
 
   USERS {
     string id PK
-    string normalized_mobile UK
+    string mobile UK
     string first_name
     string last_name
     string status
@@ -21,7 +21,7 @@ erDiagram
     string user_id FK
     string donor_kind
     string donor_display_name
-    string normalized_mobile_snapshot
+    string mobile_snapshot
     string public_visibility
     string target_type
     string target_id
@@ -66,7 +66,7 @@ erDiagram
     string mission_id FK
     string user_id FK
     string qualifying_donation_id FK
-    string normalized_mobile_snapshot
+    string mobile_snapshot
     int completion_count
     boolean completed
     datetime last_qualified_at
@@ -92,7 +92,7 @@ erDiagram
 
   ADMIN_USERS {
     string id PK
-    string normalized_mobile UK
+    string mobile UK
     string display_name
     string status
     datetime last_login_at

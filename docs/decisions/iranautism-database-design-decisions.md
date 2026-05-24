@@ -24,7 +24,7 @@ The source analysis says anonymous donation is part of the product specs, while 
 
 ### Users
 
-- `USERS.normalized_mobile` is the canonical unique mobile value.
+- `USERS.mobile` is the canonical unique mobile value after normalization.
 - Mobile input must be normalized before storage.
 - `USERS.last_login_at` and `USERS.last_login_ip_address` are kept on the user row for simple admin/support visibility.
 - The earlier `USER_AUTH_EVENTS` table was removed from the visual playground for now. Detailed auth/session logging can be revisited when the auth module is designed more deeply.
@@ -36,7 +36,7 @@ The source analysis says anonymous donation is part of the product specs, while 
 - A guest donation leaves `user_id` empty and relies on checkout-time snapshot fields.
 - `donor_kind` records whether the donation came from a registered user or a guest.
 - `donor_display_name` stores the donor-facing display name at the time of donation. This is needed for guest donors and for historical accuracy when registered users later edit their profile.
-- `normalized_mobile_snapshot` stores the mobile number used at donation time. This supports receipts, support lookup, future account matching, and Pump verification without requiring that every donor already have a user account.
+- `mobile_snapshot` stores the mobile number used at donation time after normalization. This supports receipts, support lookup, future account matching, and Pump verification without requiring that every donor already have a user account.
 - `public_visibility` controls how the donation may appear publicly, such as anonymous, display name, initials, or hidden.
 - `target_type`, `target_id`, and `target_label_snapshot` identify what the donation is for. The label snapshot protects old records if a project, phase, item, or campaign is renamed later.
 - `status` tracks the donation lifecycle, such as pending, confirmed, failed, cancelled, expired, or refunded.
@@ -91,9 +91,9 @@ The database should still support guest donation because the product documents i
 - Pump itself is not a donation.
 - A Pump mission can be completed by a verified donation or another support action.
 - `PARTNER_MISSIONS` stores mission configuration, such as partner, mission key, result type, and campaign start date.
-- `PARTNER_MISSION_COMPLETIONS` stores whether a normalized mobile/user completed a mission and, for donation-based missions, which donation qualified it.
+- `PARTNER_MISSION_COMPLETIONS` stores whether a mobile/user completed a mission and, for donation-based missions, which donation qualified it.
 - `PARTNER_MISSION_COMPLETIONS.user_id` must be nullable in the real database.
-- Pump completion counting should use `mission_id + normalized_mobile_snapshot`, not only `mission_id + user_id`, so accountless or newly created users can still be counted by mobile.
+- Pump completion counting should use `mission_id + mobile_snapshot`, not only `mission_id + user_id`, so accountless or newly created users can still be counted by mobile.
 - The first Pump donation flow may create/login the user before payment, but the schema remains capable of mobile-snapshot-based verification.
 
 ## Current Opinion

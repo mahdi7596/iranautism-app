@@ -4,6 +4,12 @@ Use this file to record confirmed decisions, scope changes, module status change
 
 ## 2026-05-24
 
+### User Table Decision Simplified Before First Prisma Slice Commit
+
+- Removed the earlier broad user/admin/auth/log decision draft because it was broader than the currently agreed database implementation slice.
+- Updated the current database design so `USERS.mobile` is the canonical unique normalized mobile value, replacing `USERS.normalized_mobile`.
+- Reduced the first Prisma database slice to only the agreed `USERS` table. Auth, admin membership, OTP, sessions, RBAC, permissions, audit logs, activity logs, and security events must be redesigned in a focused decision before implementation.
+
 ### Donation Privacy And Currency Storage Rules Accepted
 
 - Updated `docs/decisions/iranautism-database-design-decisions.md` to distinguish registered donations, guest donations, and public anonymity.
@@ -22,18 +28,19 @@ Use this file to record confirmed decisions, scope changes, module status change
 
 - Added `docs/decisions/iranautism-database-design-decisions.md` to capture the current working decisions for the first Iran Autism database design slice: users, guest/registered donations, payment transactions, and partner mission completion.
 - Added `docs/product/modules/iranautism-database-table-design.md` as the table-level memory for the first registration, donation, payment, and partner mission implementation slice.
-- Updated `docs/analysis/iranautism-database-design-playground.mmd` as the visual playground for the overall Iran Autism database design; the current slice supports nullable `user_id`, donor snapshots, public visibility, donation targets, and partner mission qualification by normalized mobile.
+- Updated `docs/analysis/iranautism-database-design-playground.mmd` as the visual playground for the overall Iran Autism database design; the current slice supports nullable `user_id`, donor snapshots, public visibility, donation targets, and partner mission qualification by mobile.
 - Current opinion: prefer OTP register/login before the first Pump donation, but keep `DONATIONS.user_id` nullable so product-supported guest/anonymous donation remains possible.
 
 ## 2026-05-23
 
 ### User, Admin, Auth, And Log Database Slice Drafted
 
-- Added `docs/decisions/user-admin-auth-log-database-design.md` as the first database-slice decision for users, profiles, mobile OTP auth, sessions/devices, admin membership, RBAC, permissions, audit logs, user activity logs, and auth security events.
+- Added an earlier broad database-slice draft for users, profiles, mobile OTP auth, sessions/devices, admin membership, RBAC, permissions, audit logs, user activity logs, and auth security events.
 - Recommended a shared `users` identity table with a separate `admin_accounts` membership model instead of fully separate admin identities.
 - Established that permissions, not role names, should be the enforcement primitive for admin APIs; roles group permissions for manageability.
 - Kept future donation, Pump, Peyman, CMS, media, reports, and project references compatible through stable user IDs plus generic audit targets without designing those full schemas yet.
 - Marked AR-05 as in discussion and pointed it to this focused database-design decision.
+- Note: this broad draft was removed on 2026-05-24 before implementation because it exceeded the agreed current schema slice.
 
 ### Pump and Peyman Feature Understanding Documented
 

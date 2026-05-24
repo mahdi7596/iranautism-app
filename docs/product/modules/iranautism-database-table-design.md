@@ -13,7 +13,7 @@ Purpose: stable public identity for donors and mobile-based users.
 | Column | Meaning |
 |---|---|
 | `id` | Primary key for the user. |
-| `normalized_mobile` | Canonical unique mobile number after normalization. |
+| `mobile` | Canonical unique mobile number after normalization. |
 | `first_name` | Optional profile first name. |
 | `last_name` | Optional profile last name. |
 | `status` | Account state, such as active or blocked. |
@@ -45,7 +45,7 @@ Purpose: donor intent and confirmed contribution record.
 | `user_id` | Optional FK to `USERS`; null for guest donations. |
 | `donor_kind` | Whether the donation came from a registered user or guest donor. |
 | `donor_display_name` | Donor-facing name captured at donation time. |
-| `normalized_mobile_snapshot` | Mobile number captured at donation time, even for guests. |
+| `mobile_snapshot` | Mobile number captured at donation time, even for guests. |
 | `public_visibility` | How the donation may appear publicly. |
 | `target_type` | What kind of target the donation supports: general, project, phase, item, campaign, or similar. |
 | `target_id` | Optional target record ID when the target is a project, phase, item, or campaign. |
@@ -172,7 +172,7 @@ Purpose: completion and verification state for a user/mobile on a partner missio
 | `mission_id` | FK to `PARTNER_MISSIONS`. |
 | `user_id` | Optional FK to `USERS`; null if completion is tracked only by mobile snapshot. |
 | `qualifying_donation_id` | Optional FK to the donation that qualified this mission. |
-| `normalized_mobile_snapshot` | Mobile identity used for Pump verification and counting. |
+| `mobile_snapshot` | Mobile identity used for Pump verification and counting. |
 | `completion_count` | Count for repeatable missions. |
 | `completed` | Boolean flag for status-based missions. |
 | `last_qualified_at` | Most recent time this mobile/user qualified. |
@@ -182,7 +182,7 @@ Purpose: completion and verification state for a user/mobile on a partner missio
 Rules:
 
 - `user_id` is nullable.
-- The stable lookup for Pump counts is `mission_id + normalized_mobile_snapshot`.
+- The stable lookup for Pump counts is `mission_id + mobile_snapshot`.
 - For donation-based Pump missions, `qualifying_donation_id` points to the donation that completed or last qualified the mission.
 - For non-donation partner missions, `qualifying_donation_id` can remain null.
 
@@ -193,5 +193,5 @@ Example Pump flow:
 3. User donates to the Pump campaign target.
 4. Payment transaction succeeds and is verified.
 5. Donation becomes confirmed.
-6. Partner mission completion is created or updated using mission and normalized mobile.
+6. Partner mission completion is created or updated using mission and mobile.
 7. Pump verification API returns the required count or status for that mobile.

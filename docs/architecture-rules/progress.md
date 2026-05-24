@@ -22,7 +22,7 @@ This file tracks discussion and decision progress for the architecture-rule agen
 | AR-02 | Prisma and data ownership rules | Not started | TBD | Should follow backend module boundaries and precede initial database design. |
 | AR-03 | Donation, payment, transaction, and project-progress separation | Not started | TBD | May become part of financial-domain boundary decision. |
 | AR-04 | Admin API, public API, account API, and webhook boundaries | Not started | TBD | Shared concern with API contracts. |
-| AR-05 | Auth, RBAC, permissions, and audit logging | In discussion | `docs/decisions/user-admin-auth-log-database-design.md` | Draft database-slice decision covers shared user/admin identity, mobile OTP, sessions, RBAC, permissions, audit logs, activity logs, and auth security events. |
+| AR-05 | Auth, RBAC, permissions, and audit logging | Needs revisit | TBD | Earlier broad database-slice decision was removed before implementation; redesign this topic before adding auth, sessions, RBAC, permissions, audit logs, activity logs, or auth security events. |
 | AR-06 | API contracts and frontend/backend type sharing | Not started | TBD | Should define shared validation, DTOs, API client, and error shape. |
 | AR-07 | Shared package ownership in the monorepo | Not started | TBD | Should align with frontend and backend boundaries. |
 | AR-08 | Frontend route groups and feature boundaries | Not started | TBD | Frontend counterpart to backend module boundaries. |
