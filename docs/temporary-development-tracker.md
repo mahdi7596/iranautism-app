@@ -442,7 +442,7 @@ test(pump): cover initial donation mission flow
 
 ### Step 11: Add user mobile identity service
 
-Status: Not started
+Status: Completed on 2026-05-24
 
 Goal:
 
@@ -454,10 +454,37 @@ Expected result:
 - Keep OTP, sessions, admin users, RBAC, and profile editing outside this step unless separately confirmed.
 - Clarify how guest/mobile-snapshot donation flow upgrades to a registered user later.
 
+Progress:
+
+- 2026-05-24: Added `UsersService.findByMobile` for the current `users.mobile` identity anchor.
+- 2026-05-24: Added `UsersService.findOrCreateByMobile` as the smallest mobile identity helper for future donation, Pump, and auth work.
+- 2026-05-24: Wired `UsersService` through `UsersModule`.
+- 2026-05-24: Added service-level tests for lookup, create-when-missing, and returning an existing user without duplication.
+
 Suggested commit message:
 
 ```txt
 feat(users): add mobile identity service
+```
+
+### Step 12: Add validation and DTO layer for public backend inputs
+
+Status: Not started
+
+Goal:
+
+Add request DTOs and validation for the current public/Pump endpoints before expanding real flows.
+
+Expected result:
+
+- Pump/donation endpoint inputs validate mobile, mission ID, amount, gateway, and optional idempotency/correlation fields.
+- Invalid public input returns predictable API errors.
+- Keep OTP, payment gateway integration, Pump API-key security, and frontend work outside this step unless separately confirmed.
+
+Suggested commit message:
+
+```txt
+feat(api): add validation for pump donation inputs
 ```
 
 ## Completed Work
@@ -469,4 +496,4 @@ feat(users): add mobile identity service
 
 ## Current Next Action
 
-Review Step 10 output and confirm whether to commit it or start Step 11.
+Review Step 11 output and confirm whether to commit it or start Step 12.
