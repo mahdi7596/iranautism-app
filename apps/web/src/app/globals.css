@@ -1,0 +1,116 @@
+:root {
+  color-scheme: light;
+  --color-primary: #642e98;
+  --color-accent: #c84a1b;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f8f6fa;
+  --color-text: #1d1a22;
+  --color-text-muted: #625b6b;
+  --color-border: #e3dde9;
+  --font-sans: "IRANSansWeb", "IRANSans", "Noto Sans Arabic", Tahoma, system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-block-size: 100%;
+  background: var(--color-surface-muted);
+}
+
+body {
+  min-block-size: 100%;
+  margin: 0;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  line-height: 1.7;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+.app-shell {
+  min-block-size: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  background: var(--color-surface);
+}
+
+.app-shell__bar,
+.app-shell__footer {
+  border-block-end: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.app-shell__footer {
+  border-block-start: 1px solid var(--color-border);
+  border-block-end: 0;
+}
+
+.app-shell__inner {
+  inline-size: min(1120px, calc(100% - 32px));
+  margin-inline: auto;
+  padding-block: 20px;
+}
+
+.app-shell__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.app-shell__brand {
+  color: var(--color-primary);
+  font-weight: 800;
+}
+
+.app-shell__links {
+  display: flex;
+  gap: 16px;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.app-shell__main {
+  inline-size: min(1120px, calc(100% - 32px));
+  margin-inline: auto;
+  padding-block: 56px;
+}
+
+.foundation-panel {
+  display: grid;
+  gap: 16px;
+  max-inline-size: 720px;
+}
+
+.foundation-panel__eyebrow {
+  margin: 0;
+  color: var(--color-accent);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.foundation-panel__title {
+  margin: 0;
+  color: var(--color-primary);
+  font-size: clamp(28px, 5vw, 44px);
+  line-height: 1.35;
+}
+
+.foundation-panel__text {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 18px;
+}
