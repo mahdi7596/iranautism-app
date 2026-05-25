@@ -7,17 +7,31 @@
     "build": "next build",
     "lint": "node -e \"console.log('Web lint is not configured yet.')\"",
     "start": "next start --port 3000",
+    "test": "node --import tsx --test \"src/**/*.test.ts\"",
     "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.4.0",
+    "@iranautism/api-client": "workspace:*",
+    "@iranautism/design-tokens": "workspace:*",
+    "@iranautism/icons": "workspace:*",
+    "@iranautism/types": "workspace:*",
+    "@iranautism/ui": "workspace:*",
+    "@iranautism/validation": "workspace:*",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-toast": "^1.2.15",
+    "@tabler/icons-react": "^3.44.0",
     "next": "^16.2.6",
     "react": "^19.2.6",
-    "react-dom": "^19.2.6"
+    "react-dom": "^19.2.6",
+    "react-hook-form": "^7.76.1",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^24.12.4",
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
+    "tsx": "^4.22.3",
     "typescript": "^5.9.3"
   }
 }
