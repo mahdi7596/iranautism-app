@@ -5,10 +5,14 @@ import { PaymentsService } from "../../payments/payments.service";
 import { PartnerMissionsService } from "../partner-missions.service";
 import {
   PumpDonationIntentCommand,
+  PumpDonationIntentV2Command,
   PumpVerificationResponse,
 } from "./pump.contracts";
 
-export type StartPumpDonationIntentCommand = PumpDonationIntentCommand & {
+export type StartPumpDonationIntentCommand = (
+  | PumpDonationIntentCommand
+  | PumpDonationIntentV2Command
+) & {
   gateway: string;
   idempotencyKey?: string;
 };

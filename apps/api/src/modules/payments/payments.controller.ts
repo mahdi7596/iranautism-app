@@ -35,6 +35,11 @@ export class PaymentsController {
     });
   }
 
+  @Get("/api/payments/:paymentTransactionId/status")
+  getPaymentStatus(@Param("paymentTransactionId") paymentTransactionId: string) {
+    return this.payments.getPaymentResultStatus(paymentTransactionId);
+  }
+
   @Post("/api/payments/sadad/callback")
   handleSadadPostCallback(
     @Body(new DtoValidationPipe(SadadCallbackDto)) body: SadadCallbackDto,

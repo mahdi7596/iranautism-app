@@ -27,6 +27,7 @@ test("AuthService requestOtp creates an OTP challenge and dispatches SMS", async
   assert.deepEqual(
     await service.requestOtp({
       mobile: "09123456789",
+      otpPurpose: "login",
     }),
     {
       challengeId: "challenge_1",
@@ -40,6 +41,90 @@ test("AuthService requestOtp creates an OTP challenge and dispatches SMS", async
       templateId: undefined,
     },
   ]);
+});
+
+test("AuthService requestOtp selects normal login SMS template by purpose", async () => {
+  const originalLoginTemplate = process.env.SMS_OTP_LOGIN_TEMPLATE_ID;
+  const originalPumpTemplate = process.env.SMS_OTP_PUMP_MISSION_TEMPLATE_ID;
+  process.env.SMS_OTP_LOGIN_TEMPLATE_ID = "login-template";
+  process.env.SMS_OTP_PUMP_MISSION_TEMPLATE_ID = "pump-template";
+
+  const smsProvider = new FakeSmsProvider();
+  const service = new AuthService(
+    new InMemoryOtpChallengeStore({
+      idFactory: () => "challenge_1",
+    }),
+    smsProvider,
+    () => "123456",
+    new AuthTokenService("test-secret"),
+    {
+      findOrCreateByMobile: async (mobile: string) => ({
+        id: "user_1",
+        mobile,
+        status: "ACTIVE",
+      }),
+    } as never,
+  );
+
+  await service.requestOtp({
+    mobile: "09123456789",
+    otpPurpose: "login",
+  });
+
+  assert.equal(smsProvider.sentMessages[0]?.templateId, "login-template");
+
+  if (originalLoginTemplate === undefined) {
+    delete process.env.SMS_OTP_LOGIN_TEMPLATE_ID;
+  } else {
+    process.env.SMS_OTP_LOGIN_TEMPLATE_ID = originalLoginTemplate;
+  }
+  if (originalPumpTemplate === undefined) {
+    delete process.env.SMS_OTP_PUMP_MISSION_TEMPLATE_ID;
+  } else {
+    process.env.SMS_OTP_PUMP_MISSION_TEMPLATE_ID = originalPumpTemplate;
+  }
+});
+
+test("AuthService requestOtp selects Pump mission SMS template by purpose", async () => {
+  const originalLoginTemplate = process.env.SMS_OTP_LOGIN_TEMPLATE_ID;
+  const originalPumpTemplate = process.env.SMS_OTP_PUMP_MISSION_TEMPLATE_ID;
+  process.env.SMS_OTP_LOGIN_TEMPLATE_ID = "login-template";
+  process.env.SMS_OTP_PUMP_MISSION_TEMPLATE_ID = "pump-template";
+
+  const smsProvider = new FakeSmsProvider();
+  const service = new AuthService(
+    new InMemoryOtpChallengeStore({
+      idFactory: () => "challenge_1",
+    }),
+    smsProvider,
+    () => "123456",
+    new AuthTokenService("test-secret"),
+    {
+      findOrCreateByMobile: async (mobile: string) => ({
+        id: "user_1",
+        mobile,
+        status: "ACTIVE",
+      }),
+    } as never,
+  );
+
+  await service.requestOtp({
+    mobile: "09123456789",
+    otpPurpose: "pump_mission",
+  });
+
+  assert.equal(smsProvider.sentMessages[0]?.templateId, "pump-template");
+
+  if (originalLoginTemplate === undefined) {
+    delete process.env.SMS_OTP_LOGIN_TEMPLATE_ID;
+  } else {
+    process.env.SMS_OTP_LOGIN_TEMPLATE_ID = originalLoginTemplate;
+  }
+  if (originalPumpTemplate === undefined) {
+    delete process.env.SMS_OTP_PUMP_MISSION_TEMPLATE_ID;
+  } else {
+    process.env.SMS_OTP_PUMP_MISSION_TEMPLATE_ID = originalPumpTemplate;
+  }
 });
 
 test("AuthService verifyOtp finds or creates a user after valid OTP", async () => {

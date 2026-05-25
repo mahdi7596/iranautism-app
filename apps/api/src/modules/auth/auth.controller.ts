@@ -15,6 +15,7 @@ export class AuthController {
   requestOtp(@Body(new DtoValidationPipe(RequestOtpDto)) body: RequestOtpDto) {
     return this.auth.requestOtp({
       mobile: body.mobile,
+      otpPurpose: body.otpPurpose,
     });
   }
 

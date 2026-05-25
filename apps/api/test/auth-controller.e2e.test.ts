@@ -15,8 +15,13 @@ test("Auth OTP endpoints expose request and verify boundaries", async () => {
     .useValue({})
     .overrideProvider(AuthService)
     .useValue({
-      requestOtp: async () => {
+      requestOtp: async (command: unknown) => {
         calls.push("request");
+        if (
+          (command as { otpPurpose?: string }).otpPurpose !== "pump_mission"
+        ) {
+          throw new Error("OTP purpose was not forwarded");
+        }
         return {
           challengeId: "challenge_1",
           status: "OTP_SENT",
@@ -43,6 +48,7 @@ test("Auth OTP endpoints expose request and verify boundaries", async () => {
     .post("/api/auth/otp/request")
     .send({
       mobile: "09123456789",
+      otpPurpose: "pump_mission",
     })
     .expect(201)
     .expect({
@@ -71,6 +77,7 @@ test("Auth OTP endpoints expose request and verify boundaries", async () => {
     .post("/api/auth/otp/request")
     .send({
       mobile: "not-a-mobile",
+      otpPurpose: "unknown",
     })
     .expect(400);
 

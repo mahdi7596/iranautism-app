@@ -32,6 +32,14 @@ test("Payment endpoints expose start and Sadad callback flows", async () => {
           status: "SUCCESSFUL",
         };
       },
+      getPaymentResultStatus: async () => {
+        calls.push("status");
+        return {
+          paymentTransactionId: "payment_1",
+          donationId: "donation_1",
+          status: "SUCCESSFUL",
+        };
+      },
     })
     .compile();
 
@@ -80,6 +88,15 @@ test("Payment endpoints expose start and Sadad callback flows", async () => {
     });
 
   await request(app.getHttpServer())
+    .get("/api/payments/payment_1/status")
+    .expect(200)
+    .expect({
+      paymentTransactionId: "payment_1",
+      donationId: "donation_1",
+      status: "SUCCESSFUL",
+    });
+
+  await request(app.getHttpServer())
     .post("/api/payments/sadad/callback")
     .send({
       ResCode: "0",
@@ -87,7 +104,7 @@ test("Payment endpoints expose start and Sadad callback flows", async () => {
     })
     .expect(400);
 
-  if (calls.join(",") !== "start,callback,callback") {
+  if (calls.join(",") !== "start,callback,callback,status") {
     throw new Error("Invalid payment requests should not call the service");
   }
 

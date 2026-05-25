@@ -4,6 +4,7 @@ import request from "supertest";
 
 import { AppModule } from "../src/app.module";
 import { PrismaService } from "../src/infrastructure/prisma/prisma.service";
+import { AuthService } from "../src/modules/auth/auth.service";
 import { PumpMissionFlowService } from "../src/modules/partner-missions/pump/pump-mission-flow.service";
 
 test("Pump endpoints expose the initial donation mission backend flow", async () => {
@@ -15,10 +16,38 @@ test("Pump endpoints expose the initial donation mission backend flow", async ()
   })
     .overrideProvider(PrismaService)
     .useValue({})
+    .overrideProvider(AuthService)
+    .useValue({
+      getCurrentUser: async (authorizationHeader?: string) => {
+        if (authorizationHeader !== "Bearer token_1") {
+          throw new Error("unexpected auth header");
+        }
+        return {
+          user: {
+            id: "user_1",
+            mobile: "09111111111",
+            status: "ACTIVE",
+          },
+        };
+      },
+    })
     .overrideProvider(PumpMissionFlowService)
     .useValue({
-      startDonationIntent: async () => {
+      startDonationIntent: async (command: unknown) => {
         calls.push("start");
+        if (calls.length === 2) {
+          const identity = (command as { identity?: unknown }).identity;
+          if (
+            JSON.stringify(identity) !==
+            JSON.stringify({
+              kind: "REGISTERED",
+              userId: "user_1",
+              mobile: "09111111111",
+            })
+          ) {
+            throw new Error("Authenticated Pump identity was not forwarded");
+          }
+        }
         return {
           donationId: "donation_1",
           paymentTransactionId: "payment_1",
@@ -43,6 +72,22 @@ test("Pump endpoints expose the initial donation mission backend flow", async ()
     .post("/api/public/missions/pump/donation-intents")
     .send({
       mobile: "09123456789",
+      missionId: "iran-autism-general-donation",
+      amountIrr: "2000000",
+      gateway: "stub",
+    })
+    .expect(201)
+    .expect({
+      donationId: "donation_1",
+      paymentTransactionId: "payment_1",
+      status: "PENDING",
+    });
+
+  await request(app.getHttpServer())
+    .post("/api/public/missions/pump/donation-intents")
+    .set("authorization", "Bearer token_1")
+    .send({
+      mobile: "09999999999",
       missionId: "iran-autism-general-donation",
       amountIrr: "2000000",
       gateway: "stub",
@@ -88,7 +133,7 @@ test("Pump endpoints expose the initial donation mission backend flow", async ()
     .set("x-pump-api-key", "test-pump-secret")
     .expect(400);
 
-  if (calls.join(",") !== "start,verify") {
+  if (calls.join(",") !== "start,start,verify") {
     throw new Error("Invalid Pump requests should not call the flow service");
   }
 

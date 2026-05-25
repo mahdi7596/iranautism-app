@@ -5,6 +5,7 @@ import {
   SMS_PROVIDER,
 } from "../../infrastructure/sms/sms.provider";
 import { UsersModule } from "../users/users.module";
+import { AccountController } from "./account.controller";
 import { AuthController } from "./auth.controller";
 import { AuthTokenService } from "./auth-token.service";
 import { AuthService, OTP_CODE_FACTORY } from "./auth.service";
@@ -19,7 +20,7 @@ function createOtpCode() {
 
 @Module({
   imports: [UsersModule],
-  controllers: [AuthController],
+  controllers: [AuthController, AccountController],
   providers: [
     AuthService,
     AuthTokenService,

@@ -104,6 +104,23 @@ export class PaymentsService {
     };
   }
 
+  async getPaymentResultStatus(paymentTransactionId: string) {
+    const paymentTransaction = await this.prisma.paymentTransaction.findUnique({
+      where: { id: paymentTransactionId },
+    });
+
+    if (!paymentTransaction) {
+      throw new NotFoundException("تراکنش پرداخت پیدا نشد.");
+    }
+
+    return {
+      paymentTransactionId: paymentTransaction.id,
+      donationId: paymentTransaction.donationId,
+      status: paymentTransaction.status,
+      failureCode: paymentTransaction.failureCode ?? undefined,
+    };
+  }
+
   async verifySadadCallback(command: {
     providerAuthority: string;
     providerStatusCode: string;

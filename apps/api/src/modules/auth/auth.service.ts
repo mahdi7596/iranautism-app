@@ -19,6 +19,7 @@ import {
 
 export type RequestOtpCommand = {
   mobile: string;
+  otpPurpose: "login" | "pump_mission";
 };
 
 export type RequestOtpResult = {
@@ -72,7 +73,7 @@ export class AuthService {
 
     if (challenge.status === "RATE_LIMITED") {
       throw new HttpException(
-        "Too many OTP requests.",
+        "تعداد درخواست‌های کد تایید بیش از حد مجاز است.",
         HttpStatus.TOO_MANY_REQUESTS,
       );
     }
@@ -80,7 +81,7 @@ export class AuthService {
     await this.smsProvider.sendOtp({
       mobile: command.mobile,
       code,
-      templateId: process.env.SMS_OTP_TEMPLATE_ID || undefined,
+      templateId: this.getOtpTemplateId(command.otpPurpose),
     });
 
     return {
@@ -98,7 +99,7 @@ export class AuthService {
     });
 
     if (verification.status !== "VERIFIED") {
-      throw new UnauthorizedException("Invalid OTP challenge.");
+      throw new UnauthorizedException("کد تایید معتبر نیست یا منقضی شده است.");
     }
 
     const user = await this.users.findOrCreateByMobile(command.mobile);
@@ -113,6 +114,14 @@ export class AuthService {
     };
   }
 
+  private getOtpTemplateId(otpPurpose: RequestOtpCommand["otpPurpose"]) {
+    if (otpPurpose === "pump_mission") {
+      return process.env.SMS_OTP_PUMP_MISSION_TEMPLATE_ID || undefined;
+    }
+
+    return process.env.SMS_OTP_LOGIN_TEMPLATE_ID || undefined;
+  }
+
   async getCurrentUser(authorizationHeader?: string): Promise<{
     user: VerifyOtpResult["user"];
   }> {
@@ -121,19 +130,19 @@ export class AuthService {
       : undefined;
 
     if (!accessToken) {
-      throw new UnauthorizedException("Authentication token is required.");
+      throw new UnauthorizedException("برای ادامه باید وارد حساب شوید.");
     }
 
     const verifiedToken = this.authToken.verifyUserToken(accessToken);
 
     if (!verifiedToken) {
-      throw new UnauthorizedException("Invalid authentication token.");
+      throw new UnauthorizedException("نشست کاربری معتبر نیست.");
     }
 
     const user = await this.users.findById(verifiedToken.userId);
 
     if (!user) {
-      throw new UnauthorizedException("Invalid authentication token.");
+      throw new UnauthorizedException("نشست کاربری معتبر نیست.");
     }
 
     return {
