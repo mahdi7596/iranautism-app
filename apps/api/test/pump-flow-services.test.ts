@@ -217,6 +217,11 @@ test("PaymentsService records Sadad callback and confirms donation after verifie
           id: "payment_1",
           donationId: "donation_1",
           amount: 2_000_000n,
+          status: "REDIRECTED",
+          donation: {
+            targetLabelSnapshot: "iran-autism-general-donation",
+            mobileSnapshot: "09123456789",
+          },
         }),
         update: async (input: unknown) => {
           paymentUpdates.push(input);
@@ -228,6 +233,16 @@ test("PaymentsService records Sadad callback and confirms donation after verifie
           donationUpdates.push(input);
           return { id: "donation_1" };
         },
+      },
+      partnerMission: {
+        findUnique: async () => ({
+          id: "mission_uuid",
+          resultType: "COUNT_BASED",
+        }),
+      },
+      partnerMissionCompletion: {
+        findUnique: async () => null,
+        upsert: async () => ({ id: "completion_1" }),
       },
     } as never,
     {
@@ -279,6 +294,12 @@ test("PaymentsService does not confirm donation after failed Sadad verification"
           id: "payment_1",
           donationId: "donation_1",
           amount: 2_000_000n,
+          status: "REDIRECTED",
+          failureCode: null,
+          donation: {
+            targetLabelSnapshot: "iran-autism-general-donation",
+            mobileSnapshot: "09123456789",
+          },
         }),
         update: async (input: unknown) => {
           paymentUpdates.push(input);
@@ -289,6 +310,19 @@ test("PaymentsService does not confirm donation after failed Sadad verification"
         update: async (input: unknown) => {
           donationUpdates.push(input);
           return { id: "donation_1" };
+        },
+      },
+      partnerMission: {
+        findUnique: async () => {
+          throw new Error("failed payments should not read Pump missions");
+        },
+      },
+      partnerMissionCompletion: {
+        findUnique: async () => {
+          throw new Error("failed payments should not update Pump completion");
+        },
+        upsert: async () => {
+          throw new Error("failed payments should not update Pump completion");
         },
       },
     } as never,
@@ -321,6 +355,72 @@ test("PaymentsService does not confirm donation after failed Sadad verification"
     "FAILED",
   );
   assert.deepEqual(donationUpdates, []);
+});
+
+test("PaymentsService treats repeated successful Sadad callbacks as idempotent", async () => {
+  const paymentUpdates: unknown[] = [];
+  const completionUpdates: unknown[] = [];
+  const service = new PaymentsService(
+    {
+      paymentTransaction: {
+        findFirst: async () => ({
+          id: "payment_1",
+          donationId: "donation_1",
+          amount: 2_000_000n,
+          status: "SUCCESSFUL",
+          failureCode: null,
+          donation: {
+            targetLabelSnapshot: "iran-autism-general-donation",
+            mobileSnapshot: "09123456789",
+          },
+        }),
+        update: async (input: unknown) => {
+          paymentUpdates.push(input);
+          return { id: "payment_1" };
+        },
+      },
+      donation: {
+        update: async () => {
+          throw new Error("repeat callback should not reconfirm donation");
+        },
+      },
+      partnerMission: {
+        findUnique: async () => {
+          throw new Error("repeat callback should not update Pump completion");
+        },
+      },
+      partnerMissionCompletion: {
+        upsert: async (input: unknown) => {
+          completionUpdates.push(input);
+          return { id: "completion_1" };
+        },
+      },
+    } as never,
+    {
+      startPayment: async () => {
+        throw new Error("startPayment should not be called");
+      },
+      verifyPayment: async () => {
+        throw new Error("repeat callback should not verify again");
+      },
+    },
+  );
+
+  assert.deepEqual(
+    await service.verifySadadCallback({
+      providerAuthority: "authority_1",
+      providerStatusCode: "0",
+      orderId: "payment_1",
+    }),
+    {
+      paymentTransactionId: "payment_1",
+      donationId: "donation_1",
+      status: "SUCCESSFUL",
+      failureCode: undefined,
+    },
+  );
+  assert.deepEqual(paymentUpdates, []);
+  assert.deepEqual(completionUpdates, []);
 });
 
 test("PartnerMissionsService returns count-based Pump verification responses", async () => {

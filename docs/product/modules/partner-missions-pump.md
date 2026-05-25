@@ -250,6 +250,22 @@ Payment-confirmation rule:
 - Pump verification endpoints may read and return mission completion state.
 - Pump partner endpoints must not be the source of truth for donation/payment completion.
 - For Sadad-backed donation missions, Sadad server-side verification confirms the payment, then the backend confirms the donation and records the Pump mission completion.
+- The implemented backend supports both registered OTP users and mobile-only users: both paths store `mobile_snapshot`, and verified Sadad success uses that mobile snapshot to update Pump completion.
+- Repeated Sadad callbacks for the same already-successful payment are idempotent and must not increment Pump mission count more than once for the same qualifying donation.
+
+Current backend endpoint handoff:
+
+- User-facing Pump donation intent starts at `POST /api/public/missions/pump/donation-intents`.
+- Gateway redirect data starts at `POST /api/payments/:paymentTransactionId/start`.
+- Sadad callback is accepted at `GET /api/payments/sadad/callback` and `POST /api/payments/sadad/callback`.
+- Pump server verification reads stored completion state at `GET /api/partners/pump/missions/:missionId/verify`.
+
+Frontend handoff notes:
+
+- The frontend should collect/confirm a normalized Iranian mobile number before starting a Pump donation, even when the user is logged in.
+- After creating a Pump donation intent, the frontend should call the payment start endpoint and redirect the browser to the returned `redirectUrl`.
+- Callback result screens must show Persian messages only and should treat backend payment status as source of truth.
+- Real Sadad credentials belong only in the server environment/secret store during deployment.
 
 ## Open Questions
 

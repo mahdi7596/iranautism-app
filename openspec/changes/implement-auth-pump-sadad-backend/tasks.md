@@ -35,16 +35,16 @@
 
 ## 5. Pump Completion After Verified Payment
 
-- [ ] 5.1 Wire successful Sadad verification to record Pump mission completion by normalized mobile.
-- [ ] 5.2 Ensure failed or mismatched payments do not confirm donations or update Pump completions.
-- [ ] 5.3 Add DB-backed test for registered Pump donation completing after verified Sadad payment.
-- [ ] 5.4 Add DB-backed test for mobile-only Pump donation completing after verified Sadad payment.
-- [ ] 5.5 Keep Pump verification endpoint returning count/status based on stored completion records.
+- [x] 5.1 Wire successful Sadad verification to record Pump mission completion by normalized mobile.
+- [x] 5.2 Ensure failed or mismatched payments do not confirm donations or update Pump completions.
+- [x] 5.3 Add DB-backed test for registered Pump donation completing after verified Sadad payment.
+- [x] 5.4 Add DB-backed test for mobile-only Pump donation completing after verified Sadad payment.
+- [x] 5.5 Keep Pump verification endpoint returning count/status based on stored completion records.
 
 ## 6. Idempotency, Safety, And Final Backend Checks
 
-- [ ] 6.1 Make repeated Sadad callbacks and verification attempts idempotent.
-- [ ] 6.2 Prevent duplicate Pump completion increments for the same successful payment transaction.
-- [ ] 6.3 Add tests for duplicate callback/provider-reference behavior.
-- [ ] 6.4 Verify API tests, database-backed tests, typecheck, Prisma validation, and full workspace build.
-- [ ] 6.5 Update durable docs with final backend flow and remaining frontend handoff notes.
+- [x] 6.1 Make repeated Sadad callbacks and verification attempts idempotent.
+- [x] 6.2 Prevent duplicate Pump completion increments for the same successful payment transaction.
+- [x] 6.3 Add tests for duplicate callback/provider-reference behavior.
+- [x] 6.4 Verify API tests, database-backed tests, typecheck, Prisma validation, and full workspace build.
+- [x] 6.5 Update durable docs with final backend flow and remaining frontend handoff notes.

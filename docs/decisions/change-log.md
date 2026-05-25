@@ -2,6 +2,16 @@
 
 Use this file to record confirmed decisions, scope changes, module status changes, and important project conclusions. Keep entries short, dated, and linked to the relevant detailed document when possible.
 
+## 2026-05-25
+
+### Sadad-To-Pump Backend Flow Implemented
+
+- Implemented the Sadad-backed payment flow for Pump donation missions: payment start creates gateway redirect data, Sadad callback is recorded, server-side verification decides final payment state, and donation confirmation happens only after verified success.
+- Successful verified Sadad payments now update Pump mission completion by stored mobile snapshot for both registered OTP users and mobile-only users.
+- Repeated successful callbacks are idempotent for the same payment and do not increment the Pump mission count more than once for the same qualifying donation.
+- Frontend handoff: create Pump donation intent, start payment, redirect to Sadad, then show Persian callback/result messaging from backend payment truth.
+- Deployment reminder: real Sadad credentials must be configured in the server environment/secret store and never committed.
+
 ## 2026-05-24
 
 ### Backend Scope Narrowed To Auth, Pump, And Sadad

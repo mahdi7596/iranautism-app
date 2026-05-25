@@ -15,6 +15,8 @@ const missionId = `pump-db-${Date.now()}`;
 const mobile = "09123456789";
 const registeredMobile = "09123456780";
 const mobileOnlyMobile = "09123456781";
+const verifiedRegisteredMobile = "09123456782";
+const verifiedMobileOnlyMobile = "09123456783";
 
 const prisma = new PrismaService();
 const flow = new PumpMissionFlowService(
@@ -58,7 +60,7 @@ after(async () => {
   await prisma.user.deleteMany({
     where: {
       mobile: {
-        in: [registeredMobile],
+        in: [registeredMobile, verifiedRegisteredMobile],
       },
     },
   });
@@ -69,6 +71,152 @@ after(async () => {
     },
   });
   await prisma.$disconnect();
+});
+
+test("Registered Pump donation completes after verified Sadad payment", async () => {
+  const donations = new DonationsService(prisma);
+  const payments = new PaymentsService(prisma);
+  const partnerMissions = new PartnerMissionsService(prisma);
+  const user = await prisma.user.create({
+    data: {
+      mobile: verifiedRegisteredMobile,
+      status: "ACTIVE",
+    },
+  });
+  const donation = await donations.createPumpDonationIntent({
+    identity: {
+      kind: "REGISTERED",
+      userId: user.id,
+      mobile: verifiedRegisteredMobile,
+    },
+    missionId,
+    amountIrr: 4_000_000n,
+  });
+  const payment = await payments.createDonationPaymentAttempt({
+    donationId: donation.id,
+    gateway: "sadad",
+    amountIrr: 4_000_000n,
+    idempotencyKey: `${missionId}-registered-sadad`,
+  });
+  const started = await payments.startPayment({
+    paymentTransactionId: payment.id,
+    callbackUrl: "https://example.test/api/payments/sadad/callback",
+  });
+
+  assert.equal(started.status, "REDIRECTED");
+  assert.deepEqual(
+    await payments.verifySadadCallback({
+      providerAuthority: started.providerAuthority,
+      providerStatusCode: "0",
+      orderId: payment.id,
+    }),
+    {
+      paymentTransactionId: payment.id,
+      donationId: donation.id,
+      status: "SUCCESSFUL",
+    },
+  );
+
+  const persistedDonation = await prisma.donation.findUniqueOrThrow({
+    where: { id: donation.id },
+  });
+  const persistedPayment = await prisma.paymentTransaction.findUniqueOrThrow({
+    where: { id: payment.id },
+  });
+
+  assert.equal(persistedDonation.status, "CONFIRMED");
+  assert.equal(persistedPayment.status, "SUCCESSFUL");
+  assert.deepEqual(
+    await partnerMissions.getPumpVerificationResult({
+      missionId,
+      mobile: verifiedRegisteredMobile,
+    }),
+    {
+      mobile: verifiedRegisteredMobile,
+      missionId,
+      count: 1,
+    },
+  );
+});
+
+test("Mobile-only Pump donation completes after verified Sadad payment", async () => {
+  const payments = new PaymentsService(prisma);
+  const partnerMissions = new PartnerMissionsService(prisma);
+  const startedIntent = await flow.startDonationIntent({
+    mobile: verifiedMobileOnlyMobile,
+    missionId,
+    amountIrr: 5_000_000n,
+    gateway: "sadad",
+    idempotencyKey: `${missionId}-mobile-only-sadad`,
+  });
+  const startedPayment = await payments.startPayment({
+    paymentTransactionId: startedIntent.paymentTransactionId,
+    callbackUrl: "https://example.test/api/payments/sadad/callback",
+  });
+
+  assert.deepEqual(
+    await payments.verifySadadCallback({
+      providerAuthority: startedPayment.providerAuthority,
+      providerStatusCode: "0",
+      orderId: startedIntent.paymentTransactionId,
+    }),
+    {
+      paymentTransactionId: startedIntent.paymentTransactionId,
+      donationId: startedIntent.donationId,
+      status: "SUCCESSFUL",
+    },
+  );
+
+  assert.deepEqual(
+    await partnerMissions.getPumpVerificationResult({
+      missionId,
+      mobile: verifiedMobileOnlyMobile,
+    }),
+    {
+      mobile: verifiedMobileOnlyMobile,
+      missionId,
+      count: 1,
+    },
+  );
+});
+
+test("Repeated Sadad callbacks do not duplicate Pump completion count", async () => {
+  const payments = new PaymentsService(prisma);
+  const partnerMissions = new PartnerMissionsService(prisma);
+  const startedIntent = await flow.startDonationIntent({
+    mobile: `${mobile.slice(0, 9)}84`,
+    missionId,
+    amountIrr: 6_000_000n,
+    gateway: "sadad",
+    idempotencyKey: `${missionId}-duplicate-callback`,
+  });
+  const startedPayment = await payments.startPayment({
+    paymentTransactionId: startedIntent.paymentTransactionId,
+    callbackUrl: "https://example.test/api/payments/sadad/callback",
+  });
+
+  await payments.verifySadadCallback({
+    providerAuthority: startedPayment.providerAuthority,
+    providerStatusCode: "0",
+    orderId: startedIntent.paymentTransactionId,
+  });
+  await payments.verifySadadCallback({
+    providerAuthority: startedPayment.providerAuthority,
+    providerStatusCode: "0",
+    orderId: startedIntent.paymentTransactionId,
+  });
+
+  assert.deepEqual(
+    await partnerMissions.getPumpVerificationResult({
+      missionId,
+      mobile: `${mobile.slice(0, 9)}84`,
+    }),
+    {
+      mobile: `${mobile.slice(0, 9)}84`,
+      missionId,
+      count: 1,
+    },
+  );
 });
 
 test("Registered Pump donation intent persists user ownership", async () => {

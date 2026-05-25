@@ -122,8 +122,8 @@ Rules:
 - Donation status changes to confirmed only after server-side payment verification succeeds.
 - Current payment provider focus is Sadad Bank gateway. Sadad merchant, terminal, username, and terminal key values must be configured through environment variables and must not be stored in repository docs or source files.
 - Gateway callbacks and verification calls must be idempotent.
-- Repeated callbacks for the same provider reference must not confirm the donation twice.
-- Repeated callbacks must not create duplicate Pump completions, duplicate receipts, or duplicate financial records.
+- Repeated callbacks for the same provider reference/payment must not confirm the donation twice.
+- Repeated callbacks must not create duplicate Pump completions, duplicate receipts, duplicate financial records, or repeated mission-count increments for the same qualifying donation.
 - `idempotency_key` or provider reference fields must be unique enough to detect repeated processing.
 - Store safe provider summaries and references needed for support/reconciliation; do not store provider secrets or unsafe raw payloads.
 - If future non-donation payments become real scope, revisit whether transactions need a generic payable target.

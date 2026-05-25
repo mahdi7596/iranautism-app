@@ -22,6 +22,18 @@ export class PartnerMissionsService {
   }) {
     const mission = await this.findPumpMission(command.missionId);
     const qualifiedAt = new Date();
+    const existing = await this.prisma.partnerMissionCompletion.findUnique({
+      where: {
+        missionId_mobileSnapshot: {
+          missionId: mission.id,
+          mobileSnapshot: command.mobile,
+        },
+      },
+    });
+
+    if (existing?.qualifyingDonationId === command.qualifyingDonationId) {
+      return existing;
+    }
 
     return this.prisma.partnerMissionCompletion.upsert({
       where: {
