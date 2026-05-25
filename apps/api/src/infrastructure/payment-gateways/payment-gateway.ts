@@ -12,6 +12,7 @@ export type StartPaymentResult = {
 export type VerifyPaymentCommand = {
   providerAuthority: string;
   amountIrr: bigint;
+  providerStatusCode?: string;
 };
 
 export type VerifyPaymentResult =
@@ -30,6 +31,8 @@ export interface PaymentGateway {
   startPayment(command: StartPaymentCommand): Promise<StartPaymentResult>;
   verifyPayment(command: VerifyPaymentCommand): Promise<VerifyPaymentResult>;
 }
+
+export const PAYMENT_GATEWAY = Symbol("PAYMENT_GATEWAY");
 
 export class FakePaymentGateway implements PaymentGateway {
   async startPayment(command: StartPaymentCommand): Promise<StartPaymentResult> {

@@ -28,10 +28,10 @@
 
 - [x] 4.1 Add payment gateway interface and local fake gateway implementation.
 - [x] 4.2 Add Sadad environment config boundary using placeholders only.
-- [ ] 4.3 Add Sadad gateway adapter with initiation and verification methods.
-- [ ] 4.4 Add payment start endpoint that creates gateway redirect data for a pending donation transaction.
-- [ ] 4.5 Add Sadad callback endpoint that records callback receipt before verification.
-- [ ] 4.6 Add Sadad server-side verification flow that marks payment success/failure and confirms donation only on verified success.
+- [x] 4.3 Add Sadad gateway adapter with initiation and verification methods.
+- [x] 4.4 Add payment start endpoint that creates gateway redirect data for a pending donation transaction.
+- [x] 4.5 Add Sadad callback endpoint that records callback receipt before verification.
+- [x] 4.6 Add Sadad server-side verification flow that marks payment success/failure and confirms donation only on verified success.
 
 ## 5. Pump Completion After Verified Payment
 

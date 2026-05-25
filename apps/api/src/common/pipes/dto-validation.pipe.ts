@@ -19,7 +19,7 @@ export class DtoValidationPipe<T extends object> implements PipeTransform {
     });
 
     if (errors.length > 0) {
-      throw new BadRequestException("Invalid request input");
+      throw new BadRequestException("ورودی درخواست نامعتبر است.");
     }
 
     return instance;

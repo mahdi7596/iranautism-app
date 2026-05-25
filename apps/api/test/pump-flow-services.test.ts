@@ -156,6 +156,173 @@ test("PaymentsService records a pending payment transaction attempt", async () =
   ]);
 });
 
+test("PaymentsService starts a pending payment and stores gateway redirect data", async () => {
+  const updates: unknown[] = [];
+  const service = new PaymentsService(
+    {
+      paymentTransaction: {
+        findUnique: async () => ({
+          id: "payment_1",
+          amount: 2_000_000n,
+          status: "PENDING",
+        }),
+        update: async (input: unknown) => {
+          updates.push(input);
+          return { id: "payment_1" };
+        },
+      },
+    } as never,
+    {
+      startPayment: async () => ({
+        providerAuthority: "authority_1",
+        redirectUrl: "https://sadad.example.test/redirect",
+      }),
+      verifyPayment: async () => {
+        throw new Error("verifyPayment should not be called");
+      },
+    },
+  );
+
+  assert.deepEqual(
+    await service.startPayment({
+      paymentTransactionId: "payment_1",
+      callbackUrl: "https://example.test/api/payments/sadad/callback",
+    }),
+    {
+      paymentTransactionId: "payment_1",
+      providerAuthority: "authority_1",
+      redirectUrl: "https://sadad.example.test/redirect",
+      status: "REDIRECTED",
+    },
+  );
+  assert.equal((updates[0] as { where: { id: string } }).where.id, "payment_1");
+  assert.equal(
+    (updates[0] as { data: { providerAuthority: string } }).data
+      .providerAuthority,
+    "authority_1",
+  );
+  assert.equal(
+    (updates[0] as { data: { status: string } }).data.status,
+    "REDIRECTED",
+  );
+});
+
+test("PaymentsService records Sadad callback and confirms donation after verified success", async () => {
+  const paymentUpdates: unknown[] = [];
+  const donationUpdates: unknown[] = [];
+  const service = new PaymentsService(
+    {
+      paymentTransaction: {
+        findFirst: async () => ({
+          id: "payment_1",
+          donationId: "donation_1",
+          amount: 2_000_000n,
+        }),
+        update: async (input: unknown) => {
+          paymentUpdates.push(input);
+          return { id: "payment_1" };
+        },
+      },
+      donation: {
+        update: async (input: unknown) => {
+          donationUpdates.push(input);
+          return { id: "donation_1" };
+        },
+      },
+    } as never,
+    {
+      startPayment: async () => {
+        throw new Error("startPayment should not be called");
+      },
+      verifyPayment: async () => ({
+        status: "SUCCESSFUL",
+        providerReference: "reference_1",
+        amountIrr: 2_000_000n,
+      }),
+    },
+  );
+
+  assert.deepEqual(
+    await service.verifySadadCallback({
+      providerAuthority: "authority_1",
+      providerStatusCode: "0",
+      orderId: "payment_1",
+    }),
+    {
+      paymentTransactionId: "payment_1",
+      donationId: "donation_1",
+      status: "SUCCESSFUL",
+    },
+  );
+  assert.equal(
+    (paymentUpdates[0] as { data: { status: string } }).data.status,
+    "VERIFICATION_PENDING",
+  );
+  assert.equal(
+    (paymentUpdates[1] as { data: { providerReference: string } }).data
+      .providerReference,
+    "reference_1",
+  );
+  assert.equal(
+    (donationUpdates[0] as { data: { status: string } }).data.status,
+    "CONFIRMED",
+  );
+});
+
+test("PaymentsService does not confirm donation after failed Sadad verification", async () => {
+  const paymentUpdates: unknown[] = [];
+  const donationUpdates: unknown[] = [];
+  const service = new PaymentsService(
+    {
+      paymentTransaction: {
+        findFirst: async () => ({
+          id: "payment_1",
+          donationId: "donation_1",
+          amount: 2_000_000n,
+        }),
+        update: async (input: unknown) => {
+          paymentUpdates.push(input);
+          return { id: "payment_1" };
+        },
+      },
+      donation: {
+        update: async (input: unknown) => {
+          donationUpdates.push(input);
+          return { id: "donation_1" };
+        },
+      },
+    } as never,
+    {
+      startPayment: async () => {
+        throw new Error("startPayment should not be called");
+      },
+      verifyPayment: async () => ({
+        status: "FAILED",
+        failureCode: "SADAD_RES_CODE_17",
+      }),
+    },
+  );
+
+  assert.deepEqual(
+    await service.verifySadadCallback({
+      providerAuthority: "authority_1",
+      providerStatusCode: "17",
+      orderId: "payment_1",
+    }),
+    {
+      paymentTransactionId: "payment_1",
+      donationId: "donation_1",
+      status: "FAILED",
+      failureCode: "SADAD_RES_CODE_17",
+    },
+  );
+  assert.equal(
+    (paymentUpdates[1] as { data: { status: string } }).data.status,
+    "FAILED",
+  );
+  assert.deepEqual(donationUpdates, []);
+});
+
 test("PartnerMissionsService returns count-based Pump verification responses", async () => {
   const service = new PartnerMissionsService({
     partnerMission: {
