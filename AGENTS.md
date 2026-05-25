@@ -68,6 +68,7 @@ Current active implementation focus:
 - Pump mission donations must support both OTP-registered users and mobile-only users identified by normalized mobile.
 - Broader CMS, admin, media, reports, project/phase, Peyman, and frontend work remains outside the immediate backend focus unless separately confirmed.
 - All user-facing messages must be Persian by default across backend and frontend, including API error/success messages, validation text, form messages, toasts, empty states, and loading states.
+- When deployment/server upload is requested, remind the project owner that real Sadad credentials must be added to the server-side environment file or secret store on the server, not committed to the repository.
 
 ## Current Backend Direction
 
@@ -164,6 +165,7 @@ The authoritative module list is maintained in `docs/product/module-registry.md`
 | 2026-05-24 | User table decision simplified before the first Prisma slice commit: `USERS.mobile` replaces `USERS.normalized_mobile`, and the first Prisma schema now starts only with the agreed `USERS` table. |
 | 2026-05-24 | Backend implementation focus narrowed to mobile auth/register/login, Pump mission donations, and Sadad payment verification; Pump must support both registered and mobile-only mission completion paths. |
 | 2026-05-24 | Project message-language rule accepted: all user-facing backend and frontend messages must be Persian by default. |
+| 2026-05-25 | Deployment reminder rule added: when preparing upload/deployment to server, real Sadad credentials must be configured in the server environment/secret store and never committed to the repository. |
 
 ## Working Rules Going Forward
 
@@ -175,6 +177,7 @@ The authoritative module list is maintained in `docs/product/module-registry.md`
 - Before implementing users beyond the agreed `USERS` table, admins, authentication, authorization, sessions, OTP, audit logs, activity logs, or auth security events, create or update a focused decision document first.
 - Before implementing frontend UI, check `docs/decisions/frontend-architecture.md`; create or update project-root `DESIGN.md` before serious UI implementation begins.
 - All user-facing backend/frontend messages must be Persian by default. Use English only for internal code identifiers, logs intended only for developers/operators, protocol field names, or third-party provider constants.
+- When asked to upload/deploy the app to a server, explicitly remind that real Sadad credentials belong in the server `.env` file or server secret store and must not be committed into any repo file.
 - Before changing repo structure, workspace tooling, or admin app placement, check `docs/decisions/repository-architecture.md`.
 - Before deciding durable module, data ownership, API, state, CMS, security, operations, or testing rules, check `docs/architecture-rules/deep-dive-agenda.md` and convert the relevant topic into a focused decision document.
 - Mark unclear items as `Needs confirmation` until the client or project owner confirms them.
