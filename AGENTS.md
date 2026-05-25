@@ -139,11 +139,11 @@ The authoritative module list is maintained in `docs/product/module-registry.md`
 | CMS and Editable Content | Core candidate | Pages, menus, footer/header, blog/news, SEO fields, media reuse. |
 | Admin Panel | Core candidate | Projects, donations, users, content, reports, transactions, platform settings. |
 | Payment, Transactions, and Financial Reporting | Core candidate | Domestic gateway, transaction verification, exports, monitoring. |
-| User Accounts, Authentication, and Profiles | Core candidate | Mobile OTP, profile, donation history. |
+| User Accounts, Authentication, and Profiles | In progress | Mobile OTP login/register and minimal profile/Pump history frontend are implemented; broader donation history remains later scope. |
 | UI/UX and Design | Core candidate | UX flows, wireframes, UI, responsive design system. |
 | Technical Architecture and Deployment | Core candidate | Suggested Next.js/NestJS/PostgreSQL/Prisma/Redis/Docker stack. |
 | Future/Phase-Two Services | Future scope | Appointment booking, doctor profiles, Q&A, play center reservations. |
-| Partner Missions and Reward Integrations | In progress | Pump mission landing pages and verification API; first design links donation-based mission completions to qualifying donations and counts by mobile. |
+| Partner Missions and Reward Integrations | In progress | Pump backend and first frontend slice are implemented for four Excel missions, OTP identity, Sadad payment start/result, and profile mission history; final Pump return URL/field names still need confirmation. |
 | Recurring Donations | Needs confirmation | Peyman direct debit documented as the likely recurring donation implementation. |
 | User/Admin/Auth/Logs Database Slice | Needs revisit | Earlier broad auth/admin/log decision removed; current implemented database slice starts only with the agreed `USERS` table. |
 
@@ -166,6 +166,7 @@ The authoritative module list is maintained in `docs/product/module-registry.md`
 | 2026-05-24 | Backend implementation focus narrowed to mobile auth/register/login, Pump mission donations, and Sadad payment verification; Pump must support both registered and mobile-only mission completion paths. |
 | 2026-05-24 | Project message-language rule accepted: all user-facing backend and frontend messages must be Persian by default. |
 | 2026-05-25 | Deployment reminder rule added: when preparing upload/deployment to server, real Sadad credentials must be configured in the server environment/secret store and never committed to the repository. |
+| 2026-05-25 | Pump frontend slice implemented: `/fa/login`, `/fa/missions/pump`, mission detail OTP/payment flow, Sadad result states, and profile Pump history; verified with tests, build, and browser screenshots. |
 
 ## Working Rules Going Forward
 

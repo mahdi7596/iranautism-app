@@ -55,6 +55,16 @@ Use this file to record confirmed decisions, scope changes, module status change
 - Updated `docs/analysis/iranautism-database-design-playground.mmd` as the visual playground for the overall Iran Autism database design; the current slice supports nullable `user_id`, donor snapshots, public visibility, donation targets, and partner mission qualification by mobile.
 - Current opinion: prefer OTP register/login before the first Pump donation, but keep `DONATIONS.user_id` nullable so product-supported guest/anonymous donation remains possible.
 
+## 2026-05-25
+
+### Pump Frontend Slice Implemented
+
+- Implemented the Persian RTL login/register OTP frontend, Pump mission listing/detail/payment-start flow, Sadad result states, and minimal profile Pump history pages.
+- Added shared frontend package foundations for types, validation, API client, icons, UI primitives, design tokens, amount formatting, and Jalali date display.
+- Added backend support needed by the frontend: OTP purpose selection for login versus Pump mission SMS templates, authenticated Pump donation intents, all four Pump mission seeds, payment status lookup, and authenticated Pump history API.
+- Verified the slice with API tests, frontend/package tests, workspace typecheck, production build, and local browser screenshots for login, mission listing/detail, profile, and result modal states.
+- Remaining Pump confirmation: whether `https://pwa.pumpgame.ir/missions` is the final return URL or they want a more specific Pump campaign/session URL.
+
 ## 2026-05-23
 
 ### User, Admin, Auth, And Log Database Slice Drafted

@@ -262,20 +262,19 @@ Current backend endpoint handoff:
 
 Frontend handoff notes:
 
-- The frontend should collect/confirm a normalized Iranian mobile number before starting a Pump donation, even when the user is logged in.
-- After creating a Pump donation intent, the frontend should call the payment start endpoint and redirect the browser to the returned `redirectUrl`.
-- Callback result screens must show Persian messages only and should treat backend payment status as source of truth.
+- The frontend now provides `/fa/login`, `/fa/missions/pump`, `/fa/missions/pump/[missionId]`, `/fa/payments/sadad/result`, `/fa/profile`, and `/fa/profile/pump-missions`.
+- Normal login OTP sends `otpPurpose: "login"` and Pump mission OTP sends `otpPurpose: "pump_mission"` so SMS templates can differ.
+- If the user is already authenticated, the Pump mission detail page uses the authenticated mobile and does not ask for mobile again.
+- The first three Excel missions accept custom repeatable amounts from 10,000 toman with 10,000 toman step controls and do not display ticket counts.
+- The general donation mission uses the 200,000 toman threshold and displays 3,000 tickets.
+- After creating a Pump donation intent, the frontend calls the payment start endpoint and redirects the browser to the returned `redirectUrl`.
+- Callback/result screens show Persian messages only and treat backend payment status from `GET /api/payments/:paymentTransactionId/status` as source of truth.
+- User profile history reads `GET /api/account/pump-missions/history` and displays mission titles, completion status/count where available, and Jalali completion dates.
 - Real Sadad credentials belong only in the server environment/secret store during deployment.
 
 ## Open Questions
 
-- Which missions are repeatable and which are one-time?
-- What is the ticket count for the first three missions?
-- What is the repeat cap for each repeatable mission?
-- Are all missions donation-based, or can any be completed by account/profile/content actions?
-- What are the final landing page URLs?
+- Should Pump use the current temporary return target `https://pwa.pumpgame.ir/missions`, or do they want a more specific campaign/session return URL?
 - What API field names does Pump require exactly for mobile, count, and flag?
 - Does Pump accept a `pending` status, or only true/false/count?
 - What are Pump's production and staging server IPs?
-- What is the campaign start date for each mission?
-- Should the 200,000 toman threshold be stored as 2,000,000 IRR, and is that threshold only for the general donation mission?
