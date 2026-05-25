@@ -8,7 +8,7 @@ export type PreparePumpMissionPaymentInput = {
   mission: PumpMission;
   user: CurrentUser;
   amountToman: number;
-  callbackUrl: string;
+  resultUrl: string;
   idempotencyKey?: string;
   correlationId?: string;
 };
@@ -57,7 +57,7 @@ export async function preparePumpMissionPayment(
   });
 
   return apiClient.startPayment(donationIntent.paymentTransactionId, {
-    callbackUrl: input.callbackUrl,
+    resultUrl: input.resultUrl,
   });
 }
 

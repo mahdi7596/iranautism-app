@@ -108,7 +108,7 @@ describe("Pump mission flow", () => {
       mission,
       user,
       amountToman: 30_000,
-      callbackUrl: "http://localhost:3000/fa/payments/sadad/result",
+      resultUrl: "http://localhost:3000/fa/payments/sadad/result",
       idempotencyKey: "idem_1",
       correlationId: "corr_1",
     });
@@ -124,7 +124,7 @@ describe("Pump mission flow", () => {
     assert.deepEqual(startPaymentPayload, {
       paymentTransactionId: "payment_2",
       input: {
-        callbackUrl: "http://localhost:3000/fa/payments/sadad/result",
+        resultUrl: "http://localhost:3000/fa/payments/sadad/result",
       },
     });
     assert.equal(response.redirectUrl, "https://sadad.test/pay");
@@ -147,7 +147,7 @@ describe("Pump mission flow", () => {
           mission,
           user,
           amountToman: 10_000,
-          callbackUrl: "http://localhost:3000/fa/payments/sadad/result",
+          resultUrl: "http://localhost:3000/fa/payments/sadad/result",
         }),
       new RegExp(paymentUnavailableMessage),
     );

@@ -7,6 +7,8 @@ import {
   Param,
   Post,
   Query,
+  Req,
+  Res,
 } from "@nestjs/common";
 
 import { DtoValidationPipe } from "../../common/pipes/dto-validation.pipe";
@@ -16,6 +18,15 @@ import {
   StartPaymentDto,
 } from "./payment.dto";
 import { PaymentsService } from "./payments.service";
+
+type HeaderRequest = {
+  headers: Record<string, string | string[] | undefined>;
+};
+
+type RedirectResponse = {
+  status: (code: number) => unknown;
+  setHeader: (name: string, value: string) => unknown;
+};
 
 @Controller()
 export class PaymentsController {
@@ -32,6 +43,7 @@ export class PaymentsController {
     return this.payments.startPayment({
       paymentTransactionId,
       callbackUrl: body.callbackUrl,
+      resultUrl: body.resultUrl,
     });
   }
 
@@ -43,8 +55,11 @@ export class PaymentsController {
   @Post("/api/payments/sadad/callback")
   handleSadadPostCallback(
     @Body(new DtoValidationPipe(SadadCallbackDto)) body: SadadCallbackDto,
+    @Req() request: HeaderRequest,
+    @Res({ passthrough: true })
+    response: RedirectResponse,
   ) {
-    return this.handleSadadCallback(body);
+    return this.handleSadadCallback(body, request, response);
   }
 
   @Get("/api/payments/sadad/callback")
@@ -54,7 +69,11 @@ export class PaymentsController {
     return this.handleSadadCallback(query);
   }
 
-  private handleSadadCallback(input: SadadCallbackInput) {
+  private async handleSadadCallback(
+    input: SadadCallbackInput,
+    request?: HeaderRequest,
+    response?: RedirectResponse,
+  ) {
     const token = input.Token || input.token;
     const providerStatusCode = input.ResCode || input.resCode;
     const orderId = input.OrderId || input.orderId;
@@ -67,10 +86,28 @@ export class PaymentsController {
       throw new BadRequestException("وضعیت پرداخت سداد ارسال نشده است.");
     }
 
-    return this.payments.verifySadadCallback({
+    const result = await this.payments.verifySadadCallback({
       providerAuthority: token,
       providerStatusCode,
       orderId,
+      providerOrderId: input.providerOrderId,
     });
+
+    if (response && prefersHtml(request) && "resultUrl" in result) {
+      response.status(302);
+      response.setHeader("Location", result.resultUrl);
+      return undefined;
+    }
+
+    const { resultUrl: _resultUrl, ...apiResult } = result;
+
+    return apiResult;
   }
+}
+
+function prefersHtml(request?: HeaderRequest) {
+  const accept = request?.headers.accept;
+  const acceptHeader = Array.isArray(accept) ? accept.join(",") : accept;
+
+  return acceptHeader?.includes("text/html") ?? false;
 }

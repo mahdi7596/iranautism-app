@@ -8,7 +8,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { buildSadadCallbackUrl } from "../../config/app";
+import { buildSadadResultUrl } from "../../config/app";
 import { useAuth } from "../auth/auth-provider";
 import { verifyLoginOtp } from "../auth/login-flow";
 import { createBrowserApiClient } from "../../lib/api-client";
@@ -111,7 +111,7 @@ export function PumpMissionFlow({ mission, locale }: PumpMissionFlowProps) {
         mission,
         user: activeUser,
         amountToman: normalizeTomanAmount(amountToman, mission),
-        callbackUrl: buildSadadCallbackUrl(locale),
+        resultUrl: buildSadadResultUrl(locale),
       });
       window.location.assign(payment.redirectUrl);
     } catch (caughtError) {

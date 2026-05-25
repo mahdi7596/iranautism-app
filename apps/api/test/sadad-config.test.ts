@@ -15,13 +15,14 @@ test("readSadadConfig returns missing keys without exposing secrets", () => {
   });
 });
 
-test("readSadadConfig reads configured Sadad placeholders from env", () => {
+test("readSadadConfig reads configured Sadad placeholders and optional password from env", () => {
   assert.deepEqual(
     readSadadConfig({
       SADAD_MERCHANT_ID: "merchant",
       SADAD_TERMINAL_ID: "terminal",
       SADAD_TERMINAL_KEY: "secret-key",
       SADAD_USERNAME: "username",
+      SADAD_PASSWORD: "password",
     }),
     {
       configured: true,
@@ -29,6 +30,7 @@ test("readSadadConfig reads configured Sadad placeholders from env", () => {
       terminalId: "terminal",
       terminalKey: "secret-key",
       username: "username",
+      password: "password",
     },
   );
 });

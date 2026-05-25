@@ -78,6 +78,37 @@ test("getPaymentStatus reads backend payment truth", async () => {
   assert.equal(response.status, "SUCCESSFUL");
 });
 
+test("startPayment sends frontend result URL without provider callback fields", async () => {
+  const calls: Array<{ url: string; init: RequestInit }> = [];
+  const client = createApiClient({
+    baseUrl: "https://api.example.test",
+    fetch: async (url, init) => {
+      calls.push({ url: String(url), init: init ?? {} });
+      return jsonResponse({
+        paymentTransactionId: "payment_1",
+        providerAuthority: "authority_1",
+        redirectUrl: "https://sadad.shaparak.ir/Purchase?Token=authority_1",
+        status: "REDIRECTED",
+      });
+    },
+  });
+
+  await client.startPayment("payment_1", {
+    resultUrl: "https://web.example.test/fa/payments/sadad/result",
+  });
+
+  assert.equal(
+    calls[0]?.url,
+    "https://api.example.test/api/payments/payment_1/start",
+  );
+  assert.equal(
+    calls[0]?.init.body,
+    JSON.stringify({
+      resultUrl: "https://web.example.test/fa/payments/sadad/result",
+    }),
+  );
+});
+
 test("getPumpMissionHistory reads authenticated account history", async () => {
   let requestedUrl = "";
   const client = createApiClient({

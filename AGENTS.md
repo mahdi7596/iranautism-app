@@ -167,6 +167,7 @@ The authoritative module list is maintained in `docs/product/module-registry.md`
 | 2026-05-24 | Project message-language rule accepted: all user-facing backend and frontend messages must be Persian by default. |
 | 2026-05-25 | Deployment reminder rule added: when preparing upload/deployment to server, real Sadad credentials must be configured in the server environment/secret store and never committed to the repository. |
 | 2026-05-25 | Pump frontend slice implemented: `/fa/login`, `/fa/missions/pump`, mission detail OTP/payment flow, Sadad result states, and profile Pump history; verified with tests, build, and browser screenshots. |
+| 2026-05-25 | Live Sadad gateway contract hardened: numeric provider order IDs, PDF-aligned Sadad endpoints, backend callback verification before frontend result display, and documented Sadad referrer/domain deployment requirements. |
 
 ## Working Rules Going Forward
 
@@ -179,6 +180,7 @@ The authoritative module list is maintained in `docs/product/module-registry.md`
 - Before implementing frontend UI, check `docs/decisions/frontend-architecture.md`; create or update project-root `DESIGN.md` before serious UI implementation begins.
 - All user-facing backend/frontend messages must be Persian by default. Use English only for internal code identifiers, logs intended only for developers/operators, protocol field names, or third-party provider constants.
 - When asked to upload/deploy the app to a server, explicitly remind that real Sadad credentials belong in the server `.env` file or server secret store and must not be committed into any repo file.
+- For live Sadad, ensure the public domain/referrer, backend callback URL, and server IP match the Sadad portal configuration; frontend result pages should display backend payment truth by internal `paymentTransactionId`, not raw Sadad `OrderId`.
 - Before changing repo structure, workspace tooling, or admin app placement, check `docs/decisions/repository-architecture.md`.
 - Before deciding durable module, data ownership, API, state, CMS, security, operations, or testing rules, check `docs/architecture-rules/deep-dive-agenda.md` and convert the relevant topic into a focused decision document.
 - Mark unclear items as `Needs confirmation` until the client or project owner confirms them.

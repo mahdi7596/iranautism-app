@@ -10,9 +10,9 @@ import {
 import { SadadConfig } from "./sadad.config";
 
 const paymentRequestUrl =
-  "https://sadad.shaparak.ir/vpg/api/v0/Request/PaymentRequest";
-const verifyUrl = "https://sadad.shaparak.ir/vpg/api/v0/Advice/Verify";
-const purchaseBaseUrl = "https://sadad.shaparak.ir/VPG/Purchase";
+  "https://sadad.shaparak.ir/api/v0/Request/PaymentRequest";
+const verifyUrl = "https://sadad.shaparak.ir/api/v0/Advice/Verify";
+const purchaseBaseUrl = "https://sadad.shaparak.ir/Purchase";
 
 export type SadadHttpClient = (
   url: string,
@@ -33,8 +33,14 @@ export class SadadPaymentGateway implements PaymentGateway {
     }
 
     const amount = Number(command.amountIrr);
+    const orderId = Number(command.providerOrderId ?? 0n);
+
+    if (!Number.isSafeInteger(orderId) || orderId <= 0) {
+      throw new Error("شناسه سفارش سداد معتبر نیست.");
+    }
+
     const signData = encryptSadadPkcs7(
-      `${this.config.terminalId};${command.transactionId};${amount}`,
+      `${this.config.terminalId};${orderId};${amount}`,
       this.config.terminalKey,
     );
     const response = await this.httpClient(paymentRequestUrl, {
@@ -44,7 +50,7 @@ export class SadadPaymentGateway implements PaymentGateway {
       SignData: signData,
       ReturnUrl: command.callbackUrl,
       LocalDateTime: formatSadadLocalDateTime(new Date()),
-      OrderId: command.transactionId,
+      OrderId: orderId,
     });
     const resCode = response.ResCode?.toString();
     const token = response.Token?.toString();

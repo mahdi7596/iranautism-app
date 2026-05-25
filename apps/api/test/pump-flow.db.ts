@@ -17,6 +17,8 @@ const registeredMobile = "09123456780";
 const mobileOnlyMobile = "09123456781";
 const verifiedRegisteredMobile = "09123456782";
 const verifiedMobileOnlyMobile = "09123456783";
+const failedVerifyMobile = "09123456785";
+const mismatchVerifyMobile = "09123456786";
 
 const prisma = new PrismaService();
 const flow = new PumpMissionFlowService(
@@ -108,12 +110,15 @@ test("Registered Pump donation completes after verified Sadad payment", async ()
     await payments.verifySadadCallback({
       providerAuthority: started.providerAuthority,
       providerStatusCode: "0",
-      orderId: payment.id,
+      orderId: payment.providerOrderId.toString(),
     }),
     {
       paymentTransactionId: payment.id,
       donationId: donation.id,
       status: "SUCCESSFUL",
+      resultUrl:
+        "http://localhost:3000/fa/payments/sadad/result?paymentTransactionId=" +
+        payment.id,
     },
   );
 
@@ -158,12 +163,19 @@ test("Mobile-only Pump donation completes after verified Sadad payment", async (
     await payments.verifySadadCallback({
       providerAuthority: startedPayment.providerAuthority,
       providerStatusCode: "0",
-      orderId: startedIntent.paymentTransactionId,
+      orderId: (
+        await prisma.paymentTransaction.findUniqueOrThrow({
+          where: { id: startedIntent.paymentTransactionId },
+        })
+      ).providerOrderId.toString(),
     }),
     {
       paymentTransactionId: startedIntent.paymentTransactionId,
       donationId: startedIntent.donationId,
       status: "SUCCESSFUL",
+      resultUrl:
+        "http://localhost:3000/fa/payments/sadad/result?paymentTransactionId=" +
+        startedIntent.paymentTransactionId,
     },
   );
 
@@ -198,12 +210,20 @@ test("Repeated Sadad callbacks do not duplicate Pump completion count", async ()
   await payments.verifySadadCallback({
     providerAuthority: startedPayment.providerAuthority,
     providerStatusCode: "0",
-    orderId: startedIntent.paymentTransactionId,
+    orderId: (
+      await prisma.paymentTransaction.findUniqueOrThrow({
+        where: { id: startedIntent.paymentTransactionId },
+      })
+    ).providerOrderId.toString(),
   });
   await payments.verifySadadCallback({
     providerAuthority: startedPayment.providerAuthority,
     providerStatusCode: "0",
-    orderId: startedIntent.paymentTransactionId,
+    orderId: (
+      await prisma.paymentTransaction.findUniqueOrThrow({
+        where: { id: startedIntent.paymentTransactionId },
+      })
+    ).providerOrderId.toString(),
   });
 
   assert.deepEqual(
@@ -303,6 +323,7 @@ test("Pump donation mission flow persists donation, payment, and completion rows
   assert.equal(pendingPayment.status, "PENDING");
   assert.equal(pendingPayment.donationId, started.donationId);
   assert.equal(pendingPayment.amount, 2_500_000n);
+  assert.ok(pendingPayment.providerOrderId > 0n);
 
   assert.deepEqual(
     await flow.confirmDonationMission({
@@ -352,4 +373,129 @@ test("Pump donation mission flow persists donation, payment, and completion rows
     missionId,
     count: 1,
   });
+});
+
+test("Failed Sadad verification does not confirm donation or Pump completion", async () => {
+  const donations = new DonationsService(prisma);
+  const payments = new PaymentsService(prisma, {
+    startPayment: async (command) => ({
+      providerAuthority: `failed-authority-${command.transactionId}`,
+      redirectUrl: `https://sadad.example.test/pay/${command.transactionId}`,
+    }),
+    verifyPayment: async () => ({
+      status: "FAILED",
+      failureCode: "SADAD_VERIFY_-1",
+    }),
+  });
+  const donation = await donations.createPumpDonationIntent({
+    identity: {
+      kind: "MOBILE_ONLY",
+      mobile: failedVerifyMobile,
+    },
+    missionId,
+    amountIrr: 7_000_000n,
+  });
+  const payment = await payments.createDonationPaymentAttempt({
+    donationId: donation.id,
+    gateway: "sadad",
+    amountIrr: 7_000_000n,
+    idempotencyKey: `${missionId}-failed-verify`,
+  });
+  const started = await payments.startPayment({
+    paymentTransactionId: payment.id,
+    callbackUrl: "https://example.test/api/payments/sadad/callback",
+  });
+
+  assert.deepEqual(
+    await payments.verifySadadCallback({
+      providerAuthority: started.providerAuthority,
+      providerStatusCode: "0",
+      orderId: payment.providerOrderId.toString(),
+    }),
+    {
+      paymentTransactionId: payment.id,
+      donationId: donation.id,
+      status: "FAILED",
+      failureCode: "SADAD_VERIFY_-1",
+      resultUrl:
+        "http://localhost:3000/fa/payments/sadad/result?paymentTransactionId=" +
+        payment.id,
+    },
+  );
+
+  const persistedDonation = await prisma.donation.findUniqueOrThrow({
+    where: { id: donation.id },
+  });
+  const completion = await prisma.partnerMissionCompletion.findFirst({
+    where: {
+      mobileSnapshot: failedVerifyMobile,
+      mission: { missionKey: missionId },
+    },
+  });
+
+  assert.equal(persistedDonation.status, "PENDING");
+  assert.equal(completion, null);
+});
+
+test("Sadad amount mismatch does not confirm donation or Pump completion", async () => {
+  const donations = new DonationsService(prisma);
+  const payments = new PaymentsService(prisma, {
+    startPayment: async (command) => ({
+      providerAuthority: `mismatch-authority-${command.transactionId}`,
+      redirectUrl: `https://sadad.example.test/pay/${command.transactionId}`,
+    }),
+    verifyPayment: async () => ({
+      status: "MISMATCH",
+      failureCode: "SADAD_AMOUNT_MISMATCH",
+      amountIrr: 1_000_000n,
+    }),
+  });
+  const donation = await donations.createPumpDonationIntent({
+    identity: {
+      kind: "MOBILE_ONLY",
+      mobile: mismatchVerifyMobile,
+    },
+    missionId,
+    amountIrr: 8_000_000n,
+  });
+  const payment = await payments.createDonationPaymentAttempt({
+    donationId: donation.id,
+    gateway: "sadad",
+    amountIrr: 8_000_000n,
+    idempotencyKey: `${missionId}-mismatch-verify`,
+  });
+  const started = await payments.startPayment({
+    paymentTransactionId: payment.id,
+    callbackUrl: "https://example.test/api/payments/sadad/callback",
+  });
+
+  assert.deepEqual(
+    await payments.verifySadadCallback({
+      providerAuthority: started.providerAuthority,
+      providerStatusCode: "0",
+      orderId: payment.providerOrderId.toString(),
+    }),
+    {
+      paymentTransactionId: payment.id,
+      donationId: donation.id,
+      status: "MISMATCH",
+      failureCode: "SADAD_AMOUNT_MISMATCH",
+      resultUrl:
+        "http://localhost:3000/fa/payments/sadad/result?paymentTransactionId=" +
+        payment.id,
+    },
+  );
+
+  const persistedDonation = await prisma.donation.findUniqueOrThrow({
+    where: { id: donation.id },
+  });
+  const completion = await prisma.partnerMissionCompletion.findFirst({
+    where: {
+      mobileSnapshot: mismatchVerifyMobile,
+      mission: { missionKey: missionId },
+    },
+  });
+
+  assert.equal(persistedDonation.status, "PENDING");
+  assert.equal(completion, null);
 });

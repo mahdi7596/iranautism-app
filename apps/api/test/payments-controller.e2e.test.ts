@@ -30,6 +30,8 @@ test("Payment endpoints expose start and Sadad callback flows", async () => {
           paymentTransactionId: "payment_1",
           donationId: "donation_1",
           status: "SUCCESSFUL",
+          resultUrl:
+            "https://web.example.test/fa/payments/sadad/result?paymentTransactionId=payment_1",
         };
       },
       getPaymentResultStatus: async () => {
@@ -49,7 +51,7 @@ test("Payment endpoints expose start and Sadad callback flows", async () => {
   await request(app.getHttpServer())
     .post("/api/payments/payment_1/start")
     .send({
-      callbackUrl: "https://example.test/api/payments/sadad/callback",
+      resultUrl: "https://web.example.test/fa/payments/sadad/result",
     })
     .expect(201)
     .expect({
@@ -64,7 +66,7 @@ test("Payment endpoints expose start and Sadad callback flows", async () => {
     .send({
       Token: "authority_1",
       ResCode: "0",
-      OrderId: "payment_1",
+      OrderId: "12345",
     })
     .expect(201)
     .expect({
@@ -74,11 +76,25 @@ test("Payment endpoints expose start and Sadad callback flows", async () => {
     });
 
   await request(app.getHttpServer())
+    .post("/api/payments/sadad/callback")
+    .set("accept", "text/html")
+    .send({
+      Token: "authority_1",
+      ResCode: "0",
+      OrderId: "12345",
+    })
+    .expect(302)
+    .expect(
+      "location",
+      "https://web.example.test/fa/payments/sadad/result?paymentTransactionId=payment_1",
+    );
+
+  await request(app.getHttpServer())
     .get("/api/payments/sadad/callback")
     .query({
       Token: "authority_1",
       ResCode: "0",
-      OrderId: "payment_1",
+      OrderId: "12345",
     })
     .expect(200)
     .expect({
@@ -104,7 +120,15 @@ test("Payment endpoints expose start and Sadad callback flows", async () => {
     })
     .expect(400);
 
-  if (calls.join(",") !== "start,callback,callback,status") {
+  await request(app.getHttpServer())
+    .post("/api/payments/sadad/callback")
+    .send({
+      Token: "authority_1",
+      OrderId: "12345",
+    })
+    .expect(400);
+
+  if (calls.join(",") !== "start,callback,callback,callback,status") {
     throw new Error("Invalid payment requests should not call the service");
   }
 

@@ -102,6 +102,7 @@ Purpose: idempotent, reconcilable payment gateway lifecycle for one donation pay
 | `status` | Gateway/payment lifecycle state. |
 | `amount` | Amount snapshot for this payment attempt, stored as integer IRR. |
 | `currency` | Currency snapshot for this payment attempt; v1 canonical value is `IRR`. |
+| `provider_order_id` | Numeric provider-facing order ID for gateways such as Sadad that require a long/integer order number. |
 | `provider_authority` | Gateway authority/start-payment token when the provider uses one. |
 | `provider_reference` | Gateway reference, verification reference, or receipt reference when available. |
 | `idempotency_key` | Internal key used to avoid processing the same payment action twice. |
@@ -120,7 +121,10 @@ Rules:
 - A donation can have multiple transactions because payment may fail, be retried, or require later verification.
 - Each payment transaction represents one gateway payment attempt.
 - Donation status changes to confirmed only after server-side payment verification succeeds.
-- Current payment provider focus is Sadad Bank gateway. Sadad merchant, terminal, username, and terminal key values must be configured through environment variables and must not be stored in repository docs or source files.
+- Current payment provider focus is Sadad Bank gateway. Sadad merchant, terminal, username, password if required, and terminal key values must be configured through environment variables and must not be stored in repository docs or source files.
+- Sadad receives `provider_order_id` as its numeric `OrderId`; Iran Autism APIs and frontend status lookup continue to use the internal UUID `id`.
+- Sadad browser callbacks must be verified server-to-server before the donation is confirmed; after callback handling, the browser may be redirected to the frontend result page with the internal payment transaction ID.
+- Sadad handoff must preserve an acceptable registered domain/referrer, and deployment must align the public domain, callback URL, and server IP with Sadad portal configuration.
 - Gateway callbacks and verification calls must be idempotent.
 - Repeated callbacks for the same provider reference/payment must not confirm the donation twice.
 - Repeated callbacks must not create duplicate Pump completions, duplicate receipts, duplicate financial records, or repeated mission-count increments for the same qualifying donation.
@@ -135,6 +139,7 @@ Indexes and uniqueness:
 - Index `gateway`.
 - Index `correlation_id`.
 - Unique `idempotency_key` when present.
+- Unique `provider_order_id`.
 - Unique `gateway + provider_authority` when `provider_authority` is present.
 - Unique `gateway + provider_reference` when `provider_reference` is present.
 

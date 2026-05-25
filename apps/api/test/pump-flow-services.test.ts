@@ -165,6 +165,7 @@ test("PaymentsService starts a pending payment and stores gateway redirect data"
           id: "payment_1",
           amount: 2_000_000n,
           status: "PENDING",
+          providerOrderId: 12345n,
         }),
         update: async (input: unknown) => {
           updates.push(input);
@@ -186,7 +187,8 @@ test("PaymentsService starts a pending payment and stores gateway redirect data"
   assert.deepEqual(
     await service.startPayment({
       paymentTransactionId: "payment_1",
-      callbackUrl: "https://example.test/api/payments/sadad/callback",
+      resultUrl: "https://web.example.test/fa/payments/sadad/result",
+      callbackUrl: "https://api.example.test/api/payments/sadad/callback",
     }),
     {
       paymentTransactionId: "payment_1",
@@ -200,6 +202,14 @@ test("PaymentsService starts a pending payment and stores gateway redirect data"
     (updates[0] as { data: { providerAuthority: string } }).data
       .providerAuthority,
     "authority_1",
+  );
+  assert.equal(
+    (
+      updates[0] as {
+        data: { providerResponseSummary: { start: { resultUrl: string } } };
+      }
+    ).data.providerResponseSummary.start.resultUrl,
+    "https://web.example.test/fa/payments/sadad/result",
   );
   assert.equal(
     (updates[0] as { data: { status: string } }).data.status,
@@ -217,6 +227,7 @@ test("PaymentsService records Sadad callback and confirms donation after verifie
           id: "payment_1",
           donationId: "donation_1",
           amount: 2_000_000n,
+          providerOrderId: 12345n,
           status: "REDIRECTED",
           donation: {
             targetLabelSnapshot: "iran-autism-general-donation",
@@ -262,11 +273,14 @@ test("PaymentsService records Sadad callback and confirms donation after verifie
       providerAuthority: "authority_1",
       providerStatusCode: "0",
       orderId: "payment_1",
+      providerOrderId: "12345",
     }),
     {
       paymentTransactionId: "payment_1",
       donationId: "donation_1",
       status: "SUCCESSFUL",
+      resultUrl:
+        "http://localhost:3000/fa/payments/sadad/result?paymentTransactionId=payment_1",
     },
   );
   assert.equal(
@@ -294,6 +308,7 @@ test("PaymentsService does not confirm donation after failed Sadad verification"
           id: "payment_1",
           donationId: "donation_1",
           amount: 2_000_000n,
+          providerOrderId: 12345n,
           status: "REDIRECTED",
           failureCode: null,
           donation: {
@@ -342,12 +357,15 @@ test("PaymentsService does not confirm donation after failed Sadad verification"
       providerAuthority: "authority_1",
       providerStatusCode: "17",
       orderId: "payment_1",
+      providerOrderId: "12345",
     }),
     {
       paymentTransactionId: "payment_1",
       donationId: "donation_1",
       status: "FAILED",
       failureCode: "SADAD_RES_CODE_17",
+      resultUrl:
+        "http://localhost:3000/fa/payments/sadad/result?paymentTransactionId=payment_1",
     },
   );
   assert.equal(
@@ -367,6 +385,7 @@ test("PaymentsService treats repeated successful Sadad callbacks as idempotent",
           id: "payment_1",
           donationId: "donation_1",
           amount: 2_000_000n,
+          providerOrderId: 12345n,
           status: "SUCCESSFUL",
           failureCode: null,
           donation: {
@@ -411,12 +430,15 @@ test("PaymentsService treats repeated successful Sadad callbacks as idempotent",
       providerAuthority: "authority_1",
       providerStatusCode: "0",
       orderId: "payment_1",
+      providerOrderId: "12345",
     }),
     {
       paymentTransactionId: "payment_1",
       donationId: "donation_1",
       status: "SUCCESSFUL",
       failureCode: undefined,
+      resultUrl:
+        "http://localhost:3000/fa/payments/sadad/result?paymentTransactionId=payment_1",
     },
   );
   assert.deepEqual(paymentUpdates, []);

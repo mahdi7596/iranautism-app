@@ -12,12 +12,7 @@ export type PaymentResultViewModel = {
 };
 
 export function extractPaymentTransactionId(searchParams: URLSearchParams) {
-  return (
-    searchParams.get("paymentTransactionId") ||
-    searchParams.get("OrderId") ||
-    searchParams.get("orderId") ||
-    searchParams.get("order_id")
-  );
+  return searchParams.get("paymentTransactionId");
 }
 
 export function getPaymentResultViewModel(

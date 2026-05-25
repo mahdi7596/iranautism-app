@@ -1,5 +1,6 @@
 export type StartPaymentCommand = {
   transactionId: string;
+  providerOrderId?: bigint;
   amountIrr: bigint;
   callbackUrl: string;
 };
@@ -13,6 +14,7 @@ export type VerifyPaymentCommand = {
   providerAuthority: string;
   amountIrr: bigint;
   providerStatusCode?: string;
+  providerOrderId?: bigint;
 };
 
 export type VerifyPaymentResult =

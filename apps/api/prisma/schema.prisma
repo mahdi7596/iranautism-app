@@ -60,6 +60,7 @@ model PaymentTransaction {
   status                  PaymentTransactionStatus @default(PENDING)
   amount                  BigInt                   @db.BigInt
   currency                String                   @default("IRR") @db.VarChar(3)
+  providerOrderId         BigInt                   @unique @default(autoincrement()) @map("provider_order_id") @db.BigInt
   providerAuthority       String?                  @map("provider_authority") @db.VarChar(160)
   providerReference       String?                  @map("provider_reference") @db.VarChar(160)
   idempotencyKey          String?                  @unique @map("idempotency_key") @db.VarChar(160)

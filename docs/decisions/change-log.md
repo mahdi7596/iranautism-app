@@ -4,6 +4,15 @@ Use this file to record confirmed decisions, scope changes, module status change
 
 ## 2026-05-25
 
+### Live Sadad Gateway Contract Hardened
+
+- Added OpenSpec change `harden-live-sadad-payments` and implemented the live Sadad contract from the provided gateway PDF.
+- Sadad now receives a numeric provider order ID while Iran Autism keeps UUID payment transaction IDs for internal APIs and frontend status lookup.
+- Sadad payment request, purchase, and verify endpoints were aligned with the PDF; callback handling now supports backend verification followed by browser redirect to the Persian result page.
+- Documented the referrer/domain requirement: the deployed public domain, callback URL, and server IP must match Sadad portal configuration.
+- Sadad merchant, terminal, terminal key, username, and optional password remain server-side environment/secret-store values only.
+- Synced the finalized OpenSpec capability to `openspec/specs/live-sadad-payments/spec.md` and archived the completed change under `openspec/changes/archive/2026-05-25-harden-live-sadad-payments/`.
+
 ### Sadad-To-Pump Backend Flow Implemented
 
 - Implemented the Sadad-backed payment flow for Pump donation missions: payment start creates gateway redirect data, Sadad callback is recorded, server-side verification decides final payment state, and donation confirmation happens only after verified success.

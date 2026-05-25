@@ -1,9 +1,15 @@
 import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class StartPaymentDto {
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
-  callbackUrl!: string;
+  callbackUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  resultUrl?: string;
 }
 
 export type SadadCallbackInput = {
@@ -13,6 +19,7 @@ export type SadadCallbackInput = {
   resCode?: string;
   OrderId?: string;
   orderId?: string;
+  providerOrderId?: string;
 };
 
 export class SadadCallbackDto {
@@ -39,4 +46,8 @@ export class SadadCallbackDto {
   @IsOptional()
   @IsString()
   orderId?: string;
+
+  @IsOptional()
+  @IsString()
+  providerOrderId?: string;
 }

@@ -28,22 +28,23 @@ test("SadadPaymentGateway requests token and returns redirect URL", async () => 
   assert.deepEqual(
     await gateway.startPayment({
       transactionId: "payment_1",
+      providerOrderId: 12345n,
       amountIrr: 2_000_000n,
       callbackUrl: "https://example.test/payments/sadad/callback",
     }),
     {
       providerAuthority: "sadad_token_1",
-      redirectUrl: "https://sadad.shaparak.ir/VPG/Purchase?Token=sadad_token_1",
+      redirectUrl: "https://sadad.shaparak.ir/Purchase?Token=sadad_token_1",
     },
   );
   assert.equal(
     requests[0]?.url,
-    "https://sadad.shaparak.ir/vpg/api/v0/Request/PaymentRequest",
+    "https://sadad.shaparak.ir/api/v0/Request/PaymentRequest",
   );
   assert.equal((requests[0]?.body as { TerminalId: string }).TerminalId, "terminal_1");
   assert.equal((requests[0]?.body as { MerchantId: string }).MerchantId, "merchant_1");
   assert.equal((requests[0]?.body as { Amount: number }).Amount, 2_000_000);
-  assert.equal((requests[0]?.body as { OrderId: string }).OrderId, "payment_1");
+  assert.equal((requests[0]?.body as { OrderId: number }).OrderId, 12345);
   assert.equal(
     (requests[0]?.body as { ReturnUrl: string }).ReturnUrl,
     "https://example.test/payments/sadad/callback",
@@ -78,6 +79,7 @@ test("SadadPaymentGateway verifies successful payments", async () => {
       providerAuthority: "sadad_token_1",
       amountIrr: 2_000_000n,
       providerStatusCode: "0",
+      providerOrderId: 12345n,
     }),
     {
       status: "SUCCESSFUL",
@@ -87,7 +89,7 @@ test("SadadPaymentGateway verifies successful payments", async () => {
   );
   assert.equal(
     requests[0]?.url,
-    "https://sadad.shaparak.ir/vpg/api/v0/Advice/Verify",
+    "https://sadad.shaparak.ir/api/v0/Advice/Verify",
   );
   assert.deepEqual(Object.keys(requests[0]?.body as object).sort(), [
     "SignData",
@@ -116,6 +118,7 @@ test("SadadPaymentGateway reports amount mismatch", async () => {
       providerAuthority: "sadad_token_1",
       amountIrr: 2_000_000n,
       providerStatusCode: "0",
+      providerOrderId: 12345n,
     }),
     {
       status: "MISMATCH",

@@ -87,6 +87,14 @@ Out of scope for the current backend focus:
 
 Sadad payment credentials must be configured through environment variables only. Real merchant, terminal, username, or key values must not be committed to the repository or copied into durable documentation.
 
+Live Sadad hardening adds these operational rules:
+
+- Sadad receives a numeric provider order ID, while Iran Autism keeps the internal UUID payment transaction ID for application APIs and frontend status lookup.
+- Sadad must return to the backend callback endpoint first so the backend can record the callback, call Sadad Verify server-to-server, and only then redirect the browser to the Persian result page.
+- The frontend result page displays backend payment truth by internal payment transaction ID; it must not trust raw Sadad callback fields such as `OrderId`.
+- Browser handoff to Sadad should preserve the registered website origin/referrer and must not use a restrictive `Referrer-Policy` that blocks Sadad's domain validation.
+- The deployed domain, callback URL, and server IP must match the values configured in the Sadad portal.
+
 ## User Identification
 
 Use mobile-based identification as the preferred method.
@@ -257,7 +265,7 @@ Current backend endpoint handoff:
 
 - User-facing Pump donation intent starts at `POST /api/public/missions/pump/donation-intents`.
 - Gateway redirect data starts at `POST /api/payments/:paymentTransactionId/start`.
-- Sadad callback is accepted at `GET /api/payments/sadad/callback` and `POST /api/payments/sadad/callback`.
+- Sadad callback is accepted at `GET /api/payments/sadad/callback` and `POST /api/payments/sadad/callback`; browser-style Sadad POST callbacks are verified server-side and then redirected to the frontend result page with the internal `paymentTransactionId`.
 - Pump server verification reads stored completion state at `GET /api/partners/pump/missions/:missionId/verify`.
 
 Frontend handoff notes:

@@ -62,7 +62,8 @@ export class PaymentsService {
 
   async startPayment(command: {
     paymentTransactionId: string;
-    callbackUrl: string;
+    callbackUrl?: string;
+    resultUrl?: string;
   }) {
     const paymentTransaction =
       await this.prisma.paymentTransaction.findUnique({
@@ -77,10 +78,17 @@ export class PaymentsService {
       throw new BadRequestException("این تراکنش در وضعیت قابل شروع نیست.");
     }
 
+    const resultUrl = buildStartResultUrl(command.resultUrl, command.callbackUrl);
+    if (!resultUrl) {
+      throw new BadRequestException("آدرس نتیجه پرداخت ارسال نشده است.");
+    }
+    const callbackUrl = buildSadadCallbackUrl(command.callbackUrl);
+
     const redirectData = await this.paymentGateway.startPayment({
       transactionId: paymentTransaction.id,
+      providerOrderId: paymentTransaction.providerOrderId,
       amountIrr: paymentTransaction.amount,
-      callbackUrl: command.callbackUrl,
+      callbackUrl,
     });
 
     await this.prisma.paymentTransaction.update({
@@ -91,6 +99,8 @@ export class PaymentsService {
         providerResponseSummary: {
           start: {
             redirectCreatedAt: new Date().toISOString(),
+            callbackUrl,
+            resultUrl,
           },
         },
       },
@@ -125,13 +135,18 @@ export class PaymentsService {
     providerAuthority: string;
     providerStatusCode: string;
     orderId?: string;
+    providerOrderId?: string;
   }) {
+    const providerOrderId = parseProviderOrderId(
+      command.providerOrderId ?? command.orderId,
+    );
     const paymentTransaction =
       await this.prisma.paymentTransaction.findFirst({
         where: {
           OR: [
             { providerAuthority: command.providerAuthority },
-            ...(command.orderId ? [{ id: command.orderId }] : []),
+            ...(providerOrderId ? [{ providerOrderId }] : []),
+            ...(isUuid(command.orderId) ? [{ id: command.orderId }] : []),
           ],
         },
         include: {
@@ -153,9 +168,13 @@ export class PaymentsService {
         donationId: paymentTransaction.donationId,
         status: paymentTransaction.status,
         failureCode: paymentTransaction.failureCode ?? undefined,
+        resultUrl: buildPaymentResultUrl(paymentTransaction),
       };
     }
 
+    const currentSummary = asProviderSummary(
+      paymentTransaction.providerResponseSummary,
+    );
     await this.prisma.paymentTransaction.update({
       where: { id: paymentTransaction.id },
       data: {
@@ -163,9 +182,11 @@ export class PaymentsService {
         callbackReceivedAt: new Date(),
         providerAuthority: command.providerAuthority,
         providerResponseSummary: {
+          ...currentSummary,
           sadadCallback: {
             resCode: command.providerStatusCode,
             orderId: command.orderId,
+            providerOrderId: providerOrderId?.toString(),
             tokenReceived: true,
           },
         },
@@ -175,6 +196,7 @@ export class PaymentsService {
     const verification = await this.paymentGateway.verifyPayment({
       providerAuthority: command.providerAuthority,
       providerStatusCode: command.providerStatusCode,
+      providerOrderId: paymentTransaction.providerOrderId,
       amountIrr: paymentTransaction.amount,
     });
 
@@ -186,6 +208,20 @@ export class PaymentsService {
           providerReference: verification.providerReference,
           verifiedAt: new Date(),
           failureCode: null,
+          providerResponseSummary: {
+            ...currentSummary,
+            sadadCallback: {
+              resCode: command.providerStatusCode,
+              orderId: command.orderId,
+              providerOrderId: providerOrderId?.toString(),
+              tokenReceived: true,
+            },
+            sadadVerify: {
+              providerReference: verification.providerReference,
+              amountIrr: verification.amountIrr.toString(),
+              verifiedAt: new Date().toISOString(),
+            },
+          },
         },
       });
       await this.prisma.donation.update({
@@ -205,6 +241,7 @@ export class PaymentsService {
         paymentTransactionId: paymentTransaction.id,
         donationId: paymentTransaction.donationId,
         status: "SUCCESSFUL" as const,
+        resultUrl: buildPaymentResultUrl(paymentTransaction),
       };
     }
 
@@ -214,6 +251,20 @@ export class PaymentsService {
         status: verification.status,
         failedAt: new Date(),
         failureCode: verification.failureCode,
+        providerResponseSummary: {
+          ...currentSummary,
+          sadadCallback: {
+            resCode: command.providerStatusCode,
+            orderId: command.orderId,
+            providerOrderId: providerOrderId?.toString(),
+            tokenReceived: true,
+          },
+          sadadVerify: {
+            failureCode: verification.failureCode,
+            amountIrr: verification.amountIrr?.toString(),
+            failedAt: new Date().toISOString(),
+          },
+        },
       },
     });
 
@@ -222,6 +273,7 @@ export class PaymentsService {
       donationId: paymentTransaction.donationId,
       status: verification.status,
       failureCode: verification.failureCode,
+      resultUrl: buildPaymentResultUrl(paymentTransaction),
     };
   }
 
@@ -286,4 +338,72 @@ export class PaymentsService {
       },
     });
   }
+}
+
+function buildSadadCallbackUrl(inputCallbackUrl?: string) {
+  if (process.env.SADAD_CALLBACK_URL) {
+    return process.env.SADAD_CALLBACK_URL;
+  }
+
+  if (process.env.API_PUBLIC_BASE_URL) {
+    return `${process.env.API_PUBLIC_BASE_URL.replace(/\/$/, "")}/api/payments/sadad/callback`;
+  }
+
+  if (inputCallbackUrl?.includes("/api/payments/sadad/callback")) {
+    return inputCallbackUrl;
+  }
+
+  return "http://localhost:3001/api/payments/sadad/callback";
+}
+
+function buildStartResultUrl(resultUrl?: string, callbackUrl?: string) {
+  if (resultUrl) {
+    return resultUrl;
+  }
+
+  if (callbackUrl && !callbackUrl.includes("/api/payments/sadad/callback")) {
+    return callbackUrl;
+  }
+
+  return "http://localhost:3000/fa/payments/sadad/result";
+}
+
+function parseProviderOrderId(orderId?: string) {
+  if (!orderId || !/^\d+$/.test(orderId)) {
+    return undefined;
+  }
+
+  return BigInt(orderId);
+}
+
+function isUuid(value?: string) {
+  return (
+    typeof value === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+      value,
+    )
+  );
+}
+
+function asProviderSummary(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : {};
+}
+
+function buildPaymentResultUrl(paymentTransaction: {
+  id: string;
+  providerResponseSummary?: unknown;
+}) {
+  const summary = asProviderSummary(paymentTransaction.providerResponseSummary);
+  const start = asProviderSummary(summary.start);
+  const resultUrl =
+    typeof start.resultUrl === "string"
+      ? start.resultUrl
+      : "http://localhost:3000/fa/payments/sadad/result";
+  const url = new URL(resultUrl);
+
+  url.searchParams.set("paymentTransactionId", paymentTransaction.id);
+
+  return url.toString();
 }

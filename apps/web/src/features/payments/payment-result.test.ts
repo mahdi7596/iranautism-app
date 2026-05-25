@@ -10,12 +10,12 @@ import { PAYMENT_RESULT_COPY } from "./payment.constants";
 describe("payment result helpers", () => {
   it("extracts payment id from supported query names", () => {
     assert.equal(
-      extractPaymentTransactionId(new URLSearchParams("OrderId=payment_1")),
-      "payment_1",
-    );
-    assert.equal(
       extractPaymentTransactionId(new URLSearchParams("paymentTransactionId=payment_2")),
       "payment_2",
+    );
+    assert.equal(
+      extractPaymentTransactionId(new URLSearchParams("OrderId=12345")),
+      null,
     );
   });
 

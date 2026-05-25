@@ -40,6 +40,6 @@ export function buildSadadResultPath(locale: SupportedLocale) {
   return buildLocalePath(locale, "/payments/sadad/result");
 }
 
-export function buildSadadCallbackUrl(locale: SupportedLocale) {
+export function buildSadadResultUrl(locale: SupportedLocale) {
   return `${appConfig.webBaseUrl}${buildSadadResultPath(locale)}`;
 }

@@ -64,7 +64,8 @@ export type StartPumpDonationIntentResponse = {
 };
 
 export type StartPaymentRequest = {
-  callbackUrl: string;
+  resultUrl: string;
+  callbackUrl?: string;
 };
 
 export type StartPaymentResponse = {
