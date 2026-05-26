@@ -8,5 +8,8 @@
     "build": "pnpm --recursive --if-present build",
     "lint": "pnpm --recursive --if-present lint",
     "typecheck": "pnpm --recursive --if-present typecheck"
+  },
+  "devDependencies": {
+    "playwright": "^1.60.0"
   }
 }
