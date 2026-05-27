@@ -1,6 +1,7 @@
 "use client";
 
 import { Button, LoadingState } from "@iranautism/ui";
+import { Icon } from "@iranautism/icons";
 import Link from "next/link";
 
 import { buildLoginPath, buildProfilePath, buildPumpHistoryPath } from "../../config/app";
@@ -29,9 +30,19 @@ export function ProfileDashboard() {
   return (
     <section className="account-page" aria-labelledby="profile-title">
       <h1 id="profile-title">{ACCOUNT_COPY.profile.title}</h1>
-      <p>
-        {ACCOUNT_COPY.profile.mobileLabel} <span dir="ltr">{auth.user.mobile}</span>
-      </p>
+      <div className="account-identity">
+        <Icon name="user" />
+        <p>
+          {ACCOUNT_COPY.profile.mobileLabel} <span dir="ltr">{auth.user.mobile}</span>
+        </p>
+      </div>
+      <Link className="account-feature-card" href={buildPumpHistoryPath("fa")}>
+        <Icon name="ticket" />
+        <span>
+          <strong>{ACCOUNT_COPY.profile.pumpCardTitle}</strong>
+          <small>{ACCOUNT_COPY.profile.pumpCardText}</small>
+        </span>
+      </Link>
       <div className="account-actions">
         <Link className="ds-btn ds-btn--primary ds-btn--lg" href={buildPumpHistoryPath("fa")}>
           {ACCOUNT_COPY.profile.pumpHistoryCta}

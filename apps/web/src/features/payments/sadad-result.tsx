@@ -1,7 +1,8 @@
 "use client";
 
 import type { PaymentResultStatus } from "@iranautism/types";
-import { Alert, Button, LoadingState, Modal } from "@iranautism/ui";
+import { Icon } from "@iranautism/icons";
+import { Alert, LoadingState } from "@iranautism/ui";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -20,9 +21,12 @@ type ResultState =
 
 export function SadadResult() {
   const searchParams = useSearchParams();
-  const [resultState, setResultState] = useState<ResultState>({ kind: "loading" });
-  const [isOpen, setIsOpen] = useState(true);
   const paymentTransactionId = extractPaymentTransactionId(searchParams);
+  const [resultState, setResultState] = useState<ResultState>(
+    paymentTransactionId
+      ? { kind: "loading" }
+      : { kind: "error", message: PAYMENT_RESULT_COPY.missingPaymentId },
+  );
 
   useEffect(() => {
     let active = true;
@@ -62,7 +66,10 @@ export function SadadResult() {
   if (resultState.kind === "loading") {
     return (
       <section className="payment-result-page">
-        <LoadingState>{PAYMENT_RESULT_COPY.loading}</LoadingState>
+        <div className="payment-result-card payment-result-card--loading">
+          <LoadingState>{PAYMENT_RESULT_COPY.loading}</LoadingState>
+          <p>{PAYMENT_RESULT_COPY.helper.trustedLookup}</p>
+        </div>
       </section>
     );
   }
@@ -70,10 +77,19 @@ export function SadadResult() {
   if (resultState.kind === "error") {
     return (
       <section className="payment-result-page">
-        <Alert variant="danger">{resultState.message}</Alert>
-        <a className="ds-btn ds-btn--primary ds-btn--lg" href={appConfig.pumpReturnUrl}>
-          {PAYMENT_RESULT_COPY.actions.returnToPump}
-        </a>
+        <div className="payment-result-card payment-result-card--error">
+          <Icon name="alert" size="lg" />
+          <h1>{PAYMENT_RESULT_COPY.statuses.failure.title}</h1>
+          <Alert variant="danger">{resultState.message}</Alert>
+          <div className="payment-result__actions">
+            <a className="ds-btn ds-btn--quiet ds-btn--lg" href={buildPumpMissionsPath("fa")}>
+              {PAYMENT_RESULT_COPY.actions.missions}
+            </a>
+            <a className="ds-btn ds-btn--primary ds-btn--lg" href={appConfig.pumpReturnUrl}>
+              {PAYMENT_RESULT_COPY.actions.returnToPump}
+            </a>
+          </div>
+        </div>
       </section>
     );
   }
@@ -83,41 +99,31 @@ export function SadadResult() {
 
   return (
     <section className="payment-result-page" aria-labelledby="payment-result-title">
-      <Modal
-        open={isOpen}
-        onOpenChange={setIsOpen}
-        title={viewModel.title}
-        description={viewModel.description}
+      <div
+        className={`payment-result-card payment-result-card--${viewModel.tone}`}
       >
-        <div className={`payment-result payment-result--${viewModel.tone}`}>
-          {isSuccess ? (
-            <div className="payment-result__gift" aria-hidden="true">
-              <span />
-              <span />
-              <span />
-            </div>
-          ) : null}
-          <div className="payment-result__actions">
-            {viewModel.canRetry ? (
-              <a className="ds-btn ds-btn--quiet ds-btn--lg" href={buildPumpMissionsPath("fa")}>
-                {PAYMENT_RESULT_COPY.actions.retry}
-              </a>
-            ) : null}
-            <a className="ds-btn ds-btn--primary ds-btn--lg" href={appConfig.pumpReturnUrl}>
-              {PAYMENT_RESULT_COPY.actions.returnToPump}
-            </a>
-          </div>
+        <div className="payment-result__icon" aria-hidden="true">
+          {isSuccess ? <Icon name="gift" size="lg" /> : <Icon name={viewModel.canRetry ? "alert" : "receipt"} size="lg" />}
         </div>
-      </Modal>
-      {!isOpen ? (
-        <div className="payment-result-page__fallback">
+        <div className="payment-result__copy">
           <h1 id="payment-result-title">{viewModel.title}</h1>
           <p>{viewModel.description}</p>
-          <Button type="button" onClick={() => setIsOpen(true)}>
-            {PAYMENT_RESULT_COPY.actions.showResult}
-          </Button>
+          <span>{PAYMENT_RESULT_COPY.helper.trustedLookup}</span>
         </div>
-      ) : null}
+        <p className="payment-result__next">
+          {isSuccess ? PAYMENT_RESULT_COPY.helper.successNext : PAYMENT_RESULT_COPY.helper.retryNext}
+        </p>
+        <div className="payment-result__actions">
+          {viewModel.canRetry ? (
+            <a className="ds-btn ds-btn--quiet ds-btn--lg" href={buildPumpMissionsPath("fa")}>
+              {PAYMENT_RESULT_COPY.actions.retry}
+            </a>
+          ) : null}
+          <a className="ds-btn ds-btn--primary ds-btn--lg" href={appConfig.pumpReturnUrl}>
+            {PAYMENT_RESULT_COPY.actions.returnToPump}
+          </a>
+        </div>
+      </div>
     </section>
   );
 }

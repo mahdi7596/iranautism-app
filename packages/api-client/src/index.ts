@@ -44,6 +44,8 @@ export function createApiClient(options: ApiClientOptions) {
     const response = await fetchImpl(`${baseUrl}${path}`, {
       ...init,
       headers,
+    }).catch(() => {
+      throw new Error(API_CLIENT_MESSAGES.networkFailed);
     });
 
     const body = await response.json().catch(() => null);

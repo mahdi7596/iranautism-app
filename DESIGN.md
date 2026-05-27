@@ -26,9 +26,9 @@ colors:
   on-primary-container: "#32104F"
   primary-soft: "#F8F3FB"
   on-primary-soft: "#4E2378"
-  accent: "#C84A1B"
+  accent: "#FF7438"
   on-accent: "#FFFFFF"
-  accent-brand: "#F4773F"
+  accent-brand: "#FF7438"
   accent-container: "#FFE7D9"
   on-accent-container: "#6B260B"
   secondary: "#475569"
@@ -44,7 +44,7 @@ colors:
   on-surface-inverse: "#FFFFFF"
   border: "#E3DDE9"
   border-strong: "#C8BBD4"
-  outline-focus: "#F4773F"
+  outline-focus: "#FF7438"
   success: "#16734A"
   on-success: "#FFFFFF"
   success-container: "#DDF5E9"
@@ -62,7 +62,7 @@ colors:
   info-container: "#DDEBFA"
   on-info-container: "#12385E"
   chart-1: "#642E98"
-  chart-2: "#F4773F"
+  chart-2: "#FF7438"
   chart-3: "#16734A"
   chart-4: "#2868A8"
   chart-5: "#9A6500"
@@ -72,14 +72,14 @@ colors:
 
 typography:
   font-sans: "'IRANSansWeb', 'IRANSans', 'Noto Sans Arabic', Tahoma, system-ui, sans-serif"
-  font-display: "'Ray', 'IRANSansWeb', 'Noto Sans Arabic', Tahoma, system-ui, sans-serif"
-  font-latin: "Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+  font-display: "{typography.font-sans}"
+  font-latin: "{typography.font-sans}"
   font-mono: "'SFMono-Regular', Consolas, 'Roboto Mono', monospace"
-  display-lg: { fontFamily: "{typography.font-display}", fontSize: "48px", fontWeight: 800, lineHeight: "60px", letterSpacing: "0px" }
-  display-md: { fontFamily: "{typography.font-display}", fontSize: "40px", fontWeight: 800, lineHeight: "52px", letterSpacing: "0px" }
-  h1: { fontFamily: "{typography.font-sans}", fontSize: "32px", fontWeight: 700, lineHeight: "44px", letterSpacing: "0px" }
-  h2: { fontFamily: "{typography.font-sans}", fontSize: "28px", fontWeight: 700, lineHeight: "40px", letterSpacing: "0px" }
-  h3: { fontFamily: "{typography.font-sans}", fontSize: "24px", fontWeight: 700, lineHeight: "36px", letterSpacing: "0px" }
+  display-lg: { fontFamily: "{typography.font-display}", fontSize: "34px", fontWeight: 800, lineHeight: "48px", letterSpacing: "0px" }
+  display-md: { fontFamily: "{typography.font-display}", fontSize: "28px", fontWeight: 800, lineHeight: "42px", letterSpacing: "0px" }
+  h1: { fontFamily: "{typography.font-sans}", fontSize: "24px", fontWeight: 700, lineHeight: "36px", letterSpacing: "0px" }
+  h2: { fontFamily: "{typography.font-sans}", fontSize: "20px", fontWeight: 700, lineHeight: "32px", letterSpacing: "0px" }
+  h3: { fontFamily: "{typography.font-sans}", fontSize: "20px", fontWeight: 700, lineHeight: "32px", letterSpacing: "0px" }
   h4: { fontFamily: "{typography.font-sans}", fontSize: "20px", fontWeight: 700, lineHeight: "32px", letterSpacing: "0px" }
   h5: { fontFamily: "{typography.font-sans}", fontSize: "18px", fontWeight: 700, lineHeight: "28px", letterSpacing: "0px" }
   h6: { fontFamily: "{typography.font-sans}", fontSize: "16px", fontWeight: 700, lineHeight: "24px", letterSpacing: "0px" }
@@ -273,23 +273,9 @@ Status colors must not rely on color alone. Pair status color with text, icon, l
 
 ## Typography
 
-Use `IRANSans` as the default UI typeface for Persian, Arabic, and mixed RTL content. It is the body, form, button, table, dashboard, admin, donation, and CMS rendering font.
+Use `IRANSans` as the only site typeface for Persian, Arabic, Latin, numeric, and mixed RTL content. It is the body, heading, hero, form, button, table, dashboard, admin, donation, and CMS rendering font.
 
-Use `Ray` only as a controlled display accent. Allowed uses:
-
-- Homepage or campaign hero headlines.
-- Major fundraising campaign titles.
-- Construction milestone feature headings.
-- Rare celebratory donation or mission-completion moments.
-
-Forbidden uses for `Ray`:
-
-- Body copy.
-- Form labels or inputs.
-- Admin navigation.
-- Data tables.
-- Dense dashboards.
-- Error messages.
+Do not load or use secondary display fonts. Visual hierarchy should come from IRANSans weight, size, line-height, spacing, and color rather than switching font families.
 
 Typography rules:
 
@@ -324,6 +310,7 @@ Avoid nested cards. Page sections should be full-width bands or unframed layouts
 ## Elevation & Depth
 
 Depth should be quiet. Prefer borders, surface changes, and spacing before shadows.
+Buttons must not use decorative shadow styling. Orange CTAs should be flat, direct, and close to the approved reference images.
 
 Use three elevation levels:
 
@@ -353,6 +340,9 @@ Buttons:
 - Quiet buttons use white surface with purple text and border.
 - Destructive buttons use danger red and must include clear text.
 - Icon buttons must have accessible labels and tooltips when meaning is not obvious.
+- Anonymous login/account entry must not use a purple profile icon. Use a neutral login-style icon or button until the user is authenticated.
+- Logged-in profile/account entry may use profile-oriented iconography and purple identity styling.
+- Sliders must be manually controllable, keyboard reachable, and reduced-motion safe. Do not require autoplay to understand content.
 
 Forms:
 
@@ -409,7 +399,7 @@ Do:
 - Use purple for identity and continuity.
 - Use orange for primary actions.
 - Use IRANSans for nearly all UI.
-- Use Ray sparingly for public hero/campaign emphasis.
+- Use IRANSans for hero and campaign emphasis too.
 - Use real project, child-centered, and construction-progress imagery when available.
 - Keep admin quiet, dense, and trustworthy.
 - Use semantic HTML before ARIA.
@@ -421,7 +411,7 @@ Don't:
 
 - Invent colors outside this file.
 - Use orange as decoration.
-- Use Ray inside tables, forms, admin pages, or body copy.
+- Add secondary display fonts or font-family overrides outside the IRANSans stack.
 - Use decorative blobs, glass effects, generic gradients, or random illustration systems.
 - Make oversized headings inside cards, dashboards, modals, sidebars, or forms.
 - Put cards inside cards.
@@ -553,7 +543,7 @@ Agents must:
 - Use Tabler icons only through the project-owned icon wrapper once implemented.
 - Keep admin and public experiences in the same design family but with different density.
 - Keep orange reserved for high-value actions.
-- Use Ray only where this file allows it.
+- Use IRANSans as the single product typeface.
 - Include empty, loading, error, disabled, and long-text states for new components.
 - Verify mobile and desktop layouts before claiming UI work is complete.
 - Explain any design-system deviation and propose a reusable token/component when the system lacks coverage.

@@ -1,8 +1,6 @@
 "use client";
 
 import { IconButton } from "@iranautism/ui";
-import { formatPersianNumber } from "@iranautism/ui";
-
 import {
   decreaseTomanAmount,
   increaseTomanAmount,
@@ -18,39 +16,51 @@ type AmountStepperProps = {
   disabled?: boolean;
 };
 
+const amountFormatter = new Intl.NumberFormat("en-US");
+
+function formatTomanInput(value: number) {
+  return amountFormatter.format(value);
+}
+
+function parseTomanInput(value: string) {
+  const digits = value.replace(/\D/g, "");
+  if (!digits) return Number.NaN;
+
+  return Number(digits);
+}
+
 export function AmountStepper({ mission, value, onChange, disabled }: AmountStepperProps) {
   return (
     <div className="amount-stepper">
       <IconButton
-        icon="minus"
-        label={PUMP_MISSION_COPY.amountStepper.decrease}
-        disabled={disabled || value <= mission.minAmountToman}
-        onClick={() => onChange(decreaseTomanAmount(value, mission))}
+        icon="plus"
+        label={PUMP_MISSION_COPY.amountStepper.increase}
+        disabled={disabled}
+        onClick={() => onChange(increaseTomanAmount(value, mission))}
       />
       <label className="amount-stepper__field">
         <span>{PUMP_MISSION_COPY.amountStepper.label}</span>
         <input
           dir="ltr"
           inputMode="numeric"
-          value={value}
+          aria-describedby="amount-stepper-currency"
+          value={formatTomanInput(value)}
           disabled={disabled}
           min={mission.minAmountToman}
           step={mission.stepAmountToman}
           onBlur={() => onChange(normalizeTomanAmount(value, mission))}
           onChange={(event) => {
-            const nextValue = Number(event.target.value);
+            const nextValue = parseTomanInput(event.target.value);
             onChange(Number.isFinite(nextValue) ? nextValue : mission.minAmountToman);
           }}
         />
-        <small>
-          {formatPersianNumber(value)} {PUMP_MISSION_COPY.amountStepper.currency}
-        </small>
+        <small id="amount-stepper-currency">{PUMP_MISSION_COPY.amountStepper.currency}</small>
       </label>
       <IconButton
-        icon="plus"
-        label={PUMP_MISSION_COPY.amountStepper.increase}
-        disabled={disabled}
-        onClick={() => onChange(increaseTomanAmount(value, mission))}
+        icon="minus"
+        label={PUMP_MISSION_COPY.amountStepper.decrease}
+        disabled={disabled || value <= mission.minAmountToman}
+        onClick={() => onChange(decreaseTomanAmount(value, mission))}
       />
     </div>
   );

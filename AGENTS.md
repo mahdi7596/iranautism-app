@@ -32,6 +32,8 @@ This file is the root coordination document for the Iran Autism platform workspa
 - `docs/architecture-rules/progress.md`
 - `docs/decisions/backend-module-boundaries.md`
 - `docs/product/modules/partner-missions-pump.md`
+- `docs/product/modules/pump-phase-1-user-flow-summary.md`
+- `docs/product/modules/frontend-design-review-feedback-2026-05-27.md`
 - `docs/product/modules/recurring-donations-peyman.md`
 - `docs/analysis/iranautism-database-design-playground.mmd`
 - `docs/decisions/iranautism-database-design-decisions.md`
@@ -99,6 +101,15 @@ Short version:
 - Use Radix-style headless accessible primitives where complex behavior is useful, while keeping all visual styling project-owned.
 - Use Tabler Icons through a project-owned `icons.ts` wrapper/map.
 - Use Zustand selectively for cross-component client UI state, not for server data, auth truth, payment truth, CMS content, or form state.
+
+Current frontend correction focus:
+
+- OpenSpec change `refine-public-pump-frontend-design` captures the next design pass.
+- Realign the public/Pump frontend with the referenced generated designs: flatter orange CTAs, no button shadows, smaller title typography, cleaner white/lavender surfaces, and purple reserved for identity/current states.
+- Homepage hero should become a three-slide slider: corrected current concept, `Trust & Progress`, and Persian `شفافیت بالینی`.
+- Pump page first section should become only a two-banner slider; mission cards should become featured-image cards in a one-row slider across desktop, tablet, and mobile.
+- Login should use an auth-only layout without the public header/footer.
+- Shared tokens and reusable components should be updated before page-level redesign to avoid repeated one-off UI code.
 
 ## Current Repository Direction
 
@@ -168,6 +179,8 @@ The authoritative module list is maintained in `docs/product/module-registry.md`
 | 2026-05-25 | Deployment reminder rule added: when preparing upload/deployment to server, real Sadad credentials must be configured in the server environment/secret store and never committed to the repository. |
 | 2026-05-25 | Pump frontend slice implemented: `/fa/login`, `/fa/missions/pump`, mission detail OTP/payment flow, Sadad result states, and profile Pump history; verified with tests, build, and browser screenshots. |
 | 2026-05-25 | Live Sadad gateway contract hardened: numeric provider order IDs, PDF-aligned Sadad endpoints, backend callback verification before frontend result display, and documented Sadad referrer/domain deployment requirements. |
+| 2026-05-26 | Phase 1 Pump user-flow summary documented at `docs/product/modules/pump-phase-1-user-flow-summary.md`, covering mission selection, OTP identity, Sadad payment verification, Pump return/verification, and profile history. |
+| 2026-05-27 | Frontend design review feedback captured at `docs/product/modules/frontend-design-review-feedback-2026-05-27.md`; OpenSpec change `refine-public-pump-frontend-design` created and validated for the next correction pass. |
 
 ## Working Rules Going Forward
 
@@ -178,6 +191,7 @@ The authoritative module list is maintained in `docs/product/module-registry.md`
 - Before implementing a backend module, check `docs/decisions/backend-architecture.md` and create/update a dedicated module note under `docs/product/modules/` when work begins.
 - Before implementing users beyond the agreed `USERS` table, admins, authentication, authorization, sessions, OTP, audit logs, activity logs, or auth security events, create or update a focused decision document first.
 - Before implementing frontend UI, check `docs/decisions/frontend-architecture.md`; create or update project-root `DESIGN.md` before serious UI implementation begins.
+- Before implementing the next public/Pump frontend correction pass, check `docs/product/modules/frontend-design-review-feedback-2026-05-27.md` and OpenSpec change `refine-public-pump-frontend-design`; update shared tokens/components before page-specific redesign.
 - All user-facing backend/frontend messages must be Persian by default. Use English only for internal code identifiers, logs intended only for developers/operators, protocol field names, or third-party provider constants.
 - When asked to upload/deploy the app to a server, explicitly remind that real Sadad credentials belong in the server `.env` file or server secret store and must not be committed into any repo file.
 - For live Sadad, ensure the public domain/referrer, backend callback URL, and server IP match the Sadad portal configuration; frontend result pages should display backend payment truth by internal `paymentTransactionId`, not raw Sadad `OrderId`.

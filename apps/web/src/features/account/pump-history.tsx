@@ -1,12 +1,13 @@
 "use client";
 
 import { EmptyState, ErrorState, JalaliDate, LoadingState, StatusBadge } from "@iranautism/ui";
+import { Icon } from "@iranautism/icons";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import type { PumpMissionHistoryItem } from "@iranautism/types";
 
-import { buildLoginPath, buildPumpHistoryPath } from "../../config/app";
+import { buildLoginPath, buildPumpHistoryPath, buildPumpMissionsPath } from "../../config/app";
 import { createBrowserApiClient } from "../../lib/api-client";
 import { useAuth } from "../auth/auth-provider";
 import { ACCOUNT_COPY } from "./account.constants";
@@ -80,13 +81,20 @@ export function PumpHistory() {
   return (
     <section className="account-page" aria-labelledby="pump-history-title">
       <h1 id="pump-history-title">{ACCOUNT_COPY.history.title}</h1>
+      <p>{ACCOUNT_COPY.history.intro}</p>
       {rows.length === 0 ? (
-        <EmptyState>{ACCOUNT_COPY.history.empty}</EmptyState>
+        <div className="account-empty-state">
+          <EmptyState>{ACCOUNT_COPY.history.empty}</EmptyState>
+          <Link className="ds-btn ds-btn--primary ds-btn--lg" href={buildPumpMissionsPath("fa")}>
+            {ACCOUNT_COPY.profile.pumpHistoryCta}
+          </Link>
+        </div>
       ) : (
         <div className="history-list">
           {rows.map((item) => (
             <article className="history-item" key={`${item.missionId}-${item.completedAt ?? "pending"}`}>
               <div>
+                <Icon name={item.completed ? "circleCheck" : "receipt"} />
                 <h2>{item.missionTitle}</h2>
                 {item.completedAt ? (
                   <p>

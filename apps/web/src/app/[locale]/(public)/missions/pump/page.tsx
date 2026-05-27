@@ -1,4 +1,13 @@
-import { Amount, StatusBadge } from "@iranautism/ui";
+import { Icon } from "@iranautism/icons";
+import {
+  Amount,
+  Slider,
+  SliderControls,
+  SliderDots,
+  SliderSlide,
+  SliderViewport,
+  StatusBadge,
+} from "@iranautism/ui";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -7,7 +16,10 @@ import type { CSSProperties } from "react";
 import { buildPumpMissionPath } from "../../../../../config/app";
 import { isSupportedLocale } from "../../../../../config/locales";
 import { pumpMissions } from "../../../../../features/pump-missions/pump-missions";
-import { PUMP_MISSION_COPY } from "../../../../../features/pump-missions/pump-missions.constants";
+import {
+  PUMP_BANNERS,
+  PUMP_MISSION_COPY,
+} from "../../../../../features/pump-missions/pump-missions.constants";
 
 export const metadata: Metadata = {
   title: PUMP_MISSION_COPY.metadata.list.title,
@@ -26,52 +38,121 @@ export default async function PumpMissionsPage({ params }: PumpMissionsPageProps
 
   return (
     <section className="pump-page" aria-labelledby="pump-title">
-      <div className="pump-hero">
-        <div className="pump-hero__media">
-          <Image
-            src="/images/pump/iran-autism-pump-banner.jpg"
-            alt=""
-            fill
-            priority
-            sizes="(max-width: 760px) 100vw, 48vw"
-          />
-        </div>
-        <div className="pump-hero__content">
-          <p className="pump-hero__eyebrow">{PUMP_MISSION_COPY.hero.eyebrow}</p>
-          <h1 id="pump-title" className="pump-hero__title">
-            {PUMP_MISSION_COPY.hero.title}
-          </h1>
-          <p className="pump-hero__text">{PUMP_MISSION_COPY.hero.text}</p>
-        </div>
-      </div>
+      <Slider
+        label="بنرهای ماموریت پامپ"
+        className="pump-banner-slider"
+        slideCount={PUMP_BANNERS.length}
+      >
+        <SliderViewport>
+          {PUMP_BANNERS.map((banner, index) => (
+            <SliderSlide key={banner.id} id={`pump-banner-${banner.id}`} className="pump-hero">
+              <div className="pump-hero__media">
+                <Image
+                  src={banner.image.src}
+                  alt={banner.image.alt}
+                  fill
+                  priority={index === 0}
+                  sizes="(max-width: 760px) 100vw, 48vw"
+                />
+              </div>
+              <div className="pump-hero__content">
+                <p className="pump-hero__eyebrow">{banner.eyebrow}</p>
+                {index === 0 ? (
+                  <h1 id="pump-title" className="pump-hero__title">
+                    {banner.title}
+                  </h1>
+                ) : (
+                  <h2 className="pump-hero__title">{banner.title}</h2>
+                )}
+                <p className="pump-hero__text">{banner.text}</p>
+                <div className="pump-hero__actions">
+                  <a className="ds-btn ds-btn--primary ds-btn--lg" href="#pump-missions">
+                    {PUMP_MISSION_COPY.hero.primaryCta}
+                  </a>
+                  <Link className="ds-btn ds-btn--quiet ds-btn--lg" href={`/${safeLocale}/profile/pump-missions`}>
+                    {PUMP_MISSION_COPY.hero.secondaryCta}
+                  </Link>
+                </div>
+              </div>
+            </SliderSlide>
+          ))}
+        </SliderViewport>
+        <SliderControls
+          slides={PUMP_BANNERS.map((banner) => ({
+            id: `pump-banner-${banner.id}`,
+            label: banner.eyebrow,
+          }))}
+        />
+      </Slider>
 
-      <div className="pump-mission-grid" aria-label={PUMP_MISSION_COPY.list.ariaLabel}>
-        {pumpMissions.map((mission, index) => (
-          <Link
-            key={mission.id}
-            className={`pump-mission-card pump-mission-card--${mission.accent}`}
-            href={buildPumpMissionPath(safeLocale, mission.id)}
-            style={{ "--entry-index": index } as CSSProperties}
-          >
-            <span className="pump-mission-card__topline">
-              <StatusBadge tone={mission.ticketCount ? "success" : "info"}>
-                {mission.medalTitle}
-              </StatusBadge>
-              {mission.ticketCount ? (
-                <span className="pump-mission-card__tickets">
-                  {mission.ticketCount.toLocaleString("fa-IR")} {PUMP_MISSION_COPY.list.ticketSuffix}
-                </span>
-              ) : null}
-            </span>
-            <strong className="pump-mission-card__title">{mission.title}</strong>
-            <span className="pump-mission-card__text">{mission.shortText}</span>
-            <span className="pump-mission-card__amount">
-              {PUMP_MISSION_COPY.list.amountPrefix} <Amount value={mission.minAmountToman} />
-            </span>
-            <span className="pump-mission-card__cta">{PUMP_MISSION_COPY.list.cta}</span>
-          </Link>
-        ))}
-      </div>
+      <section className="pump-missions-section" id="pump-missions" aria-labelledby="pump-missions-title">
+        <div className="pump-section-heading">
+          <h2 id="pump-missions-title">{PUMP_MISSION_COPY.list.title}</h2>
+          <p>{PUMP_MISSION_COPY.list.text}</p>
+        </div>
+
+        <Slider
+          label={PUMP_MISSION_COPY.list.ariaLabel}
+          className="pump-mission-slider"
+          slideCount={pumpMissions.length}
+        >
+          <SliderViewport>
+            {pumpMissions.map((mission, index) => (
+              <SliderSlide
+                key={mission.id}
+                id={`mission-${mission.id}`}
+                className="pump-mission-slide"
+              >
+                <Link
+                  className={`pump-mission-card pump-mission-card--${mission.accent}`}
+                  href={buildPumpMissionPath(safeLocale, mission.id)}
+                  style={{ "--entry-index": index } as CSSProperties}
+                >
+                  <span className="pump-mission-card__image">
+                    <Image
+                      src={mission.featuredImage.src}
+                      alt={mission.featuredImage.alt}
+                      fill
+                      sizes="(max-width: 760px) 82vw, 320px"
+                    />
+                  </span>
+                  <span className="pump-mission-card__topline">
+                    <span className="pump-mission-card__icon" aria-hidden="true">
+                      <Icon name={mission.ticketCount ? "ticket" : "heartHandshake"} />
+                    </span>
+                    <StatusBadge tone={mission.ticketCount ? "success" : "info"}>
+                      {mission.medalTitle}
+                    </StatusBadge>
+                  </span>
+                  <strong className="pump-mission-card__title">{mission.title}</strong>
+                  <span className="pump-mission-card__text">{mission.shortText}</span>
+                  <span className="pump-mission-card__meta">
+                    <span className="pump-mission-card__amount">
+                      {PUMP_MISSION_COPY.list.amountPrefix} <Amount value={mission.minAmountToman} />
+                    </span>
+                    {mission.ticketCount ? (
+                      <span className="pump-mission-card__tickets">
+                        {mission.ticketCount.toLocaleString("fa-IR")} {PUMP_MISSION_COPY.list.ticketSuffix}
+                      </span>
+                    ) : null}
+                  </span>
+                  <span className="pump-mission-card__cta">
+                    {PUMP_MISSION_COPY.list.cta}
+                    <Icon name="arrowLeft" size="sm" />
+                  </span>
+                </Link>
+              </SliderSlide>
+            ))}
+          </SliderViewport>
+          <SliderDots />
+          <SliderControls
+            slides={pumpMissions.map((mission) => ({
+              id: `mission-${mission.id}`,
+              label: mission.title,
+            }))}
+          />
+        </Slider>
+      </section>
     </section>
   );
 }

@@ -11,6 +11,10 @@ export type PumpMission = {
   isRepeatable: boolean;
   ticketCount: number | null;
   accent: "medicine" | "rehabilitation" | "caregiving" | "general";
+  featuredImage: {
+    src: string;
+    alt: string;
+  };
 };
 
 export const PUMP_MISSION_RULES = {
@@ -32,6 +36,10 @@ export const PUMP_MISSIONS = [
     isRepeatable: true,
     ticketCount: null,
     accent: "medicine",
+    featuredImage: {
+      src: "/images/pump/iran-autism-family-hero.png",
+      alt: "تصویر حمایتی برای ماموریت کمک به هزینه دارو افراد اتیسم",
+    },
   },
   {
     id: "iran-autism-rehabilitation-support",
@@ -44,6 +52,10 @@ export const PUMP_MISSIONS = [
     isRepeatable: true,
     ticketCount: null,
     accent: "rehabilitation",
+    featuredImage: {
+      src: "/images/pump/iran-autism-pump-banner.jpg",
+      alt: "تصویر حمایتی برای ماموریت کمک به هزینه توانبخشی افراد اتیسم",
+    },
   },
   {
     id: "iran-autism-caregiving-support",
@@ -56,6 +68,10 @@ export const PUMP_MISSIONS = [
     isRepeatable: true,
     ticketCount: null,
     accent: "caregiving",
+    featuredImage: {
+      src: "/images/pump/iran-autism-family-hero.png",
+      alt: "تصویر حمایتی برای ماموریت کمک به هزینه پرستاری افراد اتیسم",
+    },
   },
   {
     id: "iran-autism-general-donation",
@@ -68,8 +84,35 @@ export const PUMP_MISSIONS = [
     isRepeatable: true,
     ticketCount: PUMP_MISSION_RULES.generalTicketCount,
     accent: "general",
+    featuredImage: {
+      src: "/images/pump/iran-autism-pump-banner.jpg",
+      alt: "تصویر حمایتی برای ماموریت کمک به انجمن اتیسم ایران",
+    },
   },
 ] as const satisfies readonly PumpMission[];
+
+export const PUMP_BANNERS = [
+  {
+    id: "pump-support",
+    eyebrow: "پامپ و انجمن اتیسم ایران",
+    title: "با هر حمایت، یک ماموریت در پامپ کامل می‌شود",
+    text: "نشان حمایتی را انتخاب کنید، شماره موبایل را تایید کنید و بعد از پرداخت امن به پامپ برگردید.",
+    image: {
+      src: "/images/pump/iran-autism-pump-banner.jpg",
+      alt: "بنر ماموریت پامپ برای حمایت از انجمن اتیسم ایران",
+    },
+  },
+  {
+    id: "pump-trust",
+    eyebrow: "حمایت شفاف",
+    title: "مسیر کوتاه، اثر قابل پیگیری",
+    text: "مبلغ حمایت، شماره تاییدشده و نتیجه پرداخت در مسیر امن انجمن ثبت می‌شود.",
+    image: {
+      src: "/images/pump/iran-autism-family-hero.png",
+      alt: "بنر حمایت شفاف از خانواده‌های اتیسم در ماموریت پامپ",
+    },
+  },
+] as const;
 
 export const PUMP_MISSION_COPY = {
   metadata: {
@@ -84,11 +127,24 @@ export const PUMP_MISSION_COPY = {
   },
   hero: {
     eyebrow: "ماموریت‌های ایران اتیسم در پامپ",
-    title: "یک ماموریت انتخاب کنید و با یک کمک کوچک همراه شوید",
-    text: "هر ماموریت به یکی از نیازهای واقعی جامعه اتیسم وصل است. مبلغ را خودتان انتخاب می‌کنید و بعد از پرداخت می‌توانید به پامپ برگردید.",
+    title: "ماموریت حمایت را انتخاب کنید؛ نتیجه در پامپ ثبت می‌شود",
+    text: "برای تکمیل ماموریت فقط یک مسیر کوتاه دارید: انتخاب نشان، تایید شماره موبایل، پرداخت امن و برگشت به پامپ برای دریافت پاداش.",
+    primaryCta: "دیدن ماموریت‌ها",
+    secondaryCta: "ورود و مشاهده سوابق",
+  },
+  steps: {
+    title: "مسیر تکمیل ماموریت",
+    items: ["انتخاب ماموریت", "تایید شماره موبایل", "پرداخت و برگشت به پامپ"],
+  },
+  assurance: {
+    title: "چرا شماره موبایل مهم است؟",
+    text: "پامپ تکمیل ماموریت را با شماره موبایل بررسی می‌کند؛ بنابراین حتی بدون ساخت حساب کامل هم ماموریت شما قابل تایید است.",
+    payment: "نتیجه پرداخت فقط از سرور انجمن بررسی می‌شود، نه از فیلدهای برگشتی درگاه.",
   },
   list: {
     ariaLabel: "فهرست ماموریت‌های پامپ",
+    title: "یکی از نشان‌های حمایتی را انتخاب کنید",
+    text: "سه ماموریت اول با مبلغ دلخواه از ۱۰ هزار تومان شروع می‌شوند. کمک عمومی انجمن از ۲۰۰ هزار تومان، تیکت پامپ هم دارد.",
     ticketSuffix: "تیکت",
     amountPrefix: "شروع از",
     cta: "شروع ماموریت",
@@ -100,9 +156,11 @@ export const PUMP_MISSION_COPY = {
     currency: "تومان",
   },
   detail: {
+    backToMissions: "بازگشت به فهرست ماموریت‌ها",
+    panelTitle: "تکمیل ماموریت",
     rewardPrefix: "پاداش پامپ:",
-    customAmountRule: "مبلغ دلخواه از حداقل ۱۰٬۰۰۰ تومان؛ با دکمه‌ها هر بار ۱۰٬۰۰۰ تومان کم یا زیاد می‌شود.",
     identityMessagePrefix: "این ماموریت با شماره حساب شما انجام می‌شود:",
+    identityReadyTitle: "شماره ماموریت تایید شده است",
     startPayment: "پرداخت و شروع ماموریت",
     preparingPayment: "در حال انتقال به پرداخت...",
     otpFieldLabel: "کد تایید ماموریت",
@@ -116,6 +174,12 @@ export const PUMP_MISSION_COPY = {
     requestingOtp: "در حال ارسال کد...",
     mobilePlaceholder: "09123456789",
     otpPlaceholder: "123456",
+    afterPaymentTitle: "بعد از پرداخت چه می‌شود؟",
+    afterPaymentItems: [
+      "سداد به سرور انجمن برمی‌گردد و پرداخت همان‌جا تایید می‌شود.",
+      "اگر پرداخت موفق باشد، تکمیل ماموریت برای همین شماره ثبت می‌شود.",
+      "در پایان می‌توانید به پامپ برگردید و پاداش را دریافت کنید.",
+    ],
   },
   messages: {
     otpSent: "کد تایید مخصوص ماموریت پامپ برای شما ارسال شد.",

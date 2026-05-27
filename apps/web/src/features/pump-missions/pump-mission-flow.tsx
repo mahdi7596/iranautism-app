@@ -1,14 +1,16 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Icon } from "@iranautism/icons";
 import type { CurrentUser } from "@iranautism/types";
 import { Alert, Button, Field, FormSummary, Input, StatusBadge } from "@iranautism/ui";
 import { iranianMobileSchema, otpCodeSchema } from "@iranautism/validation";
+import Image from "next/image";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { buildSadadResultUrl } from "../../config/app";
+import { buildPumpMissionsPath, buildSadadResultUrl } from "../../config/app";
 import { useAuth } from "../auth/auth-provider";
 import { verifyLoginOtp } from "../auth/login-flow";
 import { createBrowserApiClient } from "../../lib/api-client";
@@ -34,6 +36,10 @@ type PumpMissionFlowProps = {
   locale: "fa";
 };
 
+function getFormErrors(errors: Array<string | undefined>) {
+  return errors.filter((formError): formError is string => Boolean(formError));
+}
+
 export function PumpMissionFlow({ mission, locale }: PumpMissionFlowProps) {
   const apiClient = createBrowserApiClient();
   const auth = useAuth();
@@ -58,6 +64,12 @@ export function PumpMissionFlow({ mission, locale }: PumpMissionFlowProps) {
       code: "",
     },
   });
+  const mobileFormErrors = getFormErrors(
+    Object.values(mobileForm.formState.errors).map((formError) => formError.message),
+  );
+  const otpFormErrors = getFormErrors(
+    Object.values(otpForm.formState.errors).map((formError) => formError.message),
+  );
 
   async function onMobileSubmit(values: z.infer<typeof mobileSchema>) {
     setError(null);
@@ -123,6 +135,9 @@ export function PumpMissionFlow({ mission, locale }: PumpMissionFlowProps) {
   return (
     <section className="mission-detail" aria-labelledby="mission-title">
       <div className="mission-detail__summary">
+        <a className="mission-detail__back" href={buildPumpMissionsPath(locale)}>
+          <Icon name="arrowRight" size="sm" label={PUMP_MISSION_COPY.detail.backToMissions} />
+        </a>
         <StatusBadge tone={mission.ticketCount ? "success" : "info"}>{mission.medalTitle}</StatusBadge>
         <h1 id="mission-title">{mission.title}</h1>
         <p>{mission.medalText}</p>
@@ -131,14 +146,22 @@ export function PumpMissionFlow({ mission, locale }: PumpMissionFlowProps) {
             {PUMP_MISSION_COPY.detail.rewardPrefix} {mission.ticketCount.toLocaleString("fa-IR")}{" "}
             {PUMP_MISSION_COPY.list.ticketSuffix}
           </strong>
-        ) : (
-          <span className="mission-detail__rule">
-            {PUMP_MISSION_COPY.detail.customAmountRule}
-          </span>
-        )}
+        ) : null}
+        <figure className={`mission-detail__image mission-detail__image--${mission.accent}`}>
+          <Image
+            src={mission.featuredImage.src}
+            alt={mission.featuredImage.alt}
+            fill
+            sizes="(max-width: 900px) 100vw, 52vw"
+          />
+        </figure>
       </div>
 
       <div className="mission-detail__panel">
+        <div className="mission-panel-heading">
+          <h2>{PUMP_MISSION_COPY.detail.panelTitle}</h2>
+        </div>
+
         {message ? <Alert variant="success">{message}</Alert> : null}
         {error ? <Alert variant="danger">{error}</Alert> : null}
 
@@ -151,9 +174,15 @@ export function PumpMissionFlow({ mission, locale }: PumpMissionFlowProps) {
 
         {activeUser ? (
           <div className="mission-identity">
-            <Alert variant="info">
-              {PUMP_MISSION_COPY.detail.identityMessagePrefix} <span dir="ltr">{activeUser.mobile}</span>
-            </Alert>
+            <div className="mission-identity__ready">
+              <Icon name="phone" />
+              <div>
+                <strong>{PUMP_MISSION_COPY.detail.identityReadyTitle}</strong>
+                <p>
+                  {PUMP_MISSION_COPY.detail.identityMessagePrefix} <span dir="ltr">{activeUser.mobile}</span>
+                </p>
+              </div>
+            </div>
             <Button type="button" size="lg" onClick={onStartPayment} disabled={isPreparingPayment}>
               {isPreparingPayment ? PUMP_MISSION_COPY.detail.preparingPayment : PUMP_MISSION_COPY.detail.startPayment}
             </Button>
@@ -163,12 +192,12 @@ export function PumpMissionFlow({ mission, locale }: PumpMissionFlowProps) {
             <p className="auth-form__mobile" dir="ltr">
               +98 {otpMobile.slice(1)}
             </p>
-            <FormSummary errors={Object.values(otpForm.formState.errors).map((formError) => formError.message ?? "")} />
+            <FormSummary errors={otpFormErrors} />
             <Field
               label={PUMP_MISSION_COPY.detail.otpFieldLabel}
               htmlFor="pump-otp"
               hint={PUMP_MISSION_COPY.detail.otpFieldHint}
-              error={otpForm.formState.errors.code?.message}
+              error={otpFormErrors.length > 0 ? undefined : otpForm.formState.errors.code?.message}
               required
             >
               <Input
@@ -199,12 +228,12 @@ export function PumpMissionFlow({ mission, locale }: PumpMissionFlowProps) {
           </form>
         ) : (
           <form className="auth-form" onSubmit={mobileForm.handleSubmit(onMobileSubmit)} noValidate>
-            <FormSummary errors={Object.values(mobileForm.formState.errors).map((formError) => formError.message ?? "")} />
+            <FormSummary errors={mobileFormErrors} />
             <Field
               label={PUMP_MISSION_COPY.detail.mobileFieldLabel}
               htmlFor="pump-mobile"
               hint={PUMP_MISSION_COPY.detail.mobileFieldHint}
-              error={mobileForm.formState.errors.mobile?.message}
+              error={mobileFormErrors.length > 0 ? undefined : mobileForm.formState.errors.mobile?.message}
               required
             >
               <Input

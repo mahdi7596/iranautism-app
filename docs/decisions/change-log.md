@@ -2,6 +2,15 @@
 
 Use this file to record confirmed decisions, scope changes, module status changes, and important project conclusions. Keep entries short, dated, and linked to the relevant detailed document when possible.
 
+## 2026-05-27
+
+### Frontend Design Review Feedback Captured
+
+- Captured project-owner feedback on the current public/Pump frontend design in `docs/product/modules/frontend-design-review-feedback-2026-05-27.md`.
+- Added OpenSpec change `refine-public-pump-frontend-design` to organize the correction pass across public shell, homepage hero slider, Pump banner/mission sliders, Pump detail page, login layout, shared tokens, and reusable UI components.
+- Direction: realign with the referenced generated design images, use flatter orange CTAs with no shadows, reduce most title sizes toward a `text-xl` equivalent, keep anonymous login/account controls away from purple profile styling, remove the Pump roadmap, and avoid large one-off page components.
+- Open confirmations remain: skill authority when guidance overlaps, slider auto-advance behavior, Pump banner/mission image sources, and whether the smaller title cap applies to true hero headlines.
+
 ## 2026-05-25
 
 ### Live Sadad Gateway Contract Hardened

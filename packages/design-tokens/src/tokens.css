@@ -5,9 +5,9 @@
     --ds-color-primary-container: #f0e6f7;
     --ds-color-on-primary-container: #32104f;
     --ds-color-primary-soft: #f8f3fb;
-    --ds-color-accent: #c84a1b;
+    --ds-color-accent: #ff7438;
     --ds-color-on-accent: #ffffff;
-    --ds-color-accent-brand: #f4773f;
+    --ds-color-accent-brand: #ff7438;
     --ds-color-accent-container: #ffe7d9;
     --ds-color-surface: #ffffff;
     --ds-color-surface-muted: #f8f6fa;
@@ -18,7 +18,7 @@
     --ds-color-text-subtle: #817889;
     --ds-color-border: #e3dde9;
     --ds-color-border-strong: #c8bbd4;
-    --ds-color-focus: #f4773f;
+    --ds-color-focus: #ff7438;
     --ds-color-success: #16734a;
     --ds-color-success-container: #ddf5e9;
     --ds-color-danger: #b42318;
@@ -28,7 +28,9 @@
     --ds-color-info: #2868a8;
     --ds-color-info-container: #ddebfa;
     --ds-font-sans: "IRANSansWeb", "IRANSans", "Noto Sans Arabic", Tahoma, system-ui, sans-serif;
-    --ds-font-display: "Ray", "IRANSansWeb", "Noto Sans Arabic", Tahoma, system-ui, sans-serif;
+    --ds-font-display: var(--ds-font-sans);
+    --ds-font-size-title: 20px;
+    --ds-line-height-title: 32px;
     --ds-radius-sm: 4px;
     --ds-radius-md: 8px;
     --ds-radius-lg: 12px;

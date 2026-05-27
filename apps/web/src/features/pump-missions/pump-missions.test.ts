@@ -6,7 +6,7 @@ import {
   pumpMissions,
   repeatableCustomAmountMissions,
 } from "./pump-missions";
-import { PUMP_MISSION_RULES } from "./pump-missions.constants";
+import { PUMP_BANNERS, PUMP_MISSION_RULES } from "./pump-missions.constants";
 
 describe("Pump mission config", () => {
   it("renders exactly the four Excel-defined missions", () => {
@@ -45,5 +45,13 @@ describe("Pump mission config", () => {
     assert.equal(mission?.minAmountToman, PUMP_MISSION_RULES.generalMinAmountToman);
     assert.equal(mission?.ticketCount, PUMP_MISSION_RULES.generalTicketCount);
     assert.ok(mission?.medalText);
+  });
+
+  it("defines two Pump banners and featured images for every mission", () => {
+    assert.equal(PUMP_BANNERS.length, 2);
+    assert.equal(
+      pumpMissions.every((mission) => mission.featuredImage.src && mission.featuredImage.alt),
+      true,
+    );
   });
 });

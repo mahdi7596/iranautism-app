@@ -13,12 +13,15 @@ import {
   IconHelpCircle,
   IconHome,
   IconKey,
+  IconLogin2,
   IconMinus,
   IconPhone,
   IconPlus,
   IconReceipt,
   IconTicket,
   IconUser,
+  IconUserCheck,
+  IconUserCircle,
   IconX,
 } from "@tabler/icons-react";
 
@@ -36,12 +39,15 @@ export const iconMap = {
   help: IconHelpCircle,
   home: IconHome,
   key: IconKey,
+  login: IconLogin2,
   minus: IconMinus,
   phone: IconPhone,
   plus: IconPlus,
   receipt: IconReceipt,
   ticket: IconTicket,
   user: IconUser,
+  userCheck: IconUserCheck,
+  userCircle: IconUserCircle,
   x: IconX,
 } satisfies Record<string, ComponentType<SVGProps<SVGSVGElement>>>;
 

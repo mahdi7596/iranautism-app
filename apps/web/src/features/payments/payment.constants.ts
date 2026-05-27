@@ -10,6 +10,12 @@ export const PAYMENT_RESULT_COPY = {
     returnToPump: "برگشت به پامپ",
     retry: "تلاش دوباره",
     showResult: "نمایش نتیجه",
+    missions: "انتخاب ماموریت دیگر",
+  },
+  helper: {
+    trustedLookup: "نتیجه این صفحه از وضعیت داخلی پرداخت خوانده می‌شود.",
+    successNext: "اکنون می‌توانید به پامپ برگردید و بررسی تکمیل ماموریت را انجام دهید.",
+    retryNext: "اگر مبلغی از حساب شما کم شده باشد، وضعیت نهایی از سمت بانک مشخص می‌شود.",
   },
   statuses: {
     success: {
