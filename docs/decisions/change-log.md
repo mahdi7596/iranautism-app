@@ -2,6 +2,13 @@
 
 Use this file to record confirmed decisions, scope changes, module status changes, and important project conclusions. Keep entries short, dated, and linked to the relevant detailed document when possible.
 
+## 2026-05-30
+
+### Sadad PAN Authentication Type Confirmed
+
+- Sadad confirmed that payment requests must send `PanAuthenticationType` with value `2`.
+- Updated the Sadad payment request adapter and `openspec/specs/live-sadad-payments/spec.md` so this provider contract is explicit.
+
 ## 2026-05-27
 
 ### Frontend Design Review Feedback Captured

@@ -39,17 +39,20 @@ export type VerifyOtpResponse = {
   user: CurrentUser;
 };
 
-export type PumpMissionId =
+export type PaidPumpMissionId =
   | "iran-autism-medicine-support"
   | "iran-autism-rehabilitation-support"
-  | "iran-autism-caregiving-support"
-  | "iran-autism-general-donation";
+  | "iran-autism-caregiving-support";
+
+export type RegistrationPumpMissionId = "iran-autism-site-registration";
+
+export type PumpMissionId = PaidPumpMissionId | RegistrationPumpMissionId;
 
 export type PumpMissionResultType = "COUNT_BASED" | "STATUS_BASED";
 
 export type StartPumpDonationIntentRequest = {
   mobile: string;
-  missionId: PumpMissionId;
+  missionId: PaidPumpMissionId;
   amountIrr: string;
   gateway: string;
   donorDisplayName?: string;
@@ -61,6 +64,12 @@ export type StartPumpDonationIntentResponse = {
   donationId: string;
   paymentTransactionId: string;
   status: "PENDING";
+};
+
+export type CompletePumpRegistrationMissionResponse = {
+  mobile: string;
+  missionId: RegistrationPumpMissionId;
+  completed: true;
 };
 
 export type StartPaymentRequest = {

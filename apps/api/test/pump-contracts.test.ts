@@ -14,12 +14,12 @@ test("Pump count verification response uses the documented response shape", () =
   assert.deepEqual(
     createPumpCountVerificationResponse({
       mobile: "09123456789",
-      missionId: "iran-autism-general-donation",
+      missionId: "iran-autism-caregiving-support",
       count: 2,
     }),
     {
       mobile: "09123456789",
-      missionId: "iran-autism-general-donation",
+      missionId: "iran-autism-caregiving-support",
       count: 2,
     },
   );
@@ -29,12 +29,12 @@ test("Pump status verification response uses the documented response shape", () 
   assert.deepEqual(
     createPumpStatusVerificationResponse({
       mobile: "09123456789",
-      missionId: "iran-autism-general-donation",
+      missionId: "iran-autism-caregiving-support",
       completed: false,
     }),
     {
       mobile: "09123456789",
-      missionId: "iran-autism-general-donation",
+      missionId: "iran-autism-caregiving-support",
       completed: false,
     },
   );

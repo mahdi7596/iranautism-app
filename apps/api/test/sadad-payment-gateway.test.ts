@@ -46,6 +46,11 @@ test("SadadPaymentGateway requests token and returns redirect URL", async () => 
   assert.equal((requests[0]?.body as { Amount: number }).Amount, 2_000_000);
   assert.equal((requests[0]?.body as { OrderId: number }).OrderId, 12345);
   assert.equal(
+    (requests[0]?.body as { PanAuthenticationType: number })
+      .PanAuthenticationType,
+    2,
+  );
+  assert.equal(
     (requests[0]?.body as { ReturnUrl: string }).ReturnUrl,
     "https://example.test/payments/sadad/callback",
   );

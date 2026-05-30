@@ -6,11 +6,11 @@ import {
   increaseTomanAmount,
   normalizeTomanAmount,
 } from "./pump-flow";
-import type { PumpMission } from "./pump-missions";
+import type { PumpDonationMission } from "./pump-missions";
 import { PUMP_MISSION_COPY } from "./pump-missions.constants";
 
 type AmountStepperProps = {
-  mission: PumpMission;
+  mission: PumpDonationMission;
   value: number;
   onChange: (value: number) => void;
   disabled?: boolean;

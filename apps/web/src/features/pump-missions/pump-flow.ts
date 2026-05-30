@@ -2,10 +2,10 @@ import type { ApiClient } from "@iranautism/api-client";
 import type { CurrentUser } from "@iranautism/types";
 import { iranianMobileSchema, tomanToIrr } from "@iranautism/validation";
 
-import type { PumpMission } from "./pump-missions";
+import type { PumpDonationMission } from "./pump-missions";
 
 export type PreparePumpMissionPaymentInput = {
-  mission: PumpMission;
+  mission: PumpDonationMission;
   user: CurrentUser;
   amountToman: number;
   resultUrl: string;
@@ -22,7 +22,7 @@ export async function requestPumpMissionOtp(apiClient: ApiClient, mobile: string
   });
 }
 
-export function normalizeTomanAmount(amountToman: number, mission: PumpMission) {
+export function normalizeTomanAmount(amountToman: number, mission: PumpDonationMission) {
   if (!Number.isFinite(amountToman)) return mission.minAmountToman;
 
   const clamped = Math.max(amountToman, mission.minAmountToman);
@@ -32,12 +32,16 @@ export function normalizeTomanAmount(amountToman: number, mission: PumpMission) 
   return mission.minAmountToman + steps * mission.stepAmountToman;
 }
 
-export function increaseTomanAmount(amountToman: number, mission: PumpMission) {
+export function increaseTomanAmount(amountToman: number, mission: PumpDonationMission) {
   return normalizeTomanAmount(amountToman + mission.stepAmountToman, mission);
 }
 
-export function decreaseTomanAmount(amountToman: number, mission: PumpMission) {
+export function decreaseTomanAmount(amountToman: number, mission: PumpDonationMission) {
   return normalizeTomanAmount(amountToman - mission.stepAmountToman, mission);
+}
+
+export async function completePumpRegistrationMission(apiClient: ApiClient) {
+  return apiClient.completePumpRegistrationMission();
 }
 
 export async function preparePumpMissionPayment(

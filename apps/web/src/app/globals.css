@@ -976,6 +976,10 @@
     object-position: center;
   }
 
+  .pump-hero--pump-support .pump-hero__media img {
+    object-fit: contain;
+  }
+
   .pump-hero__content {
     display: grid;
     align-content: center;
@@ -1178,7 +1182,7 @@
     --mission-accent: var(--ds-color-accent);
   }
 
-  .pump-mission-card--general {
+  .pump-mission-card--registration {
     --mission-accent: var(--ds-color-primary);
   }
 
@@ -1186,50 +1190,14 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     gap: 8px;
-  }
-
-  .pump-mission-card__icon {
-    inline-size: 42px;
-    block-size: 42px;
-    display: inline-grid;
-    place-items: center;
-    border-radius: var(--ds-radius-md);
-    background: color-mix(in srgb, var(--mission-accent) 14%, white);
-    color: var(--mission-accent);
-  }
-
-  .pump-mission-card__tickets {
-    color: var(--ds-color-success);
-    font-size: 13px;
-    font-weight: 800;
   }
 
   .pump-mission-card__title {
     color: var(--ds-color-text);
     font-size: 21px;
     line-height: 1.55;
-  }
-
-  .pump-mission-card__text {
-    color: var(--ds-color-text-muted);
-    font-size: 15px;
-    line-height: 1.9;
-  }
-
-  .pump-mission-card__amount {
-    color: var(--ds-color-primary);
-    font-size: 15px;
-    font-weight: 800;
-  }
-
-  .pump-mission-card__meta {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
   }
 
   .pump-mission-card__cta {
@@ -1310,6 +1278,14 @@
     object-fit: cover;
   }
 
+  .mission-detail__image--medicine img,
+  .mission-detail__image--rehabilitation img,
+  .mission-detail__image--caregiving img,
+  .mission-detail__image--registration img {
+    object-fit: contain;
+    padding: 10px;
+  }
+
   .mission-detail__image--medicine {
     --mission-image-accent: var(--ds-color-info);
   }
@@ -1322,7 +1298,7 @@
     --mission-image-accent: var(--ds-color-accent);
   }
 
-  .mission-detail__image--general {
+  .mission-detail__image--registration {
     --mission-image-accent: var(--ds-color-primary);
   }
 
@@ -2282,10 +2258,16 @@
     object-fit: cover;
   }
 
+  .pump-mission-card--medicine .pump-mission-card__image img,
+  .pump-mission-card--rehabilitation .pump-mission-card__image img,
+  .pump-mission-card--caregiving .pump-mission-card__image img,
+  .pump-mission-card--registration .pump-mission-card__image img {
+    object-fit: contain;
+    padding: 10px;
+  }
+
   .pump-mission-card__topline,
   .pump-mission-card__title,
-  .pump-mission-card__text,
-  .pump-mission-card__meta,
   .pump-mission-card__cta {
     margin-inline: 28px;
   }

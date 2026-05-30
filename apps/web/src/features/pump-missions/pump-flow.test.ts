@@ -4,7 +4,9 @@ import { describe, it } from "node:test";
 import type { ApiClient } from "@iranautism/api-client";
 import type { CurrentUser } from "@iranautism/types";
 
+import type { PumpDonationMission } from "./pump-missions";
 import {
+  completePumpRegistrationMission,
   decreaseTomanAmount,
   increaseTomanAmount,
   normalizeTomanAmount,
@@ -12,6 +14,15 @@ import {
   requestPumpMissionOtp,
 } from "./pump-flow";
 import { getPumpMissionById } from "./pump-missions";
+
+function getDonationMission(missionId: string): PumpDonationMission {
+  const mission = getPumpMissionById(missionId);
+
+  assert.ok(mission);
+  assert.equal(mission.kind, "DONATION");
+
+  return mission as PumpDonationMission;
+}
 
 function createApiClientMock(overrides: Partial<ApiClient> = {}) {
   return {
@@ -42,6 +53,11 @@ function createApiClientMock(overrides: Partial<ApiClient> = {}) {
     getPumpMissionHistory: async () => ({
       items: [],
     }),
+    completePumpRegistrationMission: async () => ({
+      mobile: "09123456789",
+      missionId: "iran-autism-site-registration",
+      completed: true as const,
+    }),
     ...overrides,
   } satisfies ApiClient;
 }
@@ -68,19 +84,17 @@ describe("Pump mission flow", () => {
   });
 
   it("enforces amount minimum and step behavior", () => {
-    const mission = getPumpMissionById("iran-autism-medicine-support");
-    assert.ok(mission);
+    const mission = getDonationMission("iran-autism-medicine-support");
 
-    assert.equal(normalizeTomanAmount(1, mission), 10_000);
-    assert.equal(normalizeTomanAmount(15_001, mission), 20_000);
-    assert.equal(increaseTomanAmount(10_000, mission), 20_000);
-    assert.equal(decreaseTomanAmount(10_000, mission), 10_000);
+    assert.equal(normalizeTomanAmount(1, mission), 100_000);
+    assert.equal(normalizeTomanAmount(105_001, mission), 110_000);
+    assert.equal(increaseTomanAmount(100_000, mission), 110_000);
+    assert.equal(decreaseTomanAmount(100_000, mission), 100_000);
   });
 
   it("converts toman to IRR and starts payment once", async () => {
     const user: CurrentUser = { id: "user_1", mobile: "09123456789", status: "ACTIVE" };
-    const mission = getPumpMissionById("iran-autism-caregiving-support");
-    assert.ok(mission);
+    const mission = getDonationMission("iran-autism-caregiving-support");
 
     let donationPayload: unknown;
     let startPaymentPayload: unknown;
@@ -107,7 +121,7 @@ describe("Pump mission flow", () => {
     const response = await preparePumpMissionPayment(apiClient, {
       mission,
       user,
-      amountToman: 30_000,
+      amountToman: 260_000,
       resultUrl: "http://localhost:3000/fa/payments/sadad/result",
       idempotencyKey: "idem_1",
       correlationId: "corr_1",
@@ -116,7 +130,7 @@ describe("Pump mission flow", () => {
     assert.deepEqual(donationPayload, {
       mobile: "09123456789",
       missionId: "iran-autism-caregiving-support",
-      amountIrr: "300000",
+      amountIrr: "2600000",
       gateway: "sadad",
       idempotencyKey: "idem_1",
       correlationId: "corr_1",
@@ -130,10 +144,34 @@ describe("Pump mission flow", () => {
     assert.equal(response.redirectUrl, "https://sadad.test/pay");
   });
 
+  it("completes the free registration mission without starting payment", async () => {
+    let completed = false;
+    const apiClient = createApiClientMock({
+      completePumpRegistrationMission: async () => {
+        completed = true;
+        return {
+          mobile: "09123456789",
+          missionId: "iran-autism-site-registration",
+          completed: true,
+        };
+      },
+      startPumpDonationIntent: async () => {
+        throw new Error("registration mission should not create donation intents");
+      },
+      startPayment: async () => {
+        throw new Error("registration mission should not start payments");
+      },
+    });
+
+    const response = await completePumpRegistrationMission(apiClient);
+
+    assert.equal(completed, true);
+    assert.equal(response.missionId, "iran-autism-site-registration");
+  });
+
   it("surfaces payment start failures after creating the donation intent", async () => {
     const user: CurrentUser = { id: "user_1", mobile: "09123456789", status: "ACTIVE" };
-    const mission = getPumpMissionById("iran-autism-rehabilitation-support");
-    assert.ok(mission);
+    const mission = getDonationMission("iran-autism-rehabilitation-support");
 
     const apiClient = createApiClientMock({
       startPayment: async () => {
@@ -146,7 +184,7 @@ describe("Pump mission flow", () => {
         preparePumpMissionPayment(apiClient, {
           mission,
           user,
-          amountToman: 10_000,
+          amountToman: 150_000,
           resultUrl: "http://localhost:3000/fa/payments/sadad/result",
         }),
       new RegExp(paymentUnavailableMessage),

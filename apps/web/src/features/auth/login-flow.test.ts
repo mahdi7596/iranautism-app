@@ -43,6 +43,11 @@ function createApiClientMock(overrides: Partial<ApiClient> = {}) {
     getPumpMissionHistory: async () => ({
       items: [],
     }),
+    completePumpRegistrationMission: async () => ({
+      mobile: "09123456789",
+      missionId: "iran-autism-site-registration",
+      completed: true as const,
+    }),
     ...overrides,
   } satisfies ApiClient;
 }

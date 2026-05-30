@@ -51,6 +51,7 @@ export class SadadPaymentGateway implements PaymentGateway {
       ReturnUrl: command.callbackUrl,
       LocalDateTime: formatSadadLocalDateTime(new Date()),
       OrderId: orderId,
+      PanAuthenticationType: 2,
     });
     const resCode = response.ResCode?.toString();
     const token = response.Token?.toString();

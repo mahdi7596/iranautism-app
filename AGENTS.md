@@ -59,7 +59,7 @@ The product is a custom Iran Autism platform combining:
 - Admin panel and financial reporting.
 - Media, gallery, video, and storytelling features.
 - User accounts with mobile OTP and donation history.
-- Partner mission verification for Pump, starting with mobile-based mission completion checks.
+- Partner mission verification for Pump, including paid support missions and a free one-time registration mission.
 - Recurring donations through Peyman direct debit, pending implementation priority after Pump unless priorities change.
 
 The platform should be treated as a serious custom system, not a template website.
@@ -154,7 +154,7 @@ The authoritative module list is maintained in `docs/product/module-registry.md`
 | UI/UX and Design | Core candidate | UX flows, wireframes, UI, responsive design system. |
 | Technical Architecture and Deployment | Core candidate | Suggested Next.js/NestJS/PostgreSQL/Prisma/Redis/Docker stack. |
 | Future/Phase-Two Services | Future scope | Appointment booking, doctor profiles, Q&A, play center reservations. |
-| Partner Missions and Reward Integrations | In progress | Pump backend and first frontend slice are implemented for four Excel missions, OTP identity, Sadad payment start/result, and profile mission history; final Pump return URL/field names still need confirmation. |
+| Partner Missions and Reward Integrations | In progress | Pump backend and frontend now support three paid support missions plus a free one-time registration mission, OTP identity, Sadad payment start/result for paid missions, and profile mission history; final Pump return URL/field names/reward wording still need confirmation. |
 | Recurring Donations | Needs confirmation | Peyman direct debit documented as the likely recurring donation implementation. |
 | User/Admin/Auth/Logs Database Slice | Needs revisit | Earlier broad auth/admin/log decision removed; current implemented database slice starts only with the agreed `USERS` table. |
 
@@ -181,6 +181,7 @@ The authoritative module list is maintained in `docs/product/module-registry.md`
 | 2026-05-25 | Live Sadad gateway contract hardened: numeric provider order IDs, PDF-aligned Sadad endpoints, backend callback verification before frontend result display, and documented Sadad referrer/domain deployment requirements. |
 | 2026-05-26 | Phase 1 Pump user-flow summary documented at `docs/product/modules/pump-phase-1-user-flow-summary.md`, covering mission selection, OTP identity, Sadad payment verification, Pump return/verification, and profile history. |
 | 2026-05-27 | Frontend design review feedback captured at `docs/product/modules/frontend-design-review-feedback-2026-05-27.md`; OpenSpec change `refine-public-pump-frontend-design` created and validated for the next correction pass. |
+| 2026-05-30 | Pump mission set changed: `کمک به انجمن اتیسم ایران` retired from active starts and replaced with free one-time registration mission `iran-autism-site-registration`; details captured in OpenSpec change `replace-pump-general-donation-with-registration-mission` and Pump module docs. |
 
 ## Working Rules Going Forward
 

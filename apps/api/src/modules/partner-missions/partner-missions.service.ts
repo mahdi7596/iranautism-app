@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 
 import { PrismaService } from "../../infrastructure/prisma/prisma.service";
 import {
@@ -7,6 +12,7 @@ import {
   PUMP_PARTNER_KEY,
   PumpVerificationResponse,
 } from "./pump/pump.contracts";
+import { PUMP_REGISTRATION_MISSION_KEY } from "./pump/pump-mission-seeds";
 
 @Injectable()
 export class PartnerMissionsService {
@@ -57,6 +63,52 @@ export class PartnerMissionsService {
         completed: true,
         lastQualifiedAt: qualifiedAt,
       },
+    });
+  }
+
+  async assertPumpDonationMission(missionId: string) {
+    const mission = await this.findPumpMission(missionId);
+
+    if (mission.resultType !== "COUNT_BASED") {
+      throw new BadRequestException("این ماموریت از نوع پرداختی نیست.");
+    }
+
+    return mission;
+  }
+
+  async recordPumpRegistrationCompletion(command: {
+    userId: string;
+    mobile: string;
+  }): Promise<PumpVerificationResponse> {
+    const mission = await this.findPumpMission(PUMP_REGISTRATION_MISSION_KEY);
+    const qualifiedAt = new Date();
+
+    await this.prisma.partnerMissionCompletion.upsert({
+      where: {
+        missionId_mobileSnapshot: {
+          missionId: mission.id,
+          mobileSnapshot: command.mobile,
+        },
+      },
+      create: {
+        missionId: mission.id,
+        userId: command.userId,
+        mobileSnapshot: command.mobile,
+        completionCount: 0,
+        completed: true,
+        lastQualifiedAt: qualifiedAt,
+      },
+      update: {
+        userId: command.userId,
+        completed: true,
+        completionCount: 0,
+        lastQualifiedAt: qualifiedAt,
+      },
+    });
+
+    return this.getPumpVerificationResult({
+      missionId: PUMP_REGISTRATION_MISSION_KEY,
+      mobile: command.mobile,
     });
   }
 

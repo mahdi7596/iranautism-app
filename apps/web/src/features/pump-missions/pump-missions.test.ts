@@ -9,21 +9,23 @@ import {
 import { PUMP_BANNERS, PUMP_MISSION_RULES } from "./pump-missions.constants";
 
 describe("Pump mission config", () => {
-  it("renders exactly the four Excel-defined missions", () => {
+  it("renders the three paid missions plus the free registration mission", () => {
     assert.deepEqual(
       pumpMissions.map((mission) => mission.id),
       [
         "iran-autism-medicine-support",
         "iran-autism-rehabilitation-support",
         "iran-autism-caregiving-support",
-        "iran-autism-general-donation",
+        "iran-autism-site-registration",
       ],
     );
   });
 
-  it("does not include a registration-only mission", () => {
+  it("does not include the retired general donation mission", () => {
     assert.equal(
-      pumpMissions.some((mission) => mission.id.includes("registration")),
+      (pumpMissions.map((mission) => mission.id) as readonly string[]).includes(
+        "iran-autism-general-donation",
+      ),
       false,
     );
   });
@@ -31,19 +33,29 @@ describe("Pump mission config", () => {
   it("configures the first three missions as repeatable custom amount missions without ticket counts", () => {
     assert.equal(repeatableCustomAmountMissions.length, 3);
 
+    assert.deepEqual(
+      repeatableCustomAmountMissions.map((mission) => mission.minAmountToman),
+      [
+        PUMP_MISSION_RULES.medicineMinAmountToman,
+        PUMP_MISSION_RULES.rehabilitationMinAmountToman,
+        PUMP_MISSION_RULES.caregivingMinAmountToman,
+      ],
+    );
+
     for (const mission of repeatableCustomAmountMissions) {
-      assert.equal(mission.minAmountToman, PUMP_MISSION_RULES.customMinAmountToman);
       assert.equal(mission.stepAmountToman, PUMP_MISSION_RULES.amountStepToman);
       assert.equal(mission.isRepeatable, true);
       assert.equal(mission.ticketCount, null);
     }
   });
 
-  it("uses the spreadsheet threshold and ticket count for the general donation mission", () => {
-    const mission = getPumpMissionById("iran-autism-general-donation");
+  it("configures the registration mission as free and one-time", () => {
+    const mission = getPumpMissionById("iran-autism-site-registration");
 
-    assert.equal(mission?.minAmountToman, PUMP_MISSION_RULES.generalMinAmountToman);
-    assert.equal(mission?.ticketCount, PUMP_MISSION_RULES.generalTicketCount);
+    assert.equal(mission?.kind, "REGISTRATION");
+    assert.equal(mission?.minAmountToman, null);
+    assert.equal(mission?.isRepeatable, false);
+    assert.equal(mission?.ticketCount, null);
     assert.ok(mission?.medalText);
   });
 

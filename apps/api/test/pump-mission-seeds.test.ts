@@ -6,7 +6,7 @@ import {
   upsertInitialPumpMissions,
 } from "../src/modules/partner-missions/pump/pump-mission-seeds";
 
-test("INITIAL_PUMP_MISSIONS includes all Excel-defined Pump donation missions", () => {
+test("INITIAL_PUMP_MISSIONS includes active paid and registration Pump missions", () => {
   assert.deepEqual(INITIAL_PUMP_MISSIONS, [
     {
       missionKey: "iran-autism-medicine-support",
@@ -24,8 +24,8 @@ test("INITIAL_PUMP_MISSIONS includes all Excel-defined Pump donation missions", 
       campaignStartsAt: new Date("2026-05-24T00:00:00.000Z"),
     },
     {
-      missionKey: "iran-autism-general-donation",
-      resultType: "COUNT_BASED",
+      missionKey: "iran-autism-site-registration",
+      resultType: "STATUS_BASED",
       campaignStartsAt: new Date("2026-05-24T00:00:00.000Z"),
     },
   ]);
@@ -53,7 +53,7 @@ test("upsertInitialPumpMissions writes Pump mission configuration", async () => 
       "iran-autism-medicine-support",
       "iran-autism-rehabilitation-support",
       "iran-autism-caregiving-support",
-      "iran-autism-general-donation",
+      "iran-autism-site-registration",
     ],
   );
 });

@@ -37,6 +37,8 @@ export class PumpMissionFlowService {
   async startDonationIntent(
     command: StartPumpDonationIntentCommand,
   ): Promise<StartPumpDonationIntentResult> {
+    await this.partnerMissions.assertPumpDonationMission(command.missionId);
+
     const donation = await this.donations.createPumpDonationIntent(command);
     const paymentTransaction = await this.payments.createDonationPaymentAttempt({
       donationId: donation.id,
@@ -51,6 +53,13 @@ export class PumpMissionFlowService {
       paymentTransactionId: paymentTransaction.id,
       status: "PENDING",
     };
+  }
+
+  completeRegistrationMission(command: {
+    userId: string;
+    mobile: string;
+  }): Promise<PumpVerificationResponse> {
+    return this.partnerMissions.recordPumpRegistrationCompletion(command);
   }
 
   async confirmDonationMission(command: {

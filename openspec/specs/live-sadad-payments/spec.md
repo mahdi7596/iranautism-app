@@ -20,7 +20,7 @@ The system SHALL request a Sadad payment token using the provider's documented r
 
 #### Scenario: Payment token request
 - **WHEN** a pending payment transaction is started through the Sadad gateway
-- **THEN** the request sent to Sadad includes merchant number, terminal number, amount, unique numeric provider order ID, local date/time, return URL, and encrypted sign data
+- **THEN** the request sent to Sadad includes merchant number, terminal number, amount, unique numeric provider order ID, local date/time, return URL, encrypted sign data, and `PanAuthenticationType` set to `2`
 
 #### Scenario: Sign data generation
 - **WHEN** the system signs a Sadad payment request

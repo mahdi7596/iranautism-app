@@ -18,8 +18,24 @@ export const otpCodeSchema = z
   .regex(/^\d{4,8}$/, VALIDATION_MESSAGES.invalidOtpCode);
 
 export const pumpMissionIdSchema = z
-  .string()
-  .min(1, VALIDATION_MESSAGES.invalidPumpMissionId);
+  .enum(
+    [
+      "iran-autism-medicine-support",
+      "iran-autism-rehabilitation-support",
+      "iran-autism-caregiving-support",
+      "iran-autism-site-registration",
+    ],
+    { error: VALIDATION_MESSAGES.invalidPumpMissionId },
+  );
+
+export const paidPumpMissionIdSchema = z.enum(
+  [
+    "iran-autism-medicine-support",
+    "iran-autism-rehabilitation-support",
+    "iran-autism-caregiving-support",
+  ],
+  { error: VALIDATION_MESSAGES.invalidPumpMissionId },
+);
 
 export const tomanAmountSchema = z
   .number()

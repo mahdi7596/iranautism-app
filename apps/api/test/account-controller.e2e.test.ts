@@ -26,7 +26,7 @@ test("Account endpoints expose authenticated Pump mission history", async () => 
         findMany: async () => [
           {
             mission: {
-              missionKey: "iran-autism-general-donation",
+              missionKey: "iran-autism-caregiving-support",
             },
             completed: true,
             completionCount: 2,
@@ -47,7 +47,7 @@ test("Account endpoints expose authenticated Pump mission history", async () => 
     .expect({
       items: [
         {
-          missionId: "iran-autism-general-donation",
+          missionId: "iran-autism-caregiving-support",
           completed: true,
           completionCount: 2,
           completedAt: "2026-05-25T08:00:00.000Z",

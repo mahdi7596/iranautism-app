@@ -8,17 +8,17 @@ describe("account Pump history helpers", () => {
   it("maps backend history to safe display rows", () => {
     const rows = buildPumpHistoryRows([
       {
-        missionId: "iran-autism-general-donation",
+        missionId: "iran-autism-caregiving-support",
         completed: true,
         completionCount: 2,
         completedAt: "2026-05-25T08:00:00.000Z",
       },
     ]);
-    const mission = getPumpMissionById("iran-autism-general-donation");
+    const mission = getPumpMissionById("iran-autism-caregiving-support");
 
     assert.deepEqual(rows, [
       {
-        missionId: "iran-autism-general-donation",
+        missionId: "iran-autism-caregiving-support",
         missionTitle: mission?.title,
         completed: true,
         completionCount: 2,

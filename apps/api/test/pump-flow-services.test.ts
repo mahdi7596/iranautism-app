@@ -19,7 +19,7 @@ test("DonationsService creates a pending Pump donation intent", async () => {
 
   const donation = await service.createPumpDonationIntent({
     mobile: "09123456789",
-    missionId: "iran-autism-general-donation",
+    missionId: "iran-autism-caregiving-support",
     amountIrr: 2_000_000n,
     donorDisplayName: "Test Donor",
     correlationId: "corr_1",
@@ -35,7 +35,7 @@ test("DonationsService creates a pending Pump donation intent", async () => {
         mobileSnapshot: "09123456789",
         publicVisibility: "ANONYMOUS",
         targetType: "CAMPAIGN",
-        targetLabelSnapshot: "iran-autism-general-donation",
+        targetLabelSnapshot: "iran-autism-caregiving-support",
         status: "PENDING",
         amount: 2_000_000n,
         currency: "IRR",
@@ -61,7 +61,7 @@ test("DonationsService creates registered Pump donation intents with user owners
       userId: "user_1",
       mobile: "09123456789",
     },
-    missionId: "iran-autism-general-donation",
+    missionId: "iran-autism-caregiving-support",
     amountIrr: 2_000_000n,
   });
 
@@ -74,7 +74,7 @@ test("DonationsService creates registered Pump donation intents with user owners
         mobileSnapshot: "09123456789",
         publicVisibility: "ANONYMOUS",
         targetType: "CAMPAIGN",
-        targetLabelSnapshot: "iran-autism-general-donation",
+        targetLabelSnapshot: "iran-autism-caregiving-support",
         status: "PENDING",
         amount: 2_000_000n,
         currency: "IRR",
@@ -99,7 +99,7 @@ test("DonationsService creates mobile-only Pump donation intents without user ow
       kind: "MOBILE_ONLY",
       mobile: "09123456789",
     },
-    missionId: "iran-autism-general-donation",
+    missionId: "iran-autism-caregiving-support",
     amountIrr: 2_000_000n,
   });
 
@@ -112,7 +112,7 @@ test("DonationsService creates mobile-only Pump donation intents without user ow
         mobileSnapshot: "09123456789",
         publicVisibility: "ANONYMOUS",
         targetType: "CAMPAIGN",
-        targetLabelSnapshot: "iran-autism-general-donation",
+        targetLabelSnapshot: "iran-autism-caregiving-support",
         status: "PENDING",
         amount: 2_000_000n,
         currency: "IRR",
@@ -230,7 +230,7 @@ test("PaymentsService records Sadad callback and confirms donation after verifie
           providerOrderId: 12345n,
           status: "REDIRECTED",
           donation: {
-            targetLabelSnapshot: "iran-autism-general-donation",
+            targetLabelSnapshot: "iran-autism-caregiving-support",
             mobileSnapshot: "09123456789",
           },
         }),
@@ -312,7 +312,7 @@ test("PaymentsService does not confirm donation after failed Sadad verification"
           status: "REDIRECTED",
           failureCode: null,
           donation: {
-            targetLabelSnapshot: "iran-autism-general-donation",
+            targetLabelSnapshot: "iran-autism-caregiving-support",
             mobileSnapshot: "09123456789",
           },
         }),
@@ -389,7 +389,7 @@ test("PaymentsService treats repeated successful Sadad callbacks as idempotent",
           status: "SUCCESSFUL",
           failureCode: null,
           donation: {
-            targetLabelSnapshot: "iran-autism-general-donation",
+            targetLabelSnapshot: "iran-autism-caregiving-support",
             mobileSnapshot: "09123456789",
           },
         }),
@@ -450,7 +450,7 @@ test("PartnerMissionsService returns count-based Pump verification responses", a
     partnerMission: {
       findUnique: async () => ({
         id: "mission_uuid",
-        missionKey: "iran-autism-general-donation",
+        missionKey: "iran-autism-caregiving-support",
         resultType: "COUNT_BASED",
       }),
     },
@@ -464,13 +464,66 @@ test("PartnerMissionsService returns count-based Pump verification responses", a
 
   assert.deepEqual(
     await service.getPumpVerificationResult({
-      missionId: "iran-autism-general-donation",
+      missionId: "iran-autism-caregiving-support",
       mobile: "09123456789",
     }),
     {
       mobile: "09123456789",
-      missionId: "iran-autism-general-donation",
+      missionId: "iran-autism-caregiving-support",
       count: 3,
+    },
+  );
+});
+
+test("PartnerMissionsService records registration completions without donation data", async () => {
+  const upserts: unknown[] = [];
+  const service = new PartnerMissionsService({
+    partnerMission: {
+      findUnique: async () => ({
+        id: "registration_mission_uuid",
+        missionKey: "iran-autism-site-registration",
+        resultType: "STATUS_BASED",
+      }),
+    },
+    partnerMissionCompletion: {
+      upsert: async (input: unknown) => {
+        upserts.push(input);
+        return { id: "completion_1" };
+      },
+      findUnique: async () => ({
+        completionCount: 0,
+        completed: true,
+      }),
+    },
+  } as never);
+
+  assert.deepEqual(
+    await service.recordPumpRegistrationCompletion({
+      userId: "user_1",
+      mobile: "09123456789",
+    }),
+    {
+      mobile: "09123456789",
+      missionId: "iran-autism-site-registration",
+      completed: true,
+    },
+  );
+
+  assert.equal(
+    (upserts[0] as { create: { qualifyingDonationId?: string } }).create
+      .qualifyingDonationId,
+    undefined,
+  );
+  assert.deepEqual(
+    (upserts[0] as { create: { userId: string; mobileSnapshot: string; completed: boolean; completionCount: number } })
+      .create,
+    {
+      missionId: "registration_mission_uuid",
+      userId: "user_1",
+      mobileSnapshot: "09123456789",
+      completionCount: 0,
+      completed: true,
+      lastQualifiedAt: (upserts[0] as { create: { lastQualifiedAt: Date } }).create.lastQualifiedAt,
     },
   );
 });
@@ -483,13 +536,15 @@ test("PumpMissionFlowService creates donation and payment records together", asy
     {
       createDonationPaymentAttempt: async () => ({ id: "payment_1" }),
     } as never,
-    {} as never,
+    {
+      assertPumpDonationMission: async () => ({ id: "mission_1" }),
+    } as never,
   );
 
   assert.deepEqual(
     await service.startDonationIntent({
       mobile: "09123456789",
-      missionId: "iran-autism-general-donation",
+      missionId: "iran-autism-caregiving-support",
       amountIrr: 2_000_000n,
       gateway: "stub",
       idempotencyKey: "idem_1",
@@ -501,6 +556,45 @@ test("PumpMissionFlowService creates donation and payment records together", asy
       status: "PENDING",
     },
   );
+});
+
+test("PumpMissionFlowService completes registration mission through partner missions only", async () => {
+  const calls: string[] = [];
+  const service = new PumpMissionFlowService(
+    {
+      createPumpDonationIntent: async () => {
+        throw new Error("registration should not create donations");
+      },
+    } as never,
+    {
+      createDonationPaymentAttempt: async () => {
+        throw new Error("registration should not create payments");
+      },
+    } as never,
+    {
+      recordPumpRegistrationCompletion: async () => {
+        calls.push("registration");
+        return {
+          mobile: "09123456789",
+          missionId: "iran-autism-site-registration",
+          completed: true,
+        };
+      },
+    } as never,
+  );
+
+  assert.deepEqual(
+    await service.completeRegistrationMission({
+      userId: "user_1",
+      mobile: "09123456789",
+    }),
+    {
+      mobile: "09123456789",
+      missionId: "iran-autism-site-registration",
+      completed: true,
+    },
+  );
+  assert.deepEqual(calls, ["registration"]);
 });
 
 test("PumpMissionFlowService confirms a donation mission and returns verification", async () => {
@@ -522,7 +616,7 @@ test("PumpMissionFlowService confirms a donation mission and returns verificatio
       },
       getPumpVerificationResult: async () => ({
         mobile: "09123456789",
-        missionId: "iran-autism-general-donation",
+        missionId: "iran-autism-caregiving-support",
         completed: true,
       }),
     } as never,
@@ -530,7 +624,7 @@ test("PumpMissionFlowService confirms a donation mission and returns verificatio
 
   assert.deepEqual(
     await service.confirmDonationMission({
-      missionId: "iran-autism-general-donation",
+      missionId: "iran-autism-caregiving-support",
       mobile: "09123456789",
       donationId: "donation_1",
       paymentTransactionId: "payment_1",
@@ -538,7 +632,7 @@ test("PumpMissionFlowService confirms a donation mission and returns verificatio
     }),
     {
       mobile: "09123456789",
-      missionId: "iran-autism-general-donation",
+      missionId: "iran-autism-caregiving-support",
       completed: true,
     },
   );

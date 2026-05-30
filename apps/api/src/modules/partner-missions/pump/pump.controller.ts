@@ -67,6 +67,18 @@ export class PumpController {
     });
   }
 
+  @Post("/api/public/missions/pump/registration-completions")
+  async completeRegistrationMission(
+    @Headers("authorization") authorizationHeader?: string,
+  ) {
+    const { user } = await this.auth.getCurrentUser(authorizationHeader);
+
+    return this.pumpMissionFlow.completeRegistrationMission({
+      userId: user.id,
+      mobile: user.mobile,
+    });
+  }
+
   @Get("/api/partners/pump/missions/:missionId/verify")
   @UseGuards(PumpApiKeyGuard)
   verifyMission(

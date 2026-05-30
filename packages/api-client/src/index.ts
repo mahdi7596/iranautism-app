@@ -1,5 +1,6 @@
 import type {
   CurrentUser,
+  CompletePumpRegistrationMissionResponse,
   RequestOtpRequest,
   RequestOtpResponse,
   StartPaymentRequest,
@@ -88,6 +89,15 @@ export function createApiClient(options: ApiClientOptions) {
         {
           method: "POST",
           body: JSON.stringify(input),
+        },
+      );
+    },
+
+    completePumpRegistrationMission() {
+      return requestJson<CompletePumpRegistrationMissionResponse>(
+        "/api/public/missions/pump/registration-completions",
+        {
+          method: "POST",
         },
       );
     },

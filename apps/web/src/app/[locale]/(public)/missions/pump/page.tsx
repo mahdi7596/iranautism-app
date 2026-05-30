@@ -1,6 +1,5 @@
 import { Icon } from "@iranautism/icons";
 import {
-  Amount,
   Slider,
   SliderControls,
   SliderDots,
@@ -45,7 +44,11 @@ export default async function PumpMissionsPage({ params }: PumpMissionsPageProps
       >
         <SliderViewport>
           {PUMP_BANNERS.map((banner, index) => (
-            <SliderSlide key={banner.id} id={`pump-banner-${banner.id}`} className="pump-hero">
+            <SliderSlide
+              key={banner.id}
+              id={`pump-banner-${banner.id}`}
+              className={`pump-hero pump-hero--${banner.id}`}
+            >
               <div className="pump-hero__media">
                 <Image
                   src={banner.image.src}
@@ -117,25 +120,11 @@ export default async function PumpMissionsPage({ params }: PumpMissionsPageProps
                     />
                   </span>
                   <span className="pump-mission-card__topline">
-                    <span className="pump-mission-card__icon" aria-hidden="true">
-                      <Icon name={mission.ticketCount ? "ticket" : "heartHandshake"} />
-                    </span>
-                    <StatusBadge tone={mission.ticketCount ? "success" : "info"}>
+                    <StatusBadge tone={mission.kind === "REGISTRATION" ? "info" : "success"}>
                       {mission.medalTitle}
                     </StatusBadge>
                   </span>
                   <strong className="pump-mission-card__title">{mission.title}</strong>
-                  <span className="pump-mission-card__text">{mission.shortText}</span>
-                  <span className="pump-mission-card__meta">
-                    <span className="pump-mission-card__amount">
-                      {PUMP_MISSION_COPY.list.amountPrefix} <Amount value={mission.minAmountToman} />
-                    </span>
-                    {mission.ticketCount ? (
-                      <span className="pump-mission-card__tickets">
-                        {mission.ticketCount.toLocaleString("fa-IR")} {PUMP_MISSION_COPY.list.ticketSuffix}
-                      </span>
-                    ) : null}
-                  </span>
                   <span className="pump-mission-card__cta">
                     {PUMP_MISSION_COPY.list.cta}
                     <Icon name="arrowLeft" size="sm" />

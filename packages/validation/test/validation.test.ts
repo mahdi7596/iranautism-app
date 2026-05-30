@@ -39,10 +39,11 @@ test("otpCodeSchema accepts 4 to 8 digit OTP codes", () => {
 
 test("pumpMissionIdSchema accepts stable mission keys", () => {
   assert.equal(
-    pumpMissionIdSchema.parse("iran-autism-general-donation"),
-    "iran-autism-general-donation",
+    pumpMissionIdSchema.parse("iran-autism-site-registration"),
+    "iran-autism-site-registration",
   );
   assert.equal(pumpMissionIdSchema.safeParse("").success, false);
+  assert.equal(pumpMissionIdSchema.safeParse("iran-autism-general-donation").success, false);
 });
 
 test("tomanAmountSchema enforces minimum and step", () => {

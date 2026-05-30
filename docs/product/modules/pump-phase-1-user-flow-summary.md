@@ -8,14 +8,15 @@ Related implementation scope:
 
 - Mobile OTP login/register.
 - Pump mission listing and mission detail pages.
-- Pump donation intent creation.
+- Pump donation intent creation for paid missions.
+- Free Pump registration mission completion.
 - Sadad payment start, callback verification, and result display.
 - Pump partner verification endpoint.
 - Authenticated profile Pump mission history.
 
 ## Summary
 
-Phase 1 lets a Pump user complete an Iran Autism donation mission by choosing a mission, confirming their mobile number with OTP, paying through Sadad, and returning to Pump after the backend has verified the payment result.
+Phase 1 lets a Pump user complete an Iran Autism mission by choosing either a paid support mission or the free registration mission. Paid missions use mobile OTP, Sadad payment, backend verification, and return-to-Pump flow; the free registration mission uses mobile OTP registration/login and records completion without payment.
 
 The implemented flow is mobile-first and Persian-first. User-facing messages, validation states, loading states, and payment result copy are shown in Persian. Mobile number is the main identity used for Pump mission completion, so the mission can be verified for both an authenticated Iran Autism user and a mobile-only Pump participant.
 
@@ -26,14 +27,14 @@ The implemented flow is mobile-first and Persian-first. User-facing messages, va
    - medicine support;
    - rehabilitation support;
    - caregiving support;
-   - general donation to Iran Autism.
+   - free registration on the Iran Autism site.
 3. The user selects a mission and opens `/fa/missions/pump/[missionId]`.
-4. The mission detail page shows the mission title, medal text, reward details where available, and a donation amount selector.
+4. The mission detail page shows the mission title, medal text, reward details where available, and the relevant action for that mission.
 5. If the user is not already authenticated, they enter an Iranian mobile number.
 6. The system requests an OTP with the `pump_mission` purpose.
 7. The user enters the OTP.
 8. After successful verification, the frontend stores the session and treats the mobile number as the active mission identity.
-9. The user clicks the payment/start mission button.
+9. For paid missions, the user clicks the payment/start mission button.
 10. The frontend creates a Pump donation intent through the backend.
 11. The backend creates a pending donation and a payment transaction for the selected mission, amount, mobile identity, and Sadad gateway.
 12. The frontend starts the payment transaction and redirects the browser to Sadad.
@@ -48,6 +49,20 @@ The implemented flow is mobile-first and Persian-first. User-facing messages, va
 21. In Pump, when the user asks Pump to check completion, Pump calls Iran Autism's protected verification API.
 22. Iran Autism returns the mission completion result for the user's mobile number and mission.
 23. Pump can grant the reward based on the verification response.
+
+## Free Registration Mission Flow
+
+The free registration mission exists so Pump users are not forced to pay money to complete every mission.
+
+1. The user opens the registration mission from `/fa/missions/pump`.
+2. If anonymous, the user verifies their mobile number through the Pump OTP flow.
+3. If already logged in, the page uses the authenticated mobile and does not ask for mobile again.
+4. The user confirms the free registration mission.
+5. The backend records a status-based Pump mission completion for that user/mobile.
+6. No donation, payment transaction, Sadad redirect, or Sadad verification is created.
+7. When Pump verifies the mission, Iran Autism returns `completed: true` or `completed: false`.
+
+The free mission is one-time per mobile number. A user who already registered through a paid Pump mission can still complete this free registration mission once after explicit mission intent.
 
 ## Authenticated User Flow
 
@@ -109,7 +124,7 @@ The profile history flow:
 
 ## Important Phase 1 Boundaries
 
-Implemented Phase 1 covers the first Pump donation mission path. It does not yet cover the broader product platform.
+Implemented Phase 1 covers paid Pump donation mission paths and the free registration mission path. It does not yet cover the broader product platform.
 
 Still outside this current slice unless separately prioritized:
 
@@ -125,4 +140,4 @@ Still outside this current slice unless separately prioritized:
 
 - Real Sadad credentials must stay in the server environment or secret store and must never be committed.
 - For live Sadad, the public domain/referrer, backend callback URL, and server IP must match Sadad portal configuration.
-- Pump reward wording should stay conservative until Pump confirms exact reward copy, repeatability limits, and final verification field names.
+- Pump reward wording should stay conservative until Pump confirms exact reward copy, repeatability limits, final registration mission image/source, and final verification field names.

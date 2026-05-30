@@ -121,16 +121,20 @@ The backend must support two mission-completion identity paths:
 
 The Iran Autism mission landing page may encourage OTP login because it improves donation history and future user dashboard support, but OTP registration must not be treated as the only valid Pump mission path unless the product owner later confirms that stricter rule.
 
-## Missions From Client Spreadsheet
+## Active Mission Set
 
-The client-provided `docs/source/client/pump/V1.xlsx` currently lists these mission candidates:
+The client-provided `docs/source/client/pump/V1.xlsx` originally listed four paid mission candidates. On 2026-05-30, Pump requested one free mission so users are not forced to pay money for every mission. The active v1 mission set is now three paid spreadsheet missions plus one free registration mission.
 
 | Mission title | Medal title | Medal text | Known reward/limit details |
 |---|---|---|---|
 | کمک به هزینه دارو افراد اتیسم | نشان همراهی دارو | با خرید هر نشان دارو به یک فرد اتیسم کمک می‌کنید و این ماموریت براتون کامل میشه | Needs confirmation |
 | کمک به هزینه توانبخشی افراد اتیسم | نشان همراهی توانبخشی | با خرید هر نشان توانبخشی به توانمند شدن یک فرد اتیسم کمک می‌کنید و این ماموریت براتون کامل میشه | Needs confirmation |
 | کمک به هزینه پرستاری افراد اتیسم | نشان همراهی فرشته | با خرید هر نشان فرشته کمک به مراقبت از یک فرد اتیسم می‌کنید و این ماموریت براتون کامل میشه | Needs confirmation |
-| کمک به انجمن اتیسم ایران | کمک طیف اتیسم | با هر کمک بالای ۲۰۰ هزار تومان به انجمن اتیسم ایران، این ماموریت براتون کامل میشه | Ticket count shown as `3000`; threshold text says donation above 200,000 toman |
+| ثبت‌نام در سایت انجمن اتیسم ایران | Needs confirmation | با تایید شماره موبایل و ثبت‌نام در سایت انجمن، این ماموریت رایگان کامل می‌شود. | Free one-time/status-based mission; exact Pump reward wording and final image source need confirmation |
+
+Retired from the active mission set:
+
+- `کمک به انجمن اتیسم ایران` / `iran-autism-general-donation`: replaced by the free registration mission. Historical records may remain for audit/history tolerance, but new frontend starts should not route users to this mission.
 
 The spreadsheet leaves several important columns blank for most missions:
 
@@ -160,7 +164,7 @@ Landing pages should:
 - explain the mission in Persian;
 - preserve any Pump campaign parameters if provided;
 - ask the user to authenticate with mobile OTP if needed;
-- route the user into the relevant donation/support action;
+- route the user into the relevant donation/support action or free registration completion action;
 - show clear completion feedback after a qualifying action;
 - avoid promising Pump rewards directly unless Pump has confirmed the exact wording.
 
@@ -187,6 +191,13 @@ For non-repeatable missions:
 - Iran Autism should return `completed: true` only after the qualifying action is complete and verified.
 - Iran Autism should return `completed: false` when no qualifying action exists.
 - If the action is still being verified, Iran Autism may return a pending state internally, but Pump's accepted response format must be confirmed before exposing `pending`.
+
+For the free registration mission:
+
+- The qualifying action is verified mobile OTP registration/login on the Iran Autism platform.
+- Existing registered users can complete the mission once after explicit mission intent because prior paid Pump mission OTP already creates/reuses the user account.
+- Completion is stored in `partner_mission_completions` with no donation or payment transaction.
+- The mission returns status-based verification, not count-based verification.
 
 ## Security Requirements
 
@@ -274,8 +285,9 @@ Frontend handoff notes:
 - Normal login OTP sends `otpPurpose: "login"` and Pump mission OTP sends `otpPurpose: "pump_mission"` so SMS templates can differ.
 - If the user is already authenticated, the Pump mission detail page uses the authenticated mobile and does not ask for mobile again.
 - The first three Excel missions accept custom repeatable amounts from 10,000 toman with 10,000 toman step controls and do not display ticket counts.
-- The general donation mission uses the 200,000 toman threshold and displays 3,000 tickets.
+- The fourth active mission is the free registration mission; it has no amount selector, Sadad redirect, or count increment.
 - After creating a Pump donation intent, the frontend calls the payment start endpoint and redirects the browser to the returned `redirectUrl`.
+- After completing the free registration mission, the frontend calls `POST /api/public/missions/pump/registration-completions` and shows a Persian success/recoverable error state.
 - Callback/result screens show Persian messages only and treat backend payment status from `GET /api/payments/:paymentTransactionId/status` as source of truth.
 - User profile history reads `GET /api/account/pump-missions/history` and displays mission titles, completion status/count where available, and Jalali completion dates.
 - Real Sadad credentials belong only in the server environment/secret store during deployment.

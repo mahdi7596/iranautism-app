@@ -58,8 +58,16 @@ test("Pump endpoints expose the initial donation mission backend flow", async ()
         calls.push("verify");
         return {
           mobile: "09123456789",
-          missionId: "iran-autism-general-donation",
+          missionId: "iran-autism-caregiving-support",
           count: 1,
+        };
+      },
+      completeRegistrationMission: async () => {
+        calls.push("registration");
+        return {
+          mobile: "09111111111",
+          missionId: "iran-autism-site-registration",
+          completed: true,
         };
       },
     })
@@ -72,7 +80,7 @@ test("Pump endpoints expose the initial donation mission backend flow", async ()
     .post("/api/public/missions/pump/donation-intents")
     .send({
       mobile: "09123456789",
-      missionId: "iran-autism-general-donation",
+      missionId: "iran-autism-caregiving-support",
       amountIrr: "2000000",
       gateway: "stub",
     })
@@ -88,7 +96,7 @@ test("Pump endpoints expose the initial donation mission backend flow", async ()
     .set("authorization", "Bearer token_1")
     .send({
       mobile: "09999999999",
-      missionId: "iran-autism-general-donation",
+      missionId: "iran-autism-caregiving-support",
       amountIrr: "2000000",
       gateway: "stub",
     })
@@ -100,28 +108,38 @@ test("Pump endpoints expose the initial donation mission backend flow", async ()
     });
 
   await request(app.getHttpServer())
-    .get("/api/partners/pump/missions/iran-autism-general-donation/verify")
+    .get("/api/partners/pump/missions/iran-autism-caregiving-support/verify")
     .set("x-pump-api-key", "test-pump-secret")
     .query({ mobile: "09123456789" })
     .expect(200)
     .expect({
       mobile: "09123456789",
-      missionId: "iran-autism-general-donation",
+      missionId: "iran-autism-caregiving-support",
       count: 1,
+    });
+
+  await request(app.getHttpServer())
+    .post("/api/public/missions/pump/registration-completions")
+    .set("authorization", "Bearer token_1")
+    .expect(201)
+    .expect({
+      mobile: "09111111111",
+      missionId: "iran-autism-site-registration",
+      completed: true,
     });
 
   await request(app.getHttpServer())
     .post("/api/public/missions/pump/donation-intents")
     .send({
       mobile: "not-a-mobile",
-      missionId: "iran-autism-general-donation",
+      missionId: "iran-autism-caregiving-support",
       amountIrr: "not-a-number",
       gateway: "stub",
     })
     .expect(400);
 
   await request(app.getHttpServer())
-    .post("/api/partners/pump/missions/iran-autism-general-donation/confirm")
+    .post("/api/partners/pump/missions/iran-autism-caregiving-support/confirm")
     .send({
       mobile: "09123456789",
       donationId: "donation_1",
@@ -129,11 +147,11 @@ test("Pump endpoints expose the initial donation mission backend flow", async ()
     .expect(404);
 
   await request(app.getHttpServer())
-    .get("/api/partners/pump/missions/iran-autism-general-donation/verify")
+    .get("/api/partners/pump/missions/iran-autism-caregiving-support/verify")
     .set("x-pump-api-key", "test-pump-secret")
     .expect(400);
 
-  if (calls.join(",") !== "start,start,verify") {
+  if (calls.join(",") !== "start,start,verify,registration") {
     throw new Error("Invalid Pump requests should not call the flow service");
   }
 

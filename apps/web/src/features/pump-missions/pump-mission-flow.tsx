@@ -16,6 +16,7 @@ import { verifyLoginOtp } from "../auth/login-flow";
 import { createBrowserApiClient } from "../../lib/api-client";
 import { AmountStepper } from "./amount-stepper";
 import {
+  completePumpRegistrationMission,
   normalizeTomanAmount,
   preparePumpMissionPayment,
   requestPumpMissionOtp,
@@ -43,14 +44,19 @@ function getFormErrors(errors: Array<string | undefined>) {
 export function PumpMissionFlow({ mission, locale }: PumpMissionFlowProps) {
   const apiClient = createBrowserApiClient();
   const auth = useAuth();
-  const [amountToman, setAmountToman] = useState(mission.minAmountToman);
+  const [amountToman, setAmountToman] = useState(
+    mission.kind === "DONATION" ? mission.minAmountToman : 0,
+  );
   const [challengeId, setChallengeId] = useState<string | null>(null);
   const [otpMobile, setOtpMobile] = useState("");
   const [verifiedUser, setVerifiedUser] = useState<CurrentUser | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPreparingPayment, setIsPreparingPayment] = useState(false);
+  const [isCompletingRegistration, setIsCompletingRegistration] = useState(false);
   const activeUser = auth.user ?? verifiedUser;
+  const isRegistrationMission = mission.kind === "REGISTRATION";
+  const isBusy = isPreparingPayment || isCompletingRegistration;
 
   const mobileForm = useForm<z.infer<typeof mobileSchema>>({
     resolver: zodResolver(mobileSchema),
@@ -112,17 +118,18 @@ export function PumpMissionFlow({ mission, locale }: PumpMissionFlowProps) {
   }
 
   async function onStartPayment() {
-    if (!activeUser || isPreparingPayment) return;
+    if (!activeUser || isBusy || mission.kind !== "DONATION") return;
 
     setError(null);
     setMessage(null);
     setIsPreparingPayment(true);
 
     try {
+      const normalizedAmount = normalizeTomanAmount(amountToman, mission);
       const payment = await preparePumpMissionPayment(apiClient, {
         mission,
         user: activeUser,
-        amountToman: normalizeTomanAmount(amountToman, mission),
+        amountToman: normalizedAmount,
         resultUrl: buildSadadResultUrl(locale),
       });
       window.location.assign(payment.redirectUrl);
@@ -132,21 +139,31 @@ export function PumpMissionFlow({ mission, locale }: PumpMissionFlowProps) {
     }
   }
 
+  async function onCompleteRegistration() {
+    if (!activeUser || isBusy || !isRegistrationMission) return;
+
+    setError(null);
+    setMessage(null);
+    setIsCompletingRegistration(true);
+
+    try {
+      await completePumpRegistrationMission(apiClient);
+      setMessage(PUMP_MISSION_COPY.messages.registrationCompleted);
+    } catch (caughtError) {
+      setError(caughtError instanceof Error ? caughtError.message : PUMP_MISSION_COPY.messages.registrationFailed);
+    } finally {
+      setIsCompletingRegistration(false);
+    }
+  }
+
   return (
     <section className="mission-detail" aria-labelledby="mission-title">
       <div className="mission-detail__summary">
         <a className="mission-detail__back" href={buildPumpMissionsPath(locale)}>
           <Icon name="arrowRight" size="sm" label={PUMP_MISSION_COPY.detail.backToMissions} />
         </a>
-        <StatusBadge tone={mission.ticketCount ? "success" : "info"}>{mission.medalTitle}</StatusBadge>
+        <StatusBadge tone={mission.kind === "REGISTRATION" ? "info" : "success"}>{mission.medalTitle}</StatusBadge>
         <h1 id="mission-title">{mission.title}</h1>
-        <p>{mission.medalText}</p>
-        {mission.ticketCount ? (
-          <strong className="mission-detail__reward">
-            {PUMP_MISSION_COPY.detail.rewardPrefix} {mission.ticketCount.toLocaleString("fa-IR")}{" "}
-            {PUMP_MISSION_COPY.list.ticketSuffix}
-          </strong>
-        ) : null}
         <figure className={`mission-detail__image mission-detail__image--${mission.accent}`}>
           <Image
             src={mission.featuredImage.src}
@@ -165,12 +182,14 @@ export function PumpMissionFlow({ mission, locale }: PumpMissionFlowProps) {
         {message ? <Alert variant="success">{message}</Alert> : null}
         {error ? <Alert variant="danger">{error}</Alert> : null}
 
-        <AmountStepper
-          mission={mission}
-          value={amountToman}
-          onChange={setAmountToman}
-          disabled={isPreparingPayment}
-        />
+        {mission.kind === "DONATION" ? (
+          <AmountStepper
+            mission={mission}
+            value={amountToman}
+            onChange={setAmountToman}
+            disabled={isBusy}
+          />
+        ) : null}
 
         {activeUser ? (
           <div className="mission-identity">
@@ -183,8 +202,19 @@ export function PumpMissionFlow({ mission, locale }: PumpMissionFlowProps) {
                 </p>
               </div>
             </div>
-            <Button type="button" size="lg" onClick={onStartPayment} disabled={isPreparingPayment}>
-              {isPreparingPayment ? PUMP_MISSION_COPY.detail.preparingPayment : PUMP_MISSION_COPY.detail.startPayment}
+            <Button
+              type="button"
+              size="lg"
+              onClick={isRegistrationMission ? onCompleteRegistration : onStartPayment}
+              disabled={isBusy}
+            >
+              {isRegistrationMission
+                ? isCompletingRegistration
+                  ? PUMP_MISSION_COPY.detail.completingRegistration
+                  : PUMP_MISSION_COPY.detail.completeRegistration
+                : isPreparingPayment
+                  ? PUMP_MISSION_COPY.detail.preparingPayment
+                  : PUMP_MISSION_COPY.detail.startPayment}
             </Button>
           </div>
         ) : challengeId ? (
@@ -252,6 +282,22 @@ export function PumpMissionFlow({ mission, locale }: PumpMissionFlowProps) {
             </Button>
           </form>
         )}
+
+        <div className="mission-detail__after">
+          <h3>
+            {isRegistrationMission
+              ? PUMP_MISSION_COPY.detail.afterRegistrationTitle
+              : PUMP_MISSION_COPY.detail.afterPaymentTitle}
+          </h3>
+          <ul>
+            {(isRegistrationMission
+              ? PUMP_MISSION_COPY.detail.afterRegistrationItems
+              : PUMP_MISSION_COPY.detail.afterPaymentItems
+            ).map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </div>
       </div>
     </section>
   );

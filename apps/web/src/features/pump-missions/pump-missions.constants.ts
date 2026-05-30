@@ -1,92 +1,109 @@
-import type { PumpMissionId } from "@iranautism/types";
+import type { PaidPumpMissionId, PumpMissionId, RegistrationPumpMissionId } from "@iranautism/types";
 
-export type PumpMission = {
-  id: PumpMissionId;
+type PumpMissionBase = {
   title: string;
   medalTitle: string;
   medalText: string;
   shortText: string;
-  minAmountToman: number;
-  stepAmountToman: number;
   isRepeatable: boolean;
   ticketCount: number | null;
-  accent: "medicine" | "rehabilitation" | "caregiving" | "general";
+  accent: "medicine" | "rehabilitation" | "caregiving" | "registration";
   featuredImage: {
     src: string;
     alt: string;
   };
 };
 
+export type PumpDonationMission = PumpMissionBase & {
+  kind: "DONATION";
+  id: PaidPumpMissionId;
+  minAmountToman: number;
+  stepAmountToman: number;
+};
+
+export type PumpRegistrationMission = PumpMissionBase & {
+  kind: "REGISTRATION";
+  id: RegistrationPumpMissionId;
+  minAmountToman: null;
+  stepAmountToman: null;
+};
+
+export type PumpMission = PumpDonationMission | PumpRegistrationMission;
+
 export const PUMP_MISSION_RULES = {
-  customMinAmountToman: 10_000,
+  medicineMinAmountToman: 100_000,
+  rehabilitationMinAmountToman: 150_000,
+  caregivingMinAmountToman: 250_000,
   amountStepToman: 10_000,
-  generalMinAmountToman: 200_000,
-  generalTicketCount: 3_000,
 } as const;
 
 export const PUMP_MISSIONS = [
   {
+    kind: "DONATION",
     id: "iran-autism-medicine-support",
     title: "کمک به هزینه دارو افراد اتیسم",
     medalTitle: "نشان همراهی دارو",
     medalText: "با خرید هر نشان دارو به یک فرد اتیسم کمک می‌کنید و این ماموریت کامل می‌شود.",
     shortText: "همراهی کوچک شما می‌تواند بخشی از هزینه داروی یک فرد اتیسم را سبک‌تر کند.",
-    minAmountToman: PUMP_MISSION_RULES.customMinAmountToman,
+    minAmountToman: PUMP_MISSION_RULES.medicineMinAmountToman,
     stepAmountToman: PUMP_MISSION_RULES.amountStepToman,
     isRepeatable: true,
     ticketCount: null,
     accent: "medicine",
     featuredImage: {
-      src: "/images/pump/iran-autism-family-hero.png",
-      alt: "تصویر حمایتی برای ماموریت کمک به هزینه دارو افراد اتیسم",
+      src: "/images/pump/medicine-support-badge.png",
+      alt: "نشان همراهی دارو برای کمک به هزینه دارو افراد اتیسم",
     },
   },
   {
+    kind: "DONATION",
     id: "iran-autism-rehabilitation-support",
     title: "کمک به هزینه توانبخشی افراد اتیسم",
     medalTitle: "نشان همراهی توانبخشی",
     medalText: "با خرید هر نشان توانبخشی به توانمند شدن یک فرد اتیسم کمک می‌کنید و این ماموریت کامل می‌شود.",
     shortText: "کمک شما به ادامه خدمات توانبخشی و مسیر رشد مهارت‌های روزمره می‌رسد.",
-    minAmountToman: PUMP_MISSION_RULES.customMinAmountToman,
+    minAmountToman: PUMP_MISSION_RULES.rehabilitationMinAmountToman,
     stepAmountToman: PUMP_MISSION_RULES.amountStepToman,
     isRepeatable: true,
     ticketCount: null,
     accent: "rehabilitation",
     featuredImage: {
-      src: "/images/pump/iran-autism-pump-banner.jpg",
-      alt: "تصویر حمایتی برای ماموریت کمک به هزینه توانبخشی افراد اتیسم",
+      src: "/images/pump/rehabilitation-support-shoes-badge.png",
+      alt: "نشان همراهی کفش برای کمک به هزینه توانبخشی افراد اتیسم",
     },
   },
   {
+    kind: "DONATION",
     id: "iran-autism-caregiving-support",
     title: "کمک به هزینه پرستاری افراد اتیسم",
     medalTitle: "نشان همراهی فرشته",
     medalText: "با خرید هر نشان فرشته به مراقبت از یک فرد اتیسم کمک می‌کنید و این ماموریت کامل می‌شود.",
     shortText: "این همراهی برای پشتیبانی از مراقبت روزانه و آرامش خانواده‌ها استفاده می‌شود.",
-    minAmountToman: PUMP_MISSION_RULES.customMinAmountToman,
+    minAmountToman: PUMP_MISSION_RULES.caregivingMinAmountToman,
     stepAmountToman: PUMP_MISSION_RULES.amountStepToman,
     isRepeatable: true,
     ticketCount: null,
     accent: "caregiving",
     featuredImage: {
-      src: "/images/pump/iran-autism-family-hero.png",
-      alt: "تصویر حمایتی برای ماموریت کمک به هزینه پرستاری افراد اتیسم",
+      src: "/images/pump/caregiving-support-angel-badge.png",
+      alt: "نشان همراهی فرشته برای کمک به هزینه پرستاری افراد اتیسم",
     },
   },
   {
-    id: "iran-autism-general-donation",
-    title: "کمک به انجمن اتیسم ایران",
-    medalTitle: "کمک طیف اتیسم",
-    medalText: "با هر کمک بالای ۲۰۰ هزار تومان به انجمن اتیسم ایران، این ماموریت کامل می‌شود.",
-    shortText: "یک حمایت مستقیم برای ادامه خدمات انجمن و همراهی گسترده‌تر با جامعه اتیسم.",
-    minAmountToman: PUMP_MISSION_RULES.generalMinAmountToman,
-    stepAmountToman: PUMP_MISSION_RULES.amountStepToman,
-    isRepeatable: true,
-    ticketCount: PUMP_MISSION_RULES.generalTicketCount,
-    accent: "general",
+    kind: "REGISTRATION",
+    id: "iran-autism-site-registration",
+    title: "ثبت‌نام در سایت انجمن اتیسم ایران",
+    medalTitle: "ماموریت رایگان",
+    medalText: "با تایید شماره موبایل و ثبت‌نام در سایت انجمن، این ماموریت رایگان کامل می‌شود.",
+    shortText: "بدون پرداخت، فقط با تایید شماره موبایل در سایت انجمن ماموریت را کامل کنید.",
+    minAmountToman: null,
+    stepAmountToman: null,
+    isRepeatable: false,
+    ticketCount: null,
+    accent: "registration",
     featuredImage: {
-      src: "/images/pump/iran-autism-pump-banner.jpg",
-      alt: "تصویر حمایتی برای ماموریت کمک به انجمن اتیسم ایران",
+      src: "/images/pump/iran-autism-logo-mark-transparent.png",
+      alt: "نشان انجمن اتیسم ایران برای ماموریت ثبت‌نام رایگان",
     },
   },
 ] as const satisfies readonly PumpMission[];
@@ -95,8 +112,8 @@ export const PUMP_BANNERS = [
   {
     id: "pump-support",
     eyebrow: "پامپ و انجمن اتیسم ایران",
-    title: "با هر حمایت، یک ماموریت در پامپ کامل می‌شود",
-    text: "نشان حمایتی را انتخاب کنید، شماره موبایل را تایید کنید و بعد از پرداخت امن به پامپ برگردید.",
+    title: "ماموریت پرداختی یا رایگان را انتخاب کنید",
+    text: "می‌توانید یکی از نشان‌های حمایتی را بخرید یا با ثبت‌نام رایگان، یک ماموریت بدون پرداخت را کامل کنید.",
     image: {
       src: "/images/pump/iran-autism-pump-banner.jpg",
       alt: "بنر ماموریت پامپ برای حمایت از انجمن اتیسم ایران",
@@ -106,7 +123,7 @@ export const PUMP_BANNERS = [
     id: "pump-trust",
     eyebrow: "حمایت شفاف",
     title: "مسیر کوتاه، اثر قابل پیگیری",
-    text: "مبلغ حمایت، شماره تاییدشده و نتیجه پرداخت در مسیر امن انجمن ثبت می‌شود.",
+    text: "شماره تاییدشده پایه بررسی ماموریت است؛ پرداخت‌های موفق و ثبت‌نام رایگان هرکدام جداگانه ثبت می‌شوند.",
     image: {
       src: "/images/pump/iran-autism-family-hero.png",
       alt: "بنر حمایت شفاف از خانواده‌های اتیسم در ماموریت پامپ",
@@ -128,13 +145,13 @@ export const PUMP_MISSION_COPY = {
   hero: {
     eyebrow: "ماموریت‌های ایران اتیسم در پامپ",
     title: "ماموریت حمایت را انتخاب کنید؛ نتیجه در پامپ ثبت می‌شود",
-    text: "برای تکمیل ماموریت فقط یک مسیر کوتاه دارید: انتخاب نشان، تایید شماره موبایل، پرداخت امن و برگشت به پامپ برای دریافت پاداش.",
+    text: "برای تکمیل ماموریت فقط یک مسیر کوتاه دارید: انتخاب نشان حمایتی یا ثبت‌نام رایگان، تایید شماره موبایل و برگشت به پامپ برای بررسی پاداش.",
     primaryCta: "دیدن ماموریت‌ها",
     secondaryCta: "ورود و مشاهده سوابق",
   },
   steps: {
     title: "مسیر تکمیل ماموریت",
-    items: ["انتخاب ماموریت", "تایید شماره موبایل", "پرداخت و برگشت به پامپ"],
+    items: ["انتخاب ماموریت", "تایید شماره موبایل", "پرداخت یا ثبت رایگان"],
   },
   assurance: {
     title: "چرا شماره موبایل مهم است؟",
@@ -143,10 +160,11 @@ export const PUMP_MISSION_COPY = {
   },
   list: {
     ariaLabel: "فهرست ماموریت‌های پامپ",
-    title: "یکی از نشان‌های حمایتی را انتخاب کنید",
-    text: "سه ماموریت اول با مبلغ دلخواه از ۱۰ هزار تومان شروع می‌شوند. کمک عمومی انجمن از ۲۰۰ هزار تومان، تیکت پامپ هم دارد.",
+    title: "یکی از ماموریت‌های فعال را انتخاب کنید",
+    text: "سه ماموریت حمایتی با مبلغ دلخواه از ۱۰ هزار تومان شروع می‌شوند. ماموریت ثبت‌نام رایگان است و فقط با تایید شماره موبایل کامل می‌شود.",
     ticketSuffix: "تیکت",
     amountPrefix: "شروع از",
+    freeLabel: "رایگان",
     cta: "شروع ماموریت",
   },
   amountStepper: {
@@ -163,6 +181,8 @@ export const PUMP_MISSION_COPY = {
     identityReadyTitle: "شماره ماموریت تایید شده است",
     startPayment: "پرداخت و شروع ماموریت",
     preparingPayment: "در حال انتقال به پرداخت...",
+    completeRegistration: "ثبت رایگان ماموریت",
+    completingRegistration: "در حال ثبت ماموریت...",
     otpFieldLabel: "کد تایید ماموریت",
     otpFieldHint: "بعد از تایید شماره، همین مبلغ و ماموریت حفظ می‌شود.",
     verifyOtp: "تایید شماره و ادامه",
@@ -180,6 +200,12 @@ export const PUMP_MISSION_COPY = {
       "اگر پرداخت موفق باشد، تکمیل ماموریت برای همین شماره ثبت می‌شود.",
       "در پایان می‌توانید به پامپ برگردید و پاداش را دریافت کنید.",
     ],
+    afterRegistrationTitle: "بعد از ثبت‌نام چه می‌شود؟",
+    afterRegistrationItems: [
+      "شماره تاییدشده شما برای این ماموریت ثبت می‌شود.",
+      "این ماموریت فقط یک بار برای هر شماره موبایل کامل می‌شود.",
+      "در پایان می‌توانید به پامپ برگردید و نتیجه را بررسی کنید.",
+    ],
   },
   messages: {
     otpSent: "کد تایید مخصوص ماموریت پامپ برای شما ارسال شد.",
@@ -188,5 +214,7 @@ export const PUMP_MISSION_COPY = {
     verified: "شماره شما تایید شد. حالا می‌توانید ماموریت را شروع کنید.",
     invalidOtp: "کد تایید معتبر نیست.",
     paymentFailed: "آماده‌سازی پرداخت با خطا روبه‌رو شد.",
+    registrationCompleted: "ماموریت ثبت‌نام رایگان برای شماره شما ثبت شد.",
+    registrationFailed: "ثبت ماموریت رایگان با خطا روبه‌رو شد.",
   },
 } as const;

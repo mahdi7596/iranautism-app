@@ -44,7 +44,7 @@ test("startPumpDonationIntent sends bearer token when provided", async () => {
 
   await client.startPumpDonationIntent({
     mobile: "09123456789",
-    missionId: "iran-autism-general-donation",
+    missionId: "iran-autism-caregiving-support",
     amountIrr: "2000000",
     gateway: "sadad",
   });
@@ -53,6 +53,31 @@ test("startPumpDonationIntent sends bearer token when provided", async () => {
     (calls[0]?.init.headers as Record<string, string>).authorization,
     "Bearer token_1",
   );
+});
+
+test("completePumpRegistrationMission sends bearer token", async () => {
+  const calls: Array<{ url: string; init: RequestInit }> = [];
+  const client = createApiClient({
+    baseUrl: "https://api.example.test",
+    getAccessToken: () => "token_1",
+    fetch: async (url, init) => {
+      calls.push({ url: String(url), init: init ?? {} });
+      return jsonResponse({
+        mobile: "09123456789",
+        missionId: "iran-autism-site-registration",
+        completed: true,
+      });
+    },
+  });
+
+  const response = await client.completePumpRegistrationMission();
+
+  assert.equal(
+    calls[0]?.url,
+    "https://api.example.test/api/public/missions/pump/registration-completions",
+  );
+  assert.equal((calls[0]?.init.headers as Record<string, string>).authorization, "Bearer token_1");
+  assert.equal(response.missionId, "iran-autism-site-registration");
 });
 
 test("getPaymentStatus reads backend payment truth", async () => {
