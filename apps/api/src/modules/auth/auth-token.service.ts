@@ -4,10 +4,8 @@ import { Injectable } from "@nestjs/common";
 
 @Injectable()
 export class AuthTokenService {
-  constructor(
-    private readonly secret = process.env.AUTH_TOKEN_SECRET ||
-      "local-development-auth-secret",
-  ) {}
+  private readonly secret =
+    process.env.AUTH_TOKEN_SECRET || "local-development-auth-secret";
 
   issueUserToken(userId: string): string {
     const payload = Buffer.from(
