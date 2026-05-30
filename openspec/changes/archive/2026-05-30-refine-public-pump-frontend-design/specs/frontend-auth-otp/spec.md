@@ -1,4 +1,4 @@
-## MODIFIED Requirements
+## ADDED Requirements
 
 ### Requirement: Login page is visually focused
 The system SHALL render the login/register OTP flow as a focused Persian auth page without the normal public header, footer, or repeated public pre-footer.
@@ -14,4 +14,3 @@ The system SHALL render the login/register OTP flow as a focused Persian auth pa
 #### Scenario: Login preserves OTP behavior
 - **WHEN** a user submits mobile and OTP steps
 - **THEN** existing mobile validation, OTP request, OTP verification, loading, error, and success behavior remains unchanged
-

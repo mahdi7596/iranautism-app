@@ -15,7 +15,7 @@ The system SHALL allow an authenticated frontend user to start a Pump mission do
 - **THEN** the backend uses the authenticated user's mobile as the mission identity anchor and does not trust a conflicting submitted mobile value
 
 ### Requirement: Pump mission seeds include all frontend missions
-The system SHALL have backend Pump mission configuration for all four frontend mission cards so frontend mission IDs, backend seed keys, and Pump verification keys remain aligned.
+The system SHALL have backend Pump mission configuration for all active frontend mission cards so frontend mission IDs, backend seed keys, and Pump verification keys remain aligned. The active set SHALL include the three paid support missions and the free registration mission, and SHALL NOT expose the retired general donation mission as an active frontend mission.
 
 #### Scenario: Medicine mission exists
 - **WHEN** the frontend starts the medicine-support Pump mission
@@ -29,7 +29,11 @@ The system SHALL have backend Pump mission configuration for all four frontend m
 - **WHEN** the frontend starts the caregiving-support Pump mission
 - **THEN** the backend recognizes that mission ID as a valid Pump mission
 
-#### Scenario: General donation mission exists
-- **WHEN** the frontend starts the general Iran Autism Pump mission
-- **THEN** the backend recognizes that mission ID as a valid Pump mission
+#### Scenario: Registration mission exists
+- **WHEN** the frontend starts the free registration Pump mission
+- **THEN** the backend recognizes that mission ID as a valid status-based Pump mission
+
+#### Scenario: General donation mission is not active
+- **WHEN** the active Pump mission seed set is applied
+- **THEN** `iran-autism-general-donation` is not treated as one of the active frontend Pump mission IDs
 

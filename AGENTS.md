@@ -31,6 +31,7 @@ This file is the root coordination document for the Iran Autism platform workspa
 - `docs/architecture-rules/deep-dive-agenda.md`
 - `docs/architecture-rules/progress.md`
 - `docs/decisions/backend-module-boundaries.md`
+- `docs/decisions/server-deployment-runbook.md`
 - `docs/product/modules/partner-missions-pump.md`
 - `docs/product/modules/pump-phase-1-user-flow-summary.md`
 - `docs/product/modules/frontend-design-review-feedback-2026-05-27.md`
@@ -71,6 +72,7 @@ Current active implementation focus:
 - Broader CMS, admin, media, reports, project/phase, Peyman, and frontend work remains outside the immediate backend focus unless separately confirmed.
 - All user-facing messages must be Persian by default across backend and frontend, including API error/success messages, validation text, form messages, toasts, empty states, and loading states.
 - When deployment/server upload is requested, remind the project owner that real Sadad credentials must be added to the server-side environment file or secret store on the server, not committed to the repository.
+- First preview deployment is documented in `docs/decisions/server-deployment-runbook.md`; current preview URL is `http://5.160.71.62/fa`, server checkout is `/var/www/iranautism-app`, and updates use GitHub pull plus pnpm build/migrate/restart.
 
 ## Current Backend Direction
 
@@ -181,6 +183,7 @@ The authoritative module list is maintained in `docs/product/module-registry.md`
 | 2026-05-25 | Live Sadad gateway contract hardened: numeric provider order IDs, PDF-aligned Sadad endpoints, backend callback verification before frontend result display, and documented Sadad referrer/domain deployment requirements. |
 | 2026-05-26 | Phase 1 Pump user-flow summary documented at `docs/product/modules/pump-phase-1-user-flow-summary.md`, covering mission selection, OTP identity, Sadad payment verification, Pump return/verification, and profile history. |
 | 2026-05-27 | Frontend design review feedback captured at `docs/product/modules/frontend-design-review-feedback-2026-05-27.md`; OpenSpec change `refine-public-pump-frontend-design` created and validated for the next correction pass. |
+| 2026-05-30 | First server preview deployment completed and documented in `docs/decisions/server-deployment-runbook.md`; direct-IP preview is live at `http://5.160.71.62/fa` pending final domain/proxy decision. |
 | 2026-05-30 | Pump mission set changed: `کمک به انجمن اتیسم ایران` retired from active starts and replaced with free one-time registration mission `iran-autism-site-registration`; details captured in OpenSpec change `replace-pump-general-donation-with-registration-mission` and Pump module docs. |
 
 ## Working Rules Going Forward
@@ -195,6 +198,7 @@ The authoritative module list is maintained in `docs/product/module-registry.md`
 - Before implementing the next public/Pump frontend correction pass, check `docs/product/modules/frontend-design-review-feedback-2026-05-27.md` and OpenSpec change `refine-public-pump-frontend-design`; update shared tokens/components before page-specific redesign.
 - All user-facing backend/frontend messages must be Persian by default. Use English only for internal code identifiers, logs intended only for developers/operators, protocol field names, or third-party provider constants.
 - When asked to upload/deploy the app to a server, explicitly remind that real Sadad credentials belong in the server `.env` file or server secret store and must not be committed into any repo file.
+- For future server updates, check `docs/decisions/server-deployment-runbook.md` for SSH target, server paths, systemd service names, Nginx routing, and the GitHub pull/build/migrate/restart flow.
 - For live Sadad, ensure the public domain/referrer, backend callback URL, and server IP match the Sadad portal configuration; frontend result pages should display backend payment truth by internal `paymentTransactionId`, not raw Sadad `OrderId`.
 - Before changing repo structure, workspace tooling, or admin app placement, check `docs/decisions/repository-architecture.md`.
 - Before deciding durable module, data ownership, API, state, CMS, security, operations, or testing rules, check `docs/architecture-rules/deep-dive-agenda.md` and convert the relevant topic into a focused decision document.

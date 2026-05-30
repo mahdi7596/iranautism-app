@@ -1,4 +1,4 @@
-## MODIFIED Requirements
+## ADDED Requirements
 
 ### Requirement: Frontend design primitives are reusable and token-driven
 The system SHALL provide reusable frontend primitives and design tokens that prevent repeated page-local styling for common UI patterns.
@@ -18,4 +18,3 @@ The system SHALL provide reusable frontend primitives and design tokens that pre
 #### Scenario: Feature components stay scoped
 - **WHEN** a component is generic across the frontend
 - **THEN** it belongs in `packages/ui`; when it is Iran Autism/Pump-specific, it belongs in `apps/web/src/features/*`
-

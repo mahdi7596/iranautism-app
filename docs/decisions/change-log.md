@@ -4,6 +4,12 @@ Use this file to record confirmed decisions, scope changes, module status change
 
 ## 2026-05-30
 
+### First Server Deployment Runbook Captured
+
+- Deployed the current app to the Iran Autism Ubuntu server for preview at `http://5.160.71.62/fa`.
+- Documented server SSH details, GitHub pull workflow, runtime packages, PostgreSQL/Redis/Nginx/systemd setup, env file locations, update commands, and verification checks in `docs/decisions/server-deployment-runbook.md`.
+- Security rule: the server password is not committed; it is stored locally in the project owner's macOS Keychain under `iranautism-server-panel`. Real Sadad/SMS credentials must remain server-side only.
+
 ### Sadad PAN Authentication Type Confirmed
 
 - Sadad confirmed that payment requests must send `PanAuthenticationType` with value `2`.

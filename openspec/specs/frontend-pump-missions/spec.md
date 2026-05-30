@@ -4,26 +4,30 @@
 TBD - created by archiving change implement-auth-pump-frontend. Update Purpose after archive.
 ## Requirements
 ### Requirement: Pump mission list uses Excel-defined missions only
-The system SHALL render exactly the four Pump missions listed in `docs/source/client/pump/V1.xlsx` and SHALL NOT add a registration-only or other mission unless it is added to the mission source and confirmed later.
+The system SHALL render the confirmed active Pump mission set as four mission cards: medicine support, rehabilitation support, caregiving support, and free site registration. The system SHALL NOT render the retired general Iran Autism donation mission as an active Pump mission.
 
 #### Scenario: Pump mission page lists four missions
 - **WHEN** a user opens the Pump mission page
-- **THEN** the page shows mission cards for medicine support, rehabilitation support, caregiving support, and general Iran Autism support only
+- **THEN** the page shows mission cards for medicine support, rehabilitation support, caregiving support, and free site registration only
 
-#### Scenario: Registration mission is absent
+#### Scenario: General donation mission is absent
 - **WHEN** the Pump mission page renders
-- **THEN** no registration-only mission card is shown
+- **THEN** no active mission card for `کمک به انجمن اتیسم ایران` is shown
+
+#### Scenario: Registration mission is present
+- **WHEN** the Pump mission page renders
+- **THEN** a free registration mission card is shown with Persian copy, a featured image, and a clear start action
 
 ### Requirement: Pump mission page visual layout
 The system SHALL provide a modern Persian RTL Pump mission page with a production-ready campaign first viewport, intentional campaign imagery, clear mission journey explanation, spacious mission cards, purposeful motion, accessible action hierarchy, and orange primary mission CTAs with readable text.
 
 #### Scenario: Banner and mission cards render
 - **WHEN** a user opens `/fa/missions/pump`
-- **THEN** the page displays an intentional Iran Autism/Pump campaign first viewport and four mission cards with Persian titles, medal text, amount/reward information, and clear CTA controls
+- **THEN** the page displays an intentional Iran Autism/Pump campaign first viewport and four mission cards with Persian titles, medal text, amount or free-registration information, and clear CTA controls
 
 #### Scenario: First viewport explains the user goal
 - **WHEN** a user opens `/fa/missions/pump`
-- **THEN** the first viewport explains that the user can choose a support mission, verify mobile, pay securely, and return to Pump for reward verification
+- **THEN** the first viewport explains that the user can choose a support or registration mission, verify mobile, complete any required payment for paid missions, and return to Pump for reward verification
 
 #### Scenario: CTA contrast is readable
 - **WHEN** a mission CTA or campaign CTA renders
@@ -48,15 +52,8 @@ The system SHALL allow the first three Pump missions to accept any donation amou
 - **WHEN** a user presses the decrease amount control at 10,000 toman
 - **THEN** the amount remains 10,000 toman and the frontend does not submit a lower value
 
-### Requirement: General donation mission uses spreadsheet threshold and ticket count
-The system SHALL display the general Iran Autism Pump mission with the spreadsheet text indicating a donation above 200,000 toman and a visible 3,000 ticket reward count.
-
-#### Scenario: General mission card displays reward
-- **WHEN** the general Iran Autism mission card renders
-- **THEN** it shows the 3,000 ticket count and describes the 200,000 toman qualifying threshold in Persian
-
 ### Requirement: Pump mission requires OTP-authenticated mobile identity
-The system SHALL require a logged-in user identity before starting a Pump donation payment and SHALL use the authenticated user's mobile number if the user is already logged in.
+The system SHALL require a logged-in user identity before completing a Pump mission and SHALL use the authenticated user's mobile number if the user is already logged in.
 
 #### Scenario: Logged-in user starts mission
 - **WHEN** a logged-in user opens a Pump mission detail page
@@ -64,7 +61,7 @@ The system SHALL require a logged-in user identity before starting a Pump donati
 
 #### Scenario: Anonymous user starts mission
 - **WHEN** an anonymous user chooses a Pump mission
-- **THEN** the frontend asks for mobile, requests OTP with `otpPurpose` set to `pump_mission`, verifies the OTP, and then allows mission payment
+- **THEN** the frontend asks for mobile, requests OTP with `otpPurpose` set to `pump_mission`, verifies the OTP, and then allows the mission's paid or free completion action
 
 ### Requirement: Pump donation intent starts payment
 The system SHALL create a Pump donation intent for the selected mission and amount, start payment for the returned payment transaction, and redirect the browser to the returned Sadad redirect URL.
@@ -85,11 +82,15 @@ The system SHALL use `https://pwa.pumpgame.ir/missions` as the current return ta
 - **THEN** the browser navigates to `https://pwa.pumpgame.ir/missions`
 
 ### Requirement: Pump mission detail is a guided checkout journey
-The system SHALL render Pump mission detail pages as guided mission checkout journeys that connect mission context, amount selection, mobile identity, OTP verification, payment start, and post-payment expectations.
+The system SHALL render Pump mission detail pages as guided mission journeys that connect mission context, mobile identity, OTP verification, and the relevant completion action for the selected mission.
 
-#### Scenario: Mission detail shows clear steps
-- **WHEN** an anonymous user opens `/fa/missions/pump/[missionId]`
+#### Scenario: Paid mission detail shows clear steps
+- **WHEN** an anonymous user opens a paid support mission detail page
 - **THEN** the page shows the selected mission, amount controls, mobile verification step, payment step, and what happens after payment in a clear Persian flow
+
+#### Scenario: Registration mission detail shows free completion steps
+- **WHEN** an anonymous user opens the registration mission detail page
+- **THEN** the page shows the selected mission, mobile verification step, free completion action, and return-to-Pump guidance without amount controls or Sadad payment copy
 
 #### Scenario: Authenticated mission skips duplicate mobile entry
 - **WHEN** an authenticated user opens a mission detail page

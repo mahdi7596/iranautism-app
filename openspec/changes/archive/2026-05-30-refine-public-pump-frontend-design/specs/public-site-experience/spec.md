@@ -49,6 +49,8 @@ The system SHALL use reusable public page composition patterns for first viewpor
 - **WHEN** public CTA, secondary, quiet, icon, or form buttons render
 - **THEN** they do not use decorative shadow styling and preserve accessible focus, hover, active, disabled, and loading states
 
+## ADDED Requirements
+
 ### Requirement: Login uses an auth-only layout
 The system SHALL render the login page as a focused auth surface without the public header and footer.
 
@@ -59,4 +61,3 @@ The system SHALL render the login page as a focused auth surface without the pub
 #### Scenario: Public header routes to login
 - **WHEN** an anonymous user activates the public header login/account control
 - **THEN** the browser navigates to `/fa/login`
-

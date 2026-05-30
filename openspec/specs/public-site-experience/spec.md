@@ -7,42 +7,50 @@ TBD - created by archiving change redesign-public-pump-user-experience. Update P
 The system SHALL render a public app shell whose brand placement, navigation grouping, actions, spacing, and footer are intentional for Persian RTL users on desktop and mobile.
 
 #### Scenario: Desktop public header renders in RTL
-- **WHEN** a user opens any `/fa` public, auth, payment, or account route on a desktop viewport
-- **THEN** the header shows the brand, navigation links, and primary actions in a clear RTL reading order without accidental left/right placement or visual imbalance
+- **WHEN** a user opens any `/fa` public, payment, or account route on a desktop viewport
+- **THEN** the header shows the logo first at the RTL start, followed by main navigation items on the right side after the logo, with account/login actions visually separated from primary navigation
+
+#### Scenario: Anonymous account entry avoids profile styling
+- **WHEN** an anonymous user sees the public header
+- **THEN** the account/login entry does not use a purple profile icon and clearly routes the user to `/fa/login`
+
+#### Scenario: Logged-in account entry may use profile icon
+- **WHEN** a logged-in user sees the public header
+- **THEN** the account entry may use a profile icon and profile-oriented styling
 
 #### Scenario: Mobile public header fits
-- **WHEN** a user opens any `/fa` public, auth, payment, or account route on a mobile viewport
+- **WHEN** a user opens any `/fa` public, payment, or account route on a mobile viewport
 - **THEN** the header content fits without overlap, clipped text, horizontal scrolling, or ambiguous navigation order
 
 #### Scenario: Footer matches public shell
-- **WHEN** any implemented frontend route renders
-- **THEN** the footer uses the same visual system as the header and does not look like placeholder or default framework output
+- **WHEN** any implemented frontend route renders with the public shell
+- **THEN** the footer and repeated pre-footer area render as full-width bands whose inner content aligns with the header content width
 
 ### Requirement: Persian homepage is a real public entry point
-The system SHALL replace the placeholder homepage with a production-ready Persian public entry point for the Iran Autism platform.
+The system SHALL render a production-ready Persian public entry point for the Iran Autism platform that follows the approved visual reference direction.
 
-#### Scenario: Homepage opens with product purpose
+#### Scenario: Homepage hero is a three-slide slider
 - **WHEN** a user opens `/fa`
-- **THEN** the first viewport communicates the Iran Autism platform purpose and provides clear paths to the active Pump mission flow and account/login area
+- **THEN** the homepage first viewport renders a three-slide hero containing the corrected current hero concept, a `Trust & Progress` reference-led slide, and a Persian `شفافیت بالینی` reference-led slide
 
-#### Scenario: Homepage avoids unsupported module claims
-- **WHEN** the homepage references future platform areas
-- **THEN** it uses conservative copy and does not imply unfinished CMS, admin, media, reports, Peyman, or construction modules are already available
+#### Scenario: Current hero visual issues are fixed
+- **WHEN** the current hero concept slide renders
+- **THEN** its image starts at the hero section start without a gap, its heart animation is visible, and its CTA buttons render without shadows
 
-#### Scenario: Homepage is visually complete
-- **WHEN** the homepage renders on desktop or mobile
-- **THEN** it does not contain scaffold text, framework placeholder language, empty white expanses, or unfinished technical copy
+#### Scenario: Hero slider is accessible
+- **WHEN** a keyboard or reduced-motion user interacts with the hero slider
+- **THEN** slides can be controlled without pointer-only interaction and motion is reduced or disabled without hiding content
 
 ### Requirement: Public pages use consistent composition patterns
-The system SHALL use reusable public page composition patterns for first viewports, section headings, action groups, cards, forms, and state surfaces.
+The system SHALL use reusable public page composition patterns for first viewports, section headings, action groups, cards, forms, sliders, and state surfaces.
 
-#### Scenario: Public route composition is consistent
-- **WHEN** a user moves between `/fa`, `/fa/login`, `/fa/missions/pump`, `/fa/payments/sadad/result`, and `/fa/profile/pump-missions`
-- **THEN** page gutters, typography rhythm, action hierarchy, and state surfaces feel like one product experience
+#### Scenario: Titles use the corrected scale
+- **WHEN** public page, section, card, or form titles render outside true hero headlines
+- **THEN** they use the smaller project title scale near a `text-xl` equivalent instead of oversized display typography
 
-#### Scenario: Responsive page sections fit
-- **WHEN** public pages render at desktop and mobile widths
-- **THEN** headings, body copy, buttons, media, cards, and forms fit their containers without text overlap, accidental wrapping, or horizontal overflow
+#### Scenario: Buttons are flat
+- **WHEN** public CTA, secondary, quiet, icon, or form buttons render
+- **THEN** they do not use decorative shadow styling and preserve accessible focus, hover, active, disabled, and loading states
 
 ### Requirement: Public visual language is credible and non-generic
 The system SHALL present a polished nonprofit platform visual language that feels custom to Iran Autism rather than a generic template.
@@ -54,4 +62,15 @@ The system SHALL present a polished nonprofit platform visual language that feel
 #### Scenario: Imagery is intentional
 - **WHEN** a page uses imagery
 - **THEN** the image crop, placement, alt behavior, and surrounding copy support the user journey and do not feel like a rough placeholder banner
+
+### Requirement: Login uses an auth-only layout
+The system SHALL render the login page as a focused auth surface without the public header and footer.
+
+#### Scenario: Login hides global shell chrome
+- **WHEN** a user opens `/fa/login`
+- **THEN** the page does not render the public header, public footer, or repeated pre-footer section
+
+#### Scenario: Public header routes to login
+- **WHEN** an anonymous user activates the public header login/account control
+- **THEN** the browser navigates to `/fa/login`
 
